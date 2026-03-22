@@ -766,7 +766,8 @@
     .settings-body {
       flex: 1;
       overflow-y: auto;
-      padding: 0;
+      padding: 16px;
+      background: #F0F2F5;
     }
 
     .settings-section {
@@ -779,6 +780,66 @@
       color: #075E54;
       margin-bottom: 12px;
     }
+
+    /* New card-based settings */
+    .settings-card {
+      background: #fff;
+      border: 1px solid #E8E8E8;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .settings-card-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #075E54;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 10px;
+    }
+
+    .settings-action-card {
+      background: #F5F6F6;
+      border-radius: 12px;
+      padding: 16px;
+      cursor: pointer;
+      transition: all 0.15s;
+      text-align: center;
+    }
+    .settings-action-card:hover {
+      background: #E9EDEF;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .settings-action-card:active { transform: translateY(0); }
+    .settings-action-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #111B21;
+      margin-top: 6px;
+    }
+    .settings-action-desc {
+      font-size: 11px;
+      color: #667781;
+      margin-top: 2px;
+    }
+
+    .settings-input {
+      width: 100%;
+      padding: 10px 14px;
+      background: #F5F6F6;
+      border: 1px solid #E8E8E8;
+      border-radius: 8px;
+      font-size: 14px;
+      color: #111B21;
+      font-family: inherit;
+    }
+    .settings-input:focus { outline: none; border-color: #25D366; }
+
+    .settings-btn { padding: 10px 20px; border-radius: 8px; border: none; font-size: 14px; cursor: pointer; font-weight: 500; }
+    .settings-btn-primary { background: #25D366; color: #fff; }
+    .settings-btn-primary:hover { background: #20B954; }
 
     .setting-row {
       display: flex;
@@ -1113,129 +1174,118 @@
       <!-- Settings Panel (slides over sidebar) -->
       <div class="settings-panel" id="settingsPanel">
         <div class="settings-header">
-          <button class="back-btn" id="settingsBack">&#8592;</button>
+          <button class="back-btn" id="settingsBack">&#8592; Back to Chats</button>
           <h2>Settings</h2>
         </div>
         <div class="settings-body">
 
-          <!-- License / Plan -->
-          <div class="settings-section" id="settingsLicenseInfo">
+          <!-- Plan Banner -->
+          <div class="settings-card" id="settingsLicenseInfo" style="background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;cursor:pointer" onclick="document.getElementById('settingsUpgradeBtn').click()">
             <div style="display:flex;align-items:center;justify-content:space-between">
               <div>
-                <span style="font-size:14px;font-weight:500" id="settingsTierBadge">Free Plan</span>
-                <span style="font-size:12px;color:#667781" id="settingsLicenseEmail"></span>
+                <div style="font-size:18px;font-weight:700" id="settingsTierBadge">Free Plan</div>
+                <div style="font-size:12px;opacity:0.8;margin-top:2px">Tap to upgrade for more features</div>
+                <span style="display:none" id="settingsLicenseEmail"></span>
               </div>
-              <button class="settings-btn settings-btn-primary" style="font-size:12px;padding:4px 14px" id="settingsUpgradeBtn">Upgrade</button>
+              <span style="font-size:28px">&#10148;</span>
+            </div>
+            <button id="settingsUpgradeBtn" style="display:none"></button>
+          </div>
+
+          <!-- Big Action Cards -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+            <div class="settings-action-card" onclick="document.getElementById('settingsBack').click();document.getElementById('btnPairMobile').click()">
+              <span style="font-size:28px">&#128241;</span>
+              <div class="settings-action-title">Connect Phone</div>
+              <div class="settings-action-desc">Use SupaMsg on your iPhone</div>
+            </div>
+            <div class="settings-action-card" onclick="settingsAction('addAccount')">
+              <span style="font-size:28px">&#10133;</span>
+              <div class="settings-action-title">Add Account</div>
+              <div class="settings-action-desc">Connect another WhatsApp</div>
+            </div>
+            <div class="settings-action-card" onclick="settingsAction('apiKey')">
+              <span style="font-size:28px">&#10024;</span>
+              <div class="settings-action-title">Setup AI</div>
+              <div class="settings-action-desc">Enable smart replies & more</div>
+            </div>
+            <div class="settings-action-card" onclick="settingsAction('licenseKey')">
+              <span style="font-size:28px">&#128273;</span>
+              <div class="settings-action-title">Enter License Key</div>
+              <div class="settings-action-desc">Activate Pro or Business</div>
             </div>
           </div>
 
-          <!-- Accounts section -->
-          <div class="settings-section">
-            <div class="settings-section-title">Accounts</div>
-            <div id="stealthAccountsList"></div>
-          </div>
-
-          <!-- Notifications -->
-          <div class="settings-section">
-            <div class="settings-section-title">Notifications</div>
+          <!-- Simple toggles -->
+          <div class="settings-card">
+            <div class="settings-card-title">Notifications</div>
             <div class="setting-row">
-              <div><div class="setting-label">Notifications</div><div class="setting-desc">Show native macOS notifications</div></div>
+              <div class="setting-label">Show notifications</div>
               <div class="toggle" data-key="notifications"></div>
             </div>
             <div class="setting-row">
-              <div><div class="setting-label">Notification Sound</div><div class="setting-desc">Play sound with notifications</div></div>
+              <div class="setting-label">Play sound</div>
               <div class="toggle" data-key="notificationSound"></div>
             </div>
             <div class="setting-row">
-              <div><div class="setting-label">Do Not Disturb</div><div class="setting-desc">Suppress all notifications</div></div>
+              <div class="setting-label">Do Not Disturb</div>
               <div class="toggle" data-key="dnd"></div>
             </div>
           </div>
 
-          <!-- Privacy / Stealth -->
-          <div class="settings-section">
-            <div class="settings-section-title">Privacy</div>
+          <div class="settings-card">
+            <div class="settings-card-title">General</div>
             <div class="setting-row">
-              <div><div class="setting-label">Launch at Login</div><div class="setting-desc">Start when you log in</div></div>
+              <div class="setting-label">Open at startup</div>
               <div class="toggle" data-key="launchAtLogin"></div>
             </div>
           </div>
 
-          <!-- Appearance -->
-          <div class="settings-section">
-            <div class="settings-section-title">Appearance</div>
-            <div class="mode-option active" data-mode="whatsapp" onclick="switchMode('whatsapp')">
-              <div class="mode-radio"></div>
-              <div>
-                <div class="mode-option-label">WhatsApp Mode</div>
-                <div class="mode-option-desc">Classic WhatsApp look (default)</div>
-              </div>
-            </div>
-            <div class="mode-option" data-mode="simple" onclick="switchMode('simple')">
-              <div class="mode-radio"></div>
-              <div>
-                <div class="mode-option-label">Simple Mode</div>
-                <div class="mode-option-desc">Minimal, clean interface</div>
-              </div>
-            </div>
-            <div class="mode-option" data-mode="pro" onclick="switchMode('pro')">
-              <div class="mode-radio"></div>
-              <div>
-                <div class="mode-option-label">Pro Mode</div>
-                <div class="mode-option-desc">All tools visible, power user layout</div>
-              </div>
-            </div>
+          <!-- Accounts list -->
+          <div class="settings-card">
+            <div class="settings-card-title">My Accounts</div>
+            <div id="stealthAccountsList"></div>
           </div>
 
-          <!-- AI Helper -->
-          <div class="settings-section">
-            <div class="settings-section-title">AI Helper</div>
-            <div class="popup-form-group" style="margin-top:8px">
-              <label>Anthropic API Key</label>
-              <input class="settings-input" id="anthropicKey" type="password" placeholder="sk-ant-...">
-            </div>
-            <div style="margin-top:8px">
-              <button class="settings-btn settings-btn-primary" id="saveApiKey">Save API Key</button>
-            </div>
+          <!-- Hidden inputs for API key and license (shown by settingsAction) -->
+          <div class="settings-card" id="apiKeyCard" style="display:none">
+            <div class="settings-card-title">AI Setup</div>
+            <div style="font-size:12px;color:#667781;margin-bottom:8px">Get your API key from <a href="#" style="color:#25D366" onclick="window.open('https://console.anthropic.com/settings/keys')">console.anthropic.com</a></div>
+            <input class="settings-input" id="anthropicKey" type="password" placeholder="Paste your API key here (sk-ant-...)">
+            <button class="settings-btn settings-btn-primary" id="saveApiKey" style="margin-top:8px;width:100%">Save & Enable AI</button>
           </div>
 
-          <!-- CRM Integration -->
-          <div class="settings-section">
-            <div class="settings-section-title">CRM Integration</div>
+          <div class="settings-card" id="licenseKeyCard" style="display:none">
+            <div class="settings-card-title">Activate License</div>
+            <div style="font-size:12px;color:#667781;margin-bottom:8px">Paste the license key you received after purchase</div>
+            <input class="settings-input" id="licenseKeyInput" placeholder="WH-...">
+            <input class="settings-input" id="licenseEmailInput" placeholder="Your email" style="margin-top:6px">
+            <button class="settings-btn settings-btn-primary" id="activateLicenseBtn" style="margin-top:8px;width:100%">Activate</button>
+            <div id="licenseStatus" style="margin-top:6px;font-size:12px"></div>
+          </div>
+
+          <!-- CRM (hidden by default, shown for pro users) -->
+          <div class="settings-card" id="crmCard" style="display:none">
+            <div class="settings-card-title">CRM Integration</div>
             <div class="setting-row">
-              <div><div class="setting-label">HubSpot</div><div class="setting-desc">Connect your HubSpot CRM</div></div>
+              <div class="setting-label">HubSpot</div>
               <div class="toggle" id="toggleHubspot" data-crm="hubspot"></div>
             </div>
-            <div class="popup-form-group" id="hubspotKeyGroup" style="display:none;margin-top:4px">
+            <div id="hubspotKeyGroup" style="display:none;margin-top:4px">
               <input class="settings-input" id="hubspotKey" type="password" placeholder="HubSpot API Key">
             </div>
             <div class="setting-row">
-              <div><div class="setting-label">Zoho CRM</div><div class="setting-desc">Connect your Zoho CRM</div></div>
+              <div class="setting-label">Zoho CRM</div>
               <div class="toggle" id="toggleZoho" data-crm="zoho"></div>
             </div>
-            <div class="popup-form-group" id="zohoKeyGroup" style="display:none;margin-top:4px">
+            <div id="zohoKeyGroup" style="display:none;margin-top:4px">
               <input class="settings-input" id="zohoKey" type="password" placeholder="Zoho OAuth Token">
             </div>
-            <div style="margin-top:8px">
-              <button class="settings-btn settings-btn-primary" id="saveCrmSettings">Save CRM Settings</button>
-            </div>
+            <button class="settings-btn settings-btn-primary" id="saveCrmSettings" style="margin-top:8px;width:100%">Save</button>
           </div>
 
-          <!-- Subscription -->
-          <div class="settings-section">
-            <div class="settings-section-title">Subscription</div>
-            <div style="font-size:13px;color:#667781">
-              Manage your plan and billing from the upgrade panel.
-            </div>
-          </div>
-
-          <!-- About -->
-          <div class="settings-section">
-            <div class="settings-section-title">About</div>
-            <div style="font-size:13px;color:#667781">
-              SupaMsg &mdash; Multi-account WhatsApp Manager<br>
-              <span style="font-size:11px">Supercharge your WhatsApp experience.</span>
-            </div>
+          <div style="text-align:center;padding:16px;font-size:11px;color:#667781">
+            SupaMsg v1.0.0 &mdash; All your WhatsApps, one window
           </div>
         </div>
       </div>
@@ -1685,6 +1735,22 @@
 
     function escapeHtml(str) {
       return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+    }
+
+    // ── Settings actions ──
+    function settingsAction(action) {
+      if (action === 'addAccount') {
+        document.getElementById('settingsBack').click();
+        setTimeout(() => document.getElementById('addBtn').click(), 300);
+      } else if (action === 'apiKey') {
+        const card = document.getElementById('apiKeyCard');
+        card.style.display = card.style.display === 'none' ? 'block' : 'none';
+        if (card.style.display === 'block') card.scrollIntoView({ behavior: 'smooth' });
+      } else if (action === 'licenseKey') {
+        const card = document.getElementById('licenseKeyCard');
+        card.style.display = card.style.display === 'none' ? 'block' : 'none';
+        if (card.style.display === 'block') card.scrollIntoView({ behavior: 'smooth' });
+      }
     }
 
     // ── Tab context menu ──
