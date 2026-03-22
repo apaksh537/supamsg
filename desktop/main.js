@@ -736,6 +736,31 @@ ipcMain.handle('generate-pairing-qr', async () => {
   return { qrDataUrl, code, ip: localIp };
 });
 
+// Open Lemon Squeezy checkout inside the app
+ipcMain.on('open-checkout', (_event, url) => {
+  const checkoutWin = new BrowserWindow({
+    width: 500,
+    height: 700,
+    parent: mainWindow,
+    modal: true,
+    show: true,
+    titleBarStyle: 'hidden',
+    trafficLightPosition: { x: 12, y: 12 },
+    backgroundColor: '#FFFFFF',
+    webPreferences: {
+      contextIsolation: true,
+      nodeIntegration: false,
+    },
+  });
+
+  checkoutWin.loadURL(url);
+
+  // If user closes checkout window, that's fine
+  checkoutWin.on('closed', () => {
+    // The upgrade panel is still polling for license activation
+  });
+});
+
 ipcMain.on('wa-notification', (_event, { accountId, title, body }) => {
   showNotification(accountId, title, body);
 });

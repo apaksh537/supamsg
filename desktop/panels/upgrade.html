@@ -251,7 +251,37 @@ body {
     async function selectPlan(tier) {
       try {
         const url = await hub.getCheckoutUrl(tier, isAnnual);
-        if (url) window.open(url, '_blank');
+        if (url) {
+          // Open checkout in-app via IPC (main process opens a BrowserWindow)
+          hub.openCheckout(url);
+
+          // Show waiting state
+          document.getElementById('btn-pro').disabled = true;
+          document.getElementById('btn-business').disabled = true;
+          document.getElementById('btn-' + tier).textContent = 'Completing payment...';
+
+          // Poll for license activation (check every 5 seconds for 5 minutes)
+          let attempts = 0;
+          const pollInterval = setInterval(async () => {
+            attempts++;
+            try {
+              const license = await hub.getLicense();
+              if (license && license.tier !== 'free') {
+                clearInterval(pollInterval);
+                document.getElementById('btn-' + tier).textContent = '✓ Activated!';
+                document.getElementById('btn-' + tier).style.background = '#25D366';
+                document.getElementById('btn-' + tier).style.color = '#fff';
+                setTimeout(() => window.close(), 1500);
+              }
+            } catch (e) {}
+            if (attempts > 60) { // 5 minutes
+              clearInterval(pollInterval);
+              document.getElementById('btn-pro').disabled = false;
+              document.getElementById('btn-business').disabled = false;
+              document.getElementById('btn-' + tier).textContent = tier === 'pro' ? 'Get Pro' : 'Get Business';
+            }
+          }, 5000);
+        }
       } catch (e) {}
     }
 

@@ -88,6 +88,9 @@ contextBridge.exposeInMainWorld('hub', {
   // Pairing
   generatePairingQR: () => ipcRenderer.invoke('generate-pairing-qr'),
 
+  // Checkout
+  openCheckout: (url) => ipcRenderer.send('open-checkout', url),
+
   // Dialogs (native)
   showInputDialog: (opts) => ipcRenderer.invoke('show-input-dialog', opts),
   showConfirmDialog: (opts) => ipcRenderer.invoke('show-confirm-dialog', opts),
