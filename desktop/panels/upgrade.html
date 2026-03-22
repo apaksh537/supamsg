@@ -2,186 +2,279 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Upgrade</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
-  background: #FFFFFF;
-  color: #111B21;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
+  background: #FFFFFF; color: #111B21;
+  overflow: hidden; display: flex; flex-direction: column; height: 100vh;
 }
 .panel-header {
-  height: 48px;
-  display: flex;
-  align-items: center;
-  padding: 0 16px;
-  border-bottom: 1px solid #E8E8E8;
-  -webkit-app-region: drag;
-  flex-shrink: 0;
+  height: 48px; display: flex; align-items: center; padding: 0 16px;
+  border-bottom: 1px solid #E8E8E8; -webkit-app-region: drag; flex-shrink: 0;
 }
-.panel-title { font-size: 16px; font-weight: 600; color: #111B21; flex: 1; }
+.panel-title { font-size: 16px; font-weight: 600; flex: 1; }
 .panel-close {
-  width: 28px; height: 28px; border-radius: 6px; border: none;
-  background: none; color: #667781; font-size: 18px; cursor: pointer;
+  width: 28px; height: 28px; border-radius: 6px; border: none; background: none;
+  color: #667781; font-size: 18px; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
-  -webkit-app-region: no-drag;
-  transition: all 0.15s;
+  -webkit-app-region: no-drag; transition: all 0.15s;
 }
 .panel-close:hover { background: #F0F2F5; color: #111B21; }
 .panel-body { flex: 1; overflow-y: auto; padding: 20px; }
+
+/* Billing toggle */
 .billing-toggle {
   display: flex; align-items: center; justify-content: center;
-  gap: 12px; margin-bottom: 20px;
+  background: #F0F2F5; border-radius: 8px; padding: 3px; margin-bottom: 20px;
 }
-.billing-option {
-  font-size: 13px; color: #667781; cursor: pointer; padding: 6px 0;
-  transition: color 0.15s;
+.billing-opt {
+  flex: 1; text-align: center; padding: 8px 16px; border-radius: 6px;
+  font-size: 14px; font-weight: 500; color: #667781; cursor: pointer;
+  transition: all 0.2s; position: relative;
 }
-.billing-option.active { color: #111B21; font-weight: 600; }
-.billing-switch {
-  width: 44px; height: 24px; border-radius: 12px;
-  background: #25D366; cursor: pointer; position: relative;
-  transition: background 0.2s;
+.billing-opt.active { background: #fff; color: #111B21; box-shadow: 0 1px 3px rgba(0,0,0,0.1); font-weight: 600; }
+.billing-opt .save-tag {
+  position: absolute; top: -8px; right: -4px;
+  background: #25D366; color: #fff; font-size: 9px; font-weight: 700;
+  padding: 2px 6px; border-radius: 8px; letter-spacing: 0.3px;
 }
-.billing-switch::after {
-  content: ''; position: absolute; top: 2px; left: 2px;
-  width: 20px; height: 20px; border-radius: 50%; background: #fff;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.2); transition: transform 0.2s;
-}
-.billing-switch.annual::after { transform: translateX(20px); }
-.save-badge {
-  font-size: 10px; background: #E8F8EE; color: #25D366;
-  padding: 2px 6px; border-radius: 4px; font-weight: 600;
-}
-.plans-row {
-  display: flex; gap: 12px;
-}
+
+/* Plans */
+.plans-row { display: flex; gap: 12px; margin-bottom: 16px; }
 .plan-card {
-  flex: 1; border: 2px solid #E8E8E8; border-radius: 12px;
-  padding: 20px; position: relative;
-  transition: border-color 0.2s;
+  flex: 1; border: 2px solid #E8E8E8; border-radius: 12px; padding: 20px;
+  position: relative; transition: all 0.2s; cursor: default;
 }
-.plan-card:hover { border-color: #CED0D1; }
+.plan-card:hover { border-color: #CED0D1; box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
 .plan-card.popular { border-color: #25D366; }
 .popular-badge {
-  position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
-  background: #25D366; color: #fff; font-size: 10px; font-weight: 600;
-  padding: 2px 10px; border-radius: 10px; text-transform: uppercase;
-  letter-spacing: 0.5px;
+  position: absolute; top: -11px; left: 50%; transform: translateX(-50%);
+  background: #25D366; color: #fff; font-size: 10px; font-weight: 700;
+  padding: 2px 12px; border-radius: 10px; text-transform: uppercase; letter-spacing: 0.5px;
 }
-.plan-name { font-size: 16px; font-weight: 700; color: #111B21; margin-bottom: 4px; }
-.plan-price { font-size: 28px; font-weight: 700; color: #111B21; }
-.plan-price span { font-size: 13px; font-weight: 400; color: #667781; }
+.plan-name { font-size: 14px; font-weight: 700; color: #111B21; margin-bottom: 8px; }
+.plan-price { font-size: 32px; font-weight: 800; color: #111B21; line-height: 1; }
+.plan-price .period { font-size: 14px; font-weight: 400; color: #667781; }
+
+/* Annual breakdown — the key motivator */
+.plan-annual-info {
+  margin-top: 8px; padding: 8px 12px; background: #F0FFF4; border-radius: 8px;
+  border: 1px solid #D1FAE5;
+}
+.plan-annual-total { font-size: 14px; font-weight: 600; color: #111B21; }
+.plan-annual-save {
+  font-size: 12px; font-weight: 700; color: #25D366; margin-top: 2px;
+  display: flex; align-items: center; gap: 4px;
+}
+.plan-monthly-compare {
+  margin-top: 4px; font-size: 12px; color: #667781;
+  text-decoration: line-through;
+}
+
+/* Feature list */
 .plan-features { list-style: none; margin: 16px 0; }
 .plan-features li {
-  font-size: 13px; color: #667781; padding: 4px 0;
+  font-size: 13px; color: #111B21; padding: 5px 0;
   display: flex; align-items: center; gap: 8px;
 }
-.plan-features li::before {
-  content: '';
-  width: 16px; height: 16px; border-radius: 50%;
-  background: #E8F8EE; flex-shrink: 0;
+.plan-features li .check-circle {
+  width: 18px; height: 18px; border-radius: 50%; background: #E8F8EE;
   display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; color: #25D366; font-size: 11px; font-weight: 700;
 }
-.check { color: #25D366; font-weight: bold; }
+
+/* CTA buttons */
 .plan-btn {
-  width: 100%; height: 36px; border: none; border-radius: 8px;
-  font-size: 13px; font-weight: 500; cursor: pointer;
-  transition: all 0.15s;
+  width: 100%; height: 40px; border: none; border-radius: 8px;
+  font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.15s;
 }
-.plan-btn-primary {
-  background: #25D366; color: #fff;
-}
+.plan-btn-primary { background: #25D366; color: #fff; }
 .plan-btn-primary:hover { background: #1FAA59; }
-.plan-btn-outline {
-  background: none; border: 1px solid #25D366; color: #25D366;
-}
+.plan-btn-outline { background: none; border: 1.5px solid #25D366; color: #25D366; }
 .plan-btn-outline:hover { background: #F0FFF4; }
+
+/* License key section */
+.license-section {
+  margin-top: 16px; padding-top: 16px; border-top: 1px solid #E8E8E8;
+}
+.license-toggle {
+  font-size: 13px; color: #667781; cursor: pointer; text-align: center;
+  transition: color 0.15s;
+}
+.license-toggle:hover { color: #25D366; }
+.license-form { display: none; margin-top: 12px; }
+.license-form.visible { display: block; }
+.license-input {
+  width: 100%; height: 40px; padding: 0 12px; background: #F0F2F5;
+  border: none; border-radius: 8px; font-size: 14px; color: #111B21;
+  outline: none; margin-bottom: 8px;
+}
+.license-input:focus { box-shadow: 0 0 0 2px rgba(37,211,102,0.3); }
+.license-btn {
+  width: 100%; height: 36px; border: none; border-radius: 8px;
+  background: #111B21; color: #fff; font-size: 13px; font-weight: 500;
+  cursor: pointer; transition: background 0.15s;
+}
+.license-btn:hover { background: #2C3E50; }
+.license-status { font-size: 12px; margin-top: 6px; text-align: center; }
+
+/* Guarantee badge */
+.guarantee {
+  text-align: center; margin-top: 16px; padding: 12px;
+  background: #FAFAFA; border-radius: 8px;
+}
+.guarantee-text { font-size: 12px; color: #667781; }
+.guarantee-text strong { color: #111B21; }
 </style>
 </head>
 <body>
   <div class="panel-header">
-    <span class="panel-title">Upgrade</span>
+    <span class="panel-title">Upgrade SupaMsg</span>
     <button class="panel-close" onclick="hub.closePanel('upgrade')">&times;</button>
   </div>
   <div class="panel-body">
+
+    <!-- Billing toggle -->
     <div class="billing-toggle">
-      <span class="billing-option active" id="label-monthly">Monthly</span>
-      <div class="billing-switch" id="billing-switch" onclick="toggleBilling()"></div>
-      <span class="billing-option" id="label-annual">Annual</span>
-      <span class="save-badge">Save 20%</span>
+      <div class="billing-opt active" id="opt-monthly" onclick="setBilling(false)">Monthly</div>
+      <div class="billing-opt" id="opt-annual" onclick="setBilling(true)">
+        Annual
+        <span class="save-tag">SAVE 27%</span>
+      </div>
     </div>
 
+    <!-- Plan cards -->
     <div class="plans-row">
-      <!-- Pro Plan -->
-      <div class="plan-card">
+      <!-- Pro -->
+      <div class="plan-card" id="card-pro">
         <div class="plan-name">Pro</div>
-        <div class="plan-price" id="price-pro">$9<span>/mo</span></div>
+        <div class="plan-price" id="price-pro">$9 <span class="period">/month</span></div>
+
+        <div class="plan-annual-info" id="annual-info-pro" style="display:none">
+          <div class="plan-annual-total" id="annual-total-pro">$79/year</div>
+          <div class="plan-annual-save">
+            <span>&#10003;</span>
+            <span id="annual-save-pro">You save $29/year</span>
+          </div>
+          <div class="plan-monthly-compare" id="annual-compare-pro">$108/year if billed monthly</div>
+        </div>
+
         <ul class="plan-features">
-          <li><span class="check">&#10003;</span> 5 Accounts</li>
-          <li><span class="check">&#10003;</span> Scheduled Messages</li>
-          <li><span class="check">&#10003;</span> Quick Replies</li>
-          <li><span class="check">&#10003;</span> Chat Export</li>
-          <li><span class="check">&#10003;</span> Labels &amp; Filters</li>
+          <li><span class="check-circle">&#10003;</span> Unlimited accounts</li>
+          <li><span class="check-circle">&#10003;</span> Scheduled messages</li>
+          <li><span class="check-circle">&#10003;</span> Quick replies & templates</li>
+          <li><span class="check-circle">&#10003;</span> Chat export</li>
+          <li><span class="check-circle">&#10003;</span> Analytics dashboard</li>
+          <li><span class="check-circle">&#10003;</span> AI smart replies (50/day)</li>
         </ul>
-        <button class="plan-btn plan-btn-outline" onclick="selectPlan('pro')">Get Pro</button>
+        <button class="plan-btn plan-btn-outline" id="btn-pro" onclick="selectPlan('pro')">Get Pro</button>
       </div>
 
-      <!-- Business Plan -->
-      <div class="plan-card popular">
-        <div class="popular-badge">Popular</div>
+      <!-- Business -->
+      <div class="plan-card popular" id="card-business">
+        <div class="popular-badge">Most Popular</div>
         <div class="plan-name">Business</div>
-        <div class="plan-price" id="price-business">$19<span>/mo</span></div>
+        <div class="plan-price" id="price-business">$19 <span class="period">/month</span></div>
+
+        <div class="plan-annual-info" id="annual-info-business" style="display:none">
+          <div class="plan-annual-total" id="annual-total-business">$149/year</div>
+          <div class="plan-annual-save">
+            <span>&#10003;</span>
+            <span id="annual-save-business">You save $79/year</span>
+          </div>
+          <div class="plan-monthly-compare" id="annual-compare-business">$228/year if billed monthly</div>
+        </div>
+
         <ul class="plan-features">
-          <li><span class="check">&#10003;</span> Unlimited Accounts</li>
-          <li><span class="check">&#10003;</span> Everything in Pro</li>
-          <li><span class="check">&#10003;</span> AI Replies</li>
-          <li><span class="check">&#10003;</span> Broadcast Campaigns</li>
-          <li><span class="check">&#10003;</span> Analytics Dashboard</li>
-          <li><span class="check">&#10003;</span> Priority Support</li>
+          <li><span class="check-circle">&#10003;</span> Everything in Pro</li>
+          <li><span class="check-circle">&#10003;</span> Automations & workflows</li>
+          <li><span class="check-circle">&#10003;</span> Broadcast campaigns</li>
+          <li><span class="check-circle">&#10003;</span> CRM integration</li>
+          <li><span class="check-circle">&#10003;</span> Unlimited AI replies</li>
+          <li><span class="check-circle">&#10003;</span> Stealth mode</li>
+          <li><span class="check-circle">&#10003;</span> Priority support</li>
         </ul>
-        <button class="plan-btn plan-btn-primary" onclick="selectPlan('business')">Get Business</button>
+        <button class="plan-btn plan-btn-primary" id="btn-business" onclick="selectPlan('business')">Get Business</button>
+      </div>
+    </div>
+
+    <!-- Guarantee -->
+    <div class="guarantee">
+      <div class="guarantee-text"><strong>30-day money-back guarantee.</strong> Try risk-free — full refund if not satisfied.</div>
+    </div>
+
+    <!-- License key -->
+    <div class="license-section">
+      <div class="license-toggle" onclick="toggleLicense()">Already have a license key? &#8594;</div>
+      <div class="license-form" id="licenseForm">
+        <input class="license-input" id="licenseKey" placeholder="Paste your license key (WH-...)">
+        <input class="license-input" id="licenseEmail" placeholder="Email used at purchase">
+        <button class="license-btn" onclick="activateLicense()">Activate License</button>
+        <div class="license-status" id="licenseStatus"></div>
       </div>
     </div>
   </div>
 
   <script>
     let isAnnual = false;
-    const prices = {
-      pro: { monthly: 9, annual: 7 },
-      business: { monthly: 19, annual: 15 },
-    };
 
-    function toggleBilling() {
-      isAnnual = !isAnnual;
-      document.getElementById('billing-switch').classList.toggle('annual', isAnnual);
-      document.getElementById('label-monthly').classList.toggle('active', !isAnnual);
-      document.getElementById('label-annual').classList.toggle('active', isAnnual);
+    function setBilling(annual) {
+      isAnnual = annual;
+      document.getElementById('opt-monthly').classList.toggle('active', !annual);
+      document.getElementById('opt-annual').classList.toggle('active', annual);
       updatePrices();
     }
 
     function updatePrices() {
-      const period = isAnnual ? 'annual' : 'monthly';
-      document.getElementById('price-pro').innerHTML =
-        `$${prices.pro[period]}<span>/mo</span>`;
-      document.getElementById('price-business').innerHTML =
-        `$${prices.business[period]}<span>/mo</span>`;
+      if (isAnnual) {
+        // Show annual pricing with savings
+        document.getElementById('price-pro').innerHTML = '$6.58 <span class="period">/month</span>';
+        document.getElementById('price-business').innerHTML = '$12.42 <span class="period">/month</span>';
+        document.getElementById('annual-info-pro').style.display = 'block';
+        document.getElementById('annual-info-business').style.display = 'block';
+        document.getElementById('btn-pro').textContent = 'Get Pro — $79/year';
+        document.getElementById('btn-business').textContent = 'Get Business — $149/year';
+      } else {
+        // Show monthly pricing
+        document.getElementById('price-pro').innerHTML = '$9 <span class="period">/month</span>';
+        document.getElementById('price-business').innerHTML = '$19 <span class="period">/month</span>';
+        document.getElementById('annual-info-pro').style.display = 'none';
+        document.getElementById('annual-info-business').style.display = 'none';
+        document.getElementById('btn-pro').textContent = 'Get Pro';
+        document.getElementById('btn-business').textContent = 'Get Business';
+      }
     }
 
     async function selectPlan(tier) {
       try {
         const url = await hub.getCheckoutUrl(tier, isAnnual);
-        if (url) {
-          window.open(url, '_blank');
+        if (url) window.open(url, '_blank');
+      } catch (e) {}
+    }
+
+    function toggleLicense() {
+      document.getElementById('licenseForm').classList.toggle('visible');
+    }
+
+    async function activateLicense() {
+      const key = document.getElementById('licenseKey').value.trim();
+      const email = document.getElementById('licenseEmail').value.trim();
+      const status = document.getElementById('licenseStatus');
+      if (!key) { status.innerHTML = '<span style="color:#EF4444">Enter a license key</span>'; return; }
+      status.innerHTML = '<span style="color:#667781">Activating...</span>';
+      try {
+        const result = await hub.activateLicense(key, email);
+        if (result.success) {
+          status.innerHTML = '<span style="color:#25D366">&#10003; Activated! You\'re now on ' + result.tier + '.</span>';
+          setTimeout(() => hub.closePanel('upgrade'), 1500);
+        } else {
+          status.innerHTML = '<span style="color:#EF4444">' + (result.error || 'Invalid key') + '</span>';
         }
       } catch (e) {
-        // fallback
+        status.innerHTML = '<span style="color:#EF4444">Activation failed</span>';
       }
     }
   </script>
