@@ -102,7 +102,16 @@ struct SettingsView: View {
             }
             .listRowBackground(Color.smSurface)
 
-            if !pairingService.isPaired {
+            if pairingService.isPaired {
+                Button(role: .destructive) {
+                    pairingService.unpair()
+                    messageStore.clearAllData()
+                } label: {
+                    Label("Disconnect from Desktop", systemImage: "wifi.slash")
+                        .foregroundColor(.smDanger)
+                }
+                .listRowBackground(Color.smSurface)
+            } else {
                 Button {
                     showingPairSheet = true
                 } label: {
@@ -114,6 +123,11 @@ struct SettingsView: View {
         } header: {
             Text("Connection")
                 .foregroundColor(.smTextSecondary)
+        } footer: {
+            if pairingService.isPaired {
+                Text("Disconnecting will remove all synced data from this device. You can reconnect anytime.")
+                    .foregroundColor(.smTextSecondary)
+            }
         }
     }
 
