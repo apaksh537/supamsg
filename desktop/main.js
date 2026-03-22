@@ -62,6 +62,7 @@ const { initAutoTranslate } = require('./features/auto-translate');
 const { initCustomDashboard } = require('./features/custom-dashboard');
 const { initWhatsappBusinessApi } = require('./features/whatsapp-business-api');
 const { initConversationSearch } = require('./features/conversation-search');
+const { initPosthogAnalytics, trackEvent } = require('./features/posthog-analytics');
 
 const DATA_PATH = path.join(app.getPath('userData'), 'accounts.json');
 const SETTINGS_PATH = path.join(app.getPath('userData'), 'settings.json');
@@ -583,6 +584,7 @@ ipcMain.on('add-account', (_event, name) => {
   mainWindow.webContents.send('load-accounts', accounts);
   switchToAccount(id);
   updateTrayMenu();
+  trackEvent('account_added', { accountCount: accounts.length });
 });
 
 ipcMain.on('rename-account', (_event, { id, name }) => {
@@ -615,6 +617,7 @@ ipcMain.on('remove-account', (_event, accountId) => {
     activeAccountId = null;
     if (accounts.length > 0) switchToAccount(accounts[0].id);
   }
+  trackEvent('account_removed', { accountCount: accounts.length });
 });
 
 ipcMain.on('reload-account', (_event, accountId) => {
@@ -726,6 +729,7 @@ app.whenReady().then(async () => {
   safeInit('custom-dashboard', () => initCustomDashboard(featureCtx));
   safeInit('whatsapp-business-api', () => initWhatsappBusinessApi(featureCtx));
   safeInit('conversation-search', () => initConversationSearch(featureCtx));
+  safeInit('posthog-analytics', () => initPosthogAnalytics({ app, ipcMain }));
 
   // Global shortcut
   if (settings.globalShortcut) {

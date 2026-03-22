@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Terms of Service — SupaMsg</title>
+<link rel="icon" type="image/png" href="favicon.png">
+<meta name="description" content="SupaMsg Terms of Service. Understand the terms governing your use of SupaMsg.">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg-primary: #0d0d1a;
+  --bg-secondary: #1a1a2e;
+  --bg-tertiary: #16213e;
+  --green: #25D366;
+  --green-dark: #1da851;
+  --green-glow: rgba(37, 211, 102, 0.15);
+  --text-primary: #f0f0f5;
+  --text-secondary: #a0a0b8;
+  --text-muted: #6b6b80;
+  --border: rgba(255,255,255,0.06);
+  --border-hover: rgba(255,255,255,0.12);
+  --card-bg: rgba(26, 26, 46, 0.6);
+  --radius: 16px;
+  --radius-sm: 10px;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', system-ui, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+.container { max-width: 860px; margin: 0 auto; padding: 0 24px; }
+
+/* Navbar */
+nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  padding: 16px 0;
+  background: rgba(13, 13, 26, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+}
+nav .nav-inner {
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-decoration: none;
+}
+.nav-logo .logo-icon {
+  width: 32px;
+  height: 32px;
+  background: var(--green);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+.nav-links { display: flex; align-items: center; gap: 24px; list-style: none; }
+.nav-links a {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--text-primary); }
+
+/* Page content */
+.legal-page {
+  padding-top: 120px;
+  padding-bottom: 80px;
+}
+
+.legal-page h1 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 8px;
+  color: var(--text-primary);
+}
+
+.legal-meta {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-bottom: 48px;
+}
+
+/* Table of Contents */
+.toc {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px 32px;
+  margin-bottom: 48px;
+}
+.toc h2 {
+  font-size: 1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--green);
+  margin-bottom: 16px;
+}
+.toc ol {
+  padding-left: 20px;
+}
+.toc li {
+  margin-bottom: 6px;
+}
+.toc a {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 0.95rem;
+  transition: color 0.2s;
+}
+.toc a:hover { color: var(--green); }
+
+/* Sections */
+.legal-section {
+  margin-bottom: 40px;
+}
+.legal-section h2 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+  padding-top: 8px;
+}
+.legal-section p,
+.legal-section li {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.75;
+  margin-bottom: 12px;
+}
+.legal-section ul,
+.legal-section ol {
+  padding-left: 24px;
+  margin-bottom: 12px;
+}
+.legal-section li {
+  margin-bottom: 6px;
+}
+.legal-section strong {
+  color: var(--text-primary);
+}
+
+.divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 48px 0;
+}
+
+/* Footer */
+.legal-footer {
+  text-align: center;
+  padding: 40px 0;
+  border-top: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+.legal-footer a {
+  color: var(--text-secondary);
+  text-decoration: none;
+}
+.legal-footer a:hover { color: var(--green); }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">
+      <span class="logo-icon"><img src="logo.png" alt="SupaMsg" width="32" height="32" style="border-radius:6px"></span>
+      SupaMsg
+    </a>
+    <ul class="nav-links">
+      <li><a href="/">Home</a></li>
+      <li><a href="/privacy.html">Privacy Policy</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main class="legal-page">
+  <div class="container">
+
+    <h1>Terms of Service</h1>
+    <p class="legal-meta">Effective Date: March 22, 2026 &nbsp;|&nbsp; Last Updated: March 22, 2026</p>
+
+    <div class="toc">
+      <h2>Table of Contents</h2>
+      <ol>
+        <li><a href="#acceptance">Acceptance of Terms</a></li>
+        <li><a href="#description">Description of Service</a></li>
+        <li><a href="#account-terms">Account &amp; License Terms</a></li>
+        <li><a href="#acceptable-use">Acceptable Use</a></li>
+        <li><a href="#whatsapp-disclaimer">WhatsApp Disclaimer</a></li>
+        <li><a href="#intellectual-property">Intellectual Property</a></li>
+        <li><a href="#payment-terms">Payment Terms</a></li>
+        <li><a href="#refund-policy">Refund Policy</a></li>
+        <li><a href="#privacy">Privacy</a></li>
+        <li><a href="#limitation">Limitation of Liability</a></li>
+        <li><a href="#disclaimer">Disclaimer of Warranties</a></li>
+        <li><a href="#indemnification">Indemnification</a></li>
+        <li><a href="#termination">Termination</a></li>
+        <li><a href="#governing-law">Governing Law</a></li>
+        <li><a href="#changes">Changes to Terms</a></li>
+        <li><a href="#contact">Contact Us</a></li>
+      </ol>
+    </div>
+
+    <div id="acceptance" class="legal-section">
+      <h2>1. Acceptance of Terms</h2>
+      <p>By downloading, installing, or using SupaMsg ("the Service"), you agree to be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, you must not use the Service.</p>
+      <p>These Terms constitute a legally binding agreement between you ("User", "you") and SupaMsg ("we", "us", "our"). We reserve the right to update these Terms at any time, and your continued use of the Service after such changes constitutes acceptance of the updated Terms.</p>
+    </div>
+
+    <div id="description" class="legal-section">
+      <h2>2. Description of Service</h2>
+      <p>SupaMsg is a desktop and mobile application that provides a unified interface for managing multiple WhatsApp accounts. Key features include:</p>
+      <ul>
+        <li>Multi-account WhatsApp management in a single window</li>
+        <li>Account switching and organization</li>
+        <li>Unified notifications across accounts</li>
+        <li>AI-powered features (optional, powered by Anthropic Claude)</li>
+        <li>Scheduled messages and productivity tools</li>
+      </ul>
+      <p>The Service loads WhatsApp Web in embedded browser views. All WhatsApp data remains on your device and is governed by WhatsApp's own terms and privacy policy.</p>
+    </div>
+
+    <div id="account-terms" class="legal-section">
+      <h2>3. Account &amp; License Terms</h2>
+      <ul>
+        <li><strong>License Key:</strong> Access to SupaMsg requires a valid license key obtained through purchase. Each license key is tied to a specific subscription plan.</li>
+        <li><strong>Activation:</strong> Your license key must be activated within the application. The number of devices on which you can activate the license depends on your subscription plan.</li>
+        <li><strong>Subscription Management:</strong> Subscriptions are managed through Lemon Squeezy. You can upgrade, downgrade, or cancel your subscription through your Lemon Squeezy customer portal.</li>
+        <li><strong>Non-Transferable:</strong> License keys are personal and non-transferable. You may not share, sell, or distribute your license key to others.</li>
+        <li><strong>Account Responsibility:</strong> You are responsible for maintaining the security of your license key and any activity that occurs under it.</li>
+      </ul>
+    </div>
+
+    <div id="acceptable-use" class="legal-section">
+      <h2>4. Acceptable Use</h2>
+      <p>You agree to use SupaMsg in compliance with all applicable laws and regulations. Specifically, you must NOT use SupaMsg to:</p>
+      <ul>
+        <li>Send spam, bulk unsolicited messages, or automated mass messaging.</li>
+        <li>Harass, threaten, or abuse other individuals.</li>
+        <li>Distribute malware, phishing content, or any harmful material.</li>
+        <li>Violate WhatsApp's Terms of Service or any applicable third-party terms.</li>
+        <li>Engage in any activity that is illegal under applicable local, national, or international law.</li>
+        <li>Attempt to reverse engineer, decompile, disassemble, or otherwise derive the source code of the application.</li>
+        <li>Circumvent, disable, or interfere with any security or license validation features.</li>
+        <li>Use the Service for any commercial bulk messaging or marketing automation purpose that violates WhatsApp's policies.</li>
+      </ul>
+      <p>We reserve the right to suspend or terminate your license if we determine, in our sole discretion, that you have violated these acceptable use terms.</p>
+    </div>
+
+    <div id="whatsapp-disclaimer" class="legal-section">
+      <h2>5. WhatsApp Disclaimer</h2>
+      <p><strong>SupaMsg is not affiliated with, endorsed by, or sponsored by Meta Platforms, Inc. or any of its subsidiaries.</strong> WhatsApp, WhatsApp Web, and the WhatsApp logo are trademarks of Meta Platforms, Inc.</p>
+      <p>SupaMsg is an independent, third-party application that uses WhatsApp Web's publicly available web interface. We do not modify WhatsApp's software or servers. Your use of WhatsApp through SupaMsg is subject to WhatsApp's own <a href="https://www.whatsapp.com/legal/terms-of-service" target="_blank" rel="noopener" style="color:var(--green)">Terms of Service</a>.</p>
+      <p>We make no guarantees regarding continued compatibility with WhatsApp Web, as changes to WhatsApp's platform are outside our control.</p>
+    </div>
+
+    <div id="intellectual-property" class="legal-section">
+      <h2>6. Intellectual Property</h2>
+      <p>The SupaMsg application, including but not limited to its source code, design, user interface, graphics, logos, and documentation, is proprietary software owned by SupaMsg.</p>
+      <ul>
+        <li>You are granted a limited, non-exclusive, non-transferable, revocable license to use the software for personal or business purposes in accordance with your subscription plan.</li>
+        <li>You may not copy, modify, distribute, sell, lease, sublicense, or create derivative works based on the Service.</li>
+        <li>All rights not expressly granted in these Terms are reserved by SupaMsg.</li>
+      </ul>
+    </div>
+
+    <div id="payment-terms" class="legal-section">
+      <h2>7. Payment Terms</h2>
+      <ul>
+        <li><strong>Payment Processor:</strong> All payments are processed by Lemon Squeezy. By purchasing a license, you also agree to <a href="https://www.lemonsqueezy.com/terms" target="_blank" rel="noopener" style="color:var(--green)">Lemon Squeezy's Terms of Service</a>.</li>
+        <li><strong>Pricing:</strong> Current pricing is displayed on our website. Prices are subject to change, but existing subscriptions will be honored at the price agreed upon at the time of purchase until renewal.</li>
+        <li><strong>Billing Cycle:</strong> Subscriptions are billed according to the plan you select (monthly or annual). Renewal is automatic unless cancelled before the end of the current billing period.</li>
+        <li><strong>Taxes:</strong> Prices may be exclusive of applicable taxes. Any applicable sales tax, VAT, or GST will be added at checkout as required by law.</li>
+        <li><strong>Failed Payments:</strong> If a renewal payment fails, your access may be suspended until payment is successfully processed.</li>
+      </ul>
+    </div>
+
+    <div id="refund-policy" class="legal-section">
+      <h2>8. Refund Policy</h2>
+      <p>We offer a <strong>30-day money-back guarantee</strong> on all new purchases. If you are not satisfied with SupaMsg for any reason, you may request a full refund within 30 days of your original purchase date.</p>
+      <ul>
+        <li>Refund requests should be sent to <a href="mailto:support@supamsg.com" style="color:var(--green)">support@supamsg.com</a>.</li>
+        <li>Refunds are processed through Lemon Squeezy and will be returned to your original payment method.</li>
+        <li>After the 30-day period, refunds are granted at our discretion on a case-by-case basis.</li>
+        <li>Refunds for renewal charges may be requested within 7 days of the renewal date.</li>
+      </ul>
+    </div>
+
+    <div id="privacy" class="legal-section">
+      <h2>9. Privacy</h2>
+      <p>Your use of the Service is also governed by our <a href="/privacy.html" style="color:var(--green)">Privacy Policy</a>, which is incorporated into these Terms by reference. Please review the Privacy Policy to understand our data practices.</p>
+    </div>
+
+    <div id="limitation" class="legal-section">
+      <h2>10. Limitation of Liability</h2>
+      <p>To the maximum extent permitted by applicable law:</p>
+      <ul>
+        <li>SupaMsg shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including but not limited to loss of profits, data, business opportunities, or goodwill.</li>
+        <li>Our total liability for any claims arising from or related to the Service shall not exceed the amount you paid for the Service in the 12 months preceding the claim.</li>
+        <li>We are not liable for any actions taken by WhatsApp or Meta Platforms, Inc. regarding your WhatsApp account, including but not limited to account suspension or termination.</li>
+        <li>We are not responsible for any loss of WhatsApp messages, contacts, or media, as these are managed entirely by WhatsApp.</li>
+      </ul>
+    </div>
+
+    <div id="disclaimer" class="legal-section">
+      <h2>11. Disclaimer of Warranties</h2>
+      <p>The Service is provided on an <strong>"AS IS"</strong> and <strong>"AS AVAILABLE"</strong> basis, without warranties of any kind, either express or implied, including but not limited to:</p>
+      <ul>
+        <li>Implied warranties of merchantability, fitness for a particular purpose, and non-infringement.</li>
+        <li>Warranties that the Service will be uninterrupted, error-free, secure, or free of viruses or harmful components.</li>
+        <li>Warranties regarding the accuracy, reliability, or completeness of any content or functionality.</li>
+        <li>Warranties that the Service will be compatible with WhatsApp Web at all times.</li>
+      </ul>
+      <p>You acknowledge that you use the Service at your own risk.</p>
+    </div>
+
+    <div id="indemnification" class="legal-section">
+      <h2>12. Indemnification</h2>
+      <p>You agree to indemnify, defend, and hold harmless SupaMsg and its developer from and against any and all claims, liabilities, damages, losses, costs, and expenses (including reasonable attorneys' fees) arising from or related to:</p>
+      <ul>
+        <li>Your use or misuse of the Service.</li>
+        <li>Your violation of these Terms.</li>
+        <li>Your violation of WhatsApp's Terms of Service.</li>
+        <li>Your violation of any applicable law or regulation.</li>
+        <li>Any content you transmit through the Service.</li>
+      </ul>
+    </div>
+
+    <div id="termination" class="legal-section">
+      <h2>13. Termination</h2>
+      <ul>
+        <li><strong>By You:</strong> You may stop using SupaMsg at any time by uninstalling the application and cancelling your subscription through Lemon Squeezy.</li>
+        <li><strong>By Us:</strong> We reserve the right to suspend or terminate your license, without prior notice or liability, if we reasonably believe you have violated these Terms. Grounds for termination include, but are not limited to: spamming, abuse, reverse engineering, or any other violation of Section 4 (Acceptable Use).</li>
+        <li><strong>Effect of Termination:</strong> Upon termination, your license to use the Service is immediately revoked. Sections that by their nature should survive termination (including Intellectual Property, Limitation of Liability, Disclaimer of Warranties, Indemnification, and Governing Law) shall continue in effect.</li>
+      </ul>
+    </div>
+
+    <div id="governing-law" class="legal-section">
+      <h2>14. Governing Law</h2>
+      <p>These Terms shall be governed by and construed in accordance with the laws of India, without regard to its conflict of law provisions.</p>
+      <p>Any disputes arising out of or in connection with these Terms shall be subject to the exclusive jurisdiction of the courts in India. Before initiating any legal proceedings, both parties agree to attempt to resolve disputes through good-faith negotiation. If the dispute cannot be resolved within 30 days, either party may pursue legal remedies.</p>
+    </div>
+
+    <div id="changes" class="legal-section">
+      <h2>15. Changes to Terms</h2>
+      <p>We reserve the right to modify these Terms at any time. When we make changes:</p>
+      <ul>
+        <li>We will update the "Last Updated" date at the top of this page.</li>
+        <li>We will notify users of material changes through an in-app notification in the next app update.</li>
+        <li>For significant changes, we may provide additional notice (such as an email notification).</li>
+      </ul>
+      <p>Your continued use of the Service after the revised Terms are posted constitutes your acceptance of the changes. If you do not agree with the modified Terms, you must discontinue use of the Service.</p>
+    </div>
+
+    <div id="contact" class="legal-section">
+      <h2>16. Contact Us</h2>
+      <p>If you have any questions or concerns about these Terms, please contact us:</p>
+      <ul>
+        <li><strong>Email:</strong> <a href="mailto:support@supamsg.com" style="color:var(--green)">support@supamsg.com</a></li>
+        <li><strong>Website:</strong> <a href="https://supamsg.com" style="color:var(--green)">supamsg.com</a></li>
+      </ul>
+    </div>
+
+  </div>
+</main>
+
+<footer class="legal-footer">
+  <div class="container">
+    <p>&copy; 2026 SupaMsg. All rights reserved. &nbsp;|&nbsp; <a href="/privacy.html">Privacy Policy</a> &nbsp;|&nbsp; <a href="/terms.html">Terms of Service</a></p>
+  </div>
+</footer>
+
+</body>
+</html>
