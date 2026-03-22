@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment Successful — SupaMsg</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0d0d1a;
+      color: #e0e0e0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .card {
+      background: #16213e;
+      border-radius: 16px;
+      padding: 48px;
+      max-width: 520px;
+      width: 90%;
+      text-align: center;
+      border: 1px solid #0f3460;
+    }
+    .check {
+      width: 64px; height: 64px;
+      background: rgba(37,211,102,0.15);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 24px;
+      font-size: 32px;
+    }
+    h1 { font-size: 28px; color: #25D366; margin-bottom: 8px; }
+    .subtitle { font-size: 16px; color: #a0a0c0; margin-bottom: 32px; }
+    .steps { text-align: left; margin-bottom: 32px; }
+    .step {
+      display: flex; gap: 16px; padding: 16px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .step-num {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: rgba(37,211,102,0.15); color: #25D366;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 14px; flex-shrink: 0;
+    }
+    .step-text { font-size: 14px; line-height: 1.6; }
+    .step-text strong { color: #25D366; }
+    .license-box {
+      background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(37,211,102,0.3);
+      border-radius: 8px;
+      padding: 16px;
+      margin: 24px 0;
+      text-align: left;
+    }
+    .license-box label {
+      font-size: 12px; color: #7a7a9e; display: block; margin-bottom: 8px;
+    }
+    .license-box input {
+      width: 100%; padding: 10px 14px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 6px; color: #e0e0e0; font-size: 14px;
+      font-family: monospace;
+    }
+    .license-box input:focus { outline: none; border-color: #25D366; }
+    .license-box .hint {
+      font-size: 11px; color: #5a5a7e; margin-top: 6px;
+    }
+    .btn {
+      display: inline-block; padding: 12px 32px;
+      background: #25D366; color: #000;
+      border-radius: 8px; font-weight: 600; font-size: 14px;
+      text-decoration: none; border: none; cursor: pointer;
+    }
+    .btn:hover { background: #20c45a; }
+    .btn-secondary {
+      background: rgba(255,255,255,0.1); color: #e0e0e0; margin-left: 8px;
+    }
+    .footer { margin-top: 24px; font-size: 12px; color: #5a5a7e; }
+    .footer a { color: #25D366; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="check">&#10003;</div>
+    <h1>Payment Successful!</h1>
+    <p class="subtitle">Welcome to SupaMsg Pro. Here's how to activate.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-text">Check your email for your <strong>license key</strong>. It starts with <code style="color:#25D366">WH-</code></div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-text">Open <strong>SupaMsg</strong> on your Mac</div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-text">Click <strong>Settings</strong> (gear icon) → <strong>Upgrade</strong> → paste your license key</div>
+      </div>
+      <div class="step" style="border:none">
+        <div class="step-num">4</div>
+        <div class="step-text">Click <strong>Activate</strong> — all Pro features unlock instantly</div>
+      </div>
+    </div>
+
+    <div class="license-box">
+      <label>Your License Key (also sent to your email)</label>
+      <input id="licenseKey" type="text" placeholder="Retrieving your license key..." readonly>
+      <div class="hint">Tip: Click the key to copy it to your clipboard</div>
+    </div>
+
+    <a href="#" class="btn" onclick="copyKey()">Copy License Key</a>
+    <a href="/" class="btn btn-secondary">Back to Home</a>
+
+    <div class="footer">
+      Need help? Email <a href="mailto:support@supamsg.com">support@supamsg.com</a><br>
+      Manage your subscription at <a href="https://billing.stripe.com/p/login/test">Stripe Customer Portal</a>
+    </div>
+  </div>
+
+  <script>
+    // Try to retrieve license key from server using the session email
+    const params = new URLSearchParams(window.location.search);
+    const sessionId = params.get('session_id');
+
+    async function fetchLicense() {
+      const input = document.getElementById('licenseKey');
+      if (!sessionId) {
+        input.value = 'Check your email for the license key';
+        return;
+      }
+
+      try {
+        // Try to get license from webhook server
+        // Replace with your actual server URL
+        const serverUrl = window.location.origin;
+        // We don't have the email from session_id client-side
+        // The email will be sent via email by the webhook server
+        input.value = 'Your license key has been sent to your email';
+      } catch (e) {
+        input.value = 'Check your email for the license key';
+      }
+    }
+
+    function copyKey() {
+      const input = document.getElementById('licenseKey');
+      if (input.value && !input.value.startsWith('Check') && !input.value.startsWith('Your')) {
+        navigator.clipboard.writeText(input.value);
+        const btn = event.target;
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy License Key', 2000);
+      }
+    }
+
+    document.getElementById('licenseKey').addEventListener('click', copyKey);
+    fetchLicense();
+  </script>
+</body>
+</html>

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <!-- Green circle background -->
+  <circle cx="512" cy="512" r="480" fill="#25D366"/>
+
+  <!-- Shadow/depth ring -->
+  <circle cx="512" cy="512" r="480" fill="none" stroke="#1da851" stroke-width="8"/>
+
+  <!-- Left chat bubble (back) -->
+  <rect x="260" y="300" width="320" height="220" rx="30" ry="30" fill="white" opacity="0.85"/>
+  <polygon points="310,520 280,570 350,520" fill="white" opacity="0.85"/>
+
+  <!-- Right chat bubble (front) -->
+  <rect x="420" y="400" width="320" height="220" rx="30" ry="30" fill="white"/>
+  <polygon points="690,620 720,670 660,620" fill="white"/>
+
+  <!-- Chat lines in left bubble -->
+  <rect x="300" y="350" width="180" height="16" rx="8" fill="#25D366" opacity="0.5"/>
+  <rect x="300" y="385" width="140" height="16" rx="8" fill="#25D366" opacity="0.5"/>
+  <rect x="300" y="420" width="160" height="16" rx="8" fill="#25D366" opacity="0.5"/>
+
+  <!-- Chat lines in right bubble -->
+  <rect x="460" y="450" width="200" height="16" rx="8" fill="#25D366" opacity="0.6"/>
+  <rect x="460" y="485" width="150" height="16" rx="8" fill="#25D366" opacity="0.6"/>
+  <rect x="460" y="520" width="180" height="16" rx="8" fill="#25D366" opacity="0.6"/>
+</svg>

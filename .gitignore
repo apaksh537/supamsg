@@ -1,0 +1,25 @@
+# Desktop
+desktop/node_modules/
+desktop/dist/
+desktop/package-lock.json
+
+# Android
+android/build/
+android/.gradle/
+android/app/build/
+android/*.iml
+android/.idea/
+android/local.properties
+
+# iOS
+ios/build/
+ios/DerivedData/
+ios/*.xcworkspace/xcuserdata/
+ios/*.xcodeproj/xcuserdata/
+ios/Pods/
+
+# General
+.DS_Store
+*.dmg
+*.exe
+*.zip

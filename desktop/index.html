@@ -1,0 +1,1513 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>SupaMsg</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #1a1a2e;
+      color: #e0e0e0;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      width: 220px; height: 100vh;
+      background: #16213e;
+      display: flex; flex-direction: column;
+      border-right: 1px solid #0f3460;
+      transition: width 0.2s ease;
+      position: relative; z-index: 10;
+    }
+    .sidebar.collapsed { width: 60px; }
+
+    .sidebar-header {
+      padding: 48px 16px 12px;
+      border-bottom: 1px solid #0f3460;
+      display: flex; align-items: center; justify-content: space-between;
+      -webkit-app-region: drag;
+    }
+    .sidebar.collapsed .sidebar-header { padding: 48px 8px 12px; justify-content: center; }
+    .sidebar-header .title-group { flex: 1; min-width: 0; }
+    .sidebar.collapsed .title-group { display: none; }
+    .sidebar-header h1 { font-size: 16px; font-weight: 600; color: #25D366; letter-spacing: 0.5px; }
+    .sidebar-header p { font-size: 11px; color: #7a7a9e; margin-top: 2px; }
+
+    .icon-btn {
+      background: none; border: none; color: #7a7a9e; cursor: pointer;
+      font-size: 16px; padding: 4px; border-radius: 4px; -webkit-app-region: no-drag;
+    }
+    .icon-btn:hover { color: #e0e0e0; background: rgba(255,255,255,0.08); }
+
+    /* DND Banner */
+    .dnd-banner {
+      display: none; padding: 6px 12px; background: rgba(255,107,107,0.15);
+      border-bottom: 1px solid rgba(255,107,107,0.2);
+      font-size: 11px; color: #ff6b6b; text-align: center; cursor: pointer;
+      -webkit-app-region: no-drag;
+    }
+    .dnd-banner.active { display: block; }
+    .sidebar.collapsed .dnd-banner .dnd-text { display: none; }
+
+    /* Accounts list */
+    .accounts-list { flex: 1; overflow-y: auto; padding: 8px; }
+
+    .account-item {
+      display: flex; align-items: center; padding: 10px 12px; border-radius: 8px;
+      cursor: pointer; margin-bottom: 4px; transition: all 0.15s ease;
+      -webkit-app-region: no-drag; position: relative;
+    }
+    .sidebar.collapsed .account-item { padding: 10px 8px; justify-content: center; }
+    .account-item:hover { background: rgba(37,211,102,0.1); }
+    .account-item.active { background: rgba(37,211,102,0.2); border: 1px solid rgba(37,211,102,0.3); }
+    .account-item.dragging { opacity: 0.5; }
+
+    .account-dot { width: 10px; height: 10px; border-radius: 50%; margin-right: 10px; flex-shrink: 0; }
+    .sidebar.collapsed .account-dot { margin-right: 0; }
+    .account-name { flex: 1; font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .sidebar.collapsed .account-name { display: none; }
+
+    .unread-badge {
+      display: none; min-width: 18px; height: 18px; border-radius: 9px;
+      background: #25D366; color: #000; font-size: 11px; font-weight: 700;
+      text-align: center; line-height: 18px; padding: 0 5px; margin-left: 6px; flex-shrink: 0;
+    }
+    .unread-badge.has-unread { display: inline-block; }
+    .sidebar.collapsed .unread-badge {
+      position: absolute; top: 4px; right: 4px; margin-left: 0;
+      min-width: 14px; height: 14px; border-radius: 7px; font-size: 9px; line-height: 14px; padding: 0 3px;
+    }
+
+    .account-actions { display: none; gap: 4px; }
+    .account-item:hover .account-actions { display: flex; }
+    .sidebar.collapsed .account-actions { display: none !important; }
+    .account-actions button {
+      background: none; border: none; color: #7a7a9e; cursor: pointer;
+      font-size: 12px; padding: 2px 4px; border-radius: 4px; -webkit-app-region: no-drag;
+    }
+    .account-actions button:hover { color: #e0e0e0; background: rgba(255,255,255,0.1); }
+    .account-actions button.remove:hover { color: #ff6b6b; }
+
+    /* Toolbar row */
+    .toolbar {
+      display: flex; gap: 2px; padding: 6px 8px; border-top: 1px solid #0f3460;
+      flex-wrap: wrap; justify-content: center;
+    }
+    .toolbar .icon-btn { font-size: 14px; padding: 6px; border-radius: 6px; position: relative; }
+    .toolbar .icon-btn:hover { background: rgba(37,211,102,0.15); color: #25D366; }
+    .toolbar .icon-btn.active { background: rgba(37,211,102,0.2); color: #25D366; }
+    .sidebar.collapsed .toolbar .tool-label { display: none; }
+
+    .tool-label { font-size: 9px; display: block; color: #5a5a7e; margin-top: 1px; text-align: center; }
+
+    /* Shortcuts */
+    .shortcuts-hint { padding: 4px 16px; font-size: 10px; color: #5a5a7e; line-height: 1.6; }
+    .sidebar.collapsed .shortcuts-hint { display: none; }
+    .kbd {
+      display: inline-block; background: rgba(255,255,255,0.08); border-radius: 3px;
+      padding: 1px 5px; font-size: 11px; color: #7a7a9e;
+    }
+
+    /* Footer */
+    .sidebar-footer { padding: 8px; border-top: 1px solid #0f3460; }
+    .footer-buttons { display: flex; gap: 4px; }
+    .add-btn {
+      flex: 1; padding: 8px; background: rgba(37,211,102,0.15);
+      border: 1px dashed rgba(37,211,102,0.4); border-radius: 8px;
+      color: #25D366; font-size: 13px; cursor: pointer; -webkit-app-region: no-drag;
+    }
+    .add-btn:hover { background: rgba(37,211,102,0.25); border-color: rgba(37,211,102,0.6); }
+    .sidebar.collapsed .add-btn .btn-text { display: none; }
+
+    /* ── Panels (overlays for features) ── */
+    .panel-overlay {
+      display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5); z-index: 100; -webkit-app-region: no-drag;
+      align-items: center; justify-content: center;
+    }
+    .panel-overlay.visible { display: flex; }
+
+    .panel {
+      background: #16213e; border-radius: 12px; padding: 24px;
+      width: 520px; max-height: 80vh; overflow-y: auto; border: 1px solid #0f3460;
+    }
+    .panel h2 { font-size: 18px; color: #25D366; margin-bottom: 16px; }
+    .panel h3 { font-size: 14px; color: #a0a0c0; margin: 16px 0 8px; }
+
+    .panel-close {
+      float: right; background: none; border: none; color: #7a7a9e;
+      font-size: 20px; cursor: pointer; padding: 0 4px;
+    }
+    .panel-close:hover { color: #e0e0e0; }
+
+    /* Form controls */
+    .form-group { margin-bottom: 12px; }
+    .form-group label { display: block; font-size: 12px; color: #7a7a9e; margin-bottom: 4px; }
+    .form-input {
+      width: 100%; padding: 8px 12px; background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1); border-radius: 6px;
+      color: #e0e0e0; font-size: 13px; font-family: inherit;
+    }
+    .form-input:focus { outline: none; border-color: #25D366; }
+    textarea.form-input { min-height: 80px; resize: vertical; }
+    select.form-input { appearance: none; cursor: pointer; }
+
+    .btn {
+      padding: 8px 16px; border-radius: 6px; border: none; font-size: 13px;
+      cursor: pointer; font-weight: 500;
+    }
+    .btn-primary { background: #25D366; color: #000; }
+    .btn-primary:hover { background: #20c45a; }
+    .btn-secondary { background: rgba(255,255,255,0.1); color: #e0e0e0; }
+    .btn-secondary:hover { background: rgba(255,255,255,0.15); }
+    .btn-danger { background: rgba(255,107,107,0.15); color: #ff6b6b; }
+    .btn-danger:hover { background: rgba(255,107,107,0.25); }
+    .btn-row { display: flex; gap: 8px; margin-top: 12px; }
+
+    /* List items in panels */
+    .list-item {
+      display: flex; align-items: center; padding: 10px 12px;
+      background: rgba(255,255,255,0.03); border-radius: 8px; margin-bottom: 6px;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    .list-item:hover { background: rgba(255,255,255,0.06); }
+    .list-item .item-info { flex: 1; min-width: 0; }
+    .list-item .item-title { font-size: 13px; font-weight: 500; }
+    .list-item .item-sub { font-size: 11px; color: #7a7a9e; margin-top: 2px; }
+    .list-item .item-actions { display: flex; gap: 4px; }
+
+    /* Status badges */
+    .status-badge {
+      font-size: 10px; padding: 2px 8px; border-radius: 10px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .status-pending { background: rgba(52,183,241,0.15); color: #34B7F1; }
+    .status-sent { background: rgba(37,211,102,0.15); color: #25D366; }
+    .status-failed { background: rgba(255,107,107,0.15); color: #ff6b6b; }
+
+    /* Toggle */
+    .setting-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .setting-label { font-size: 13px; }
+    .setting-desc { font-size: 11px; color: #7a7a9e; margin-top: 2px; }
+    .toggle {
+      position: relative; width: 44px; height: 24px; background: #333;
+      border-radius: 12px; cursor: pointer; transition: background 0.2s; flex-shrink: 0;
+    }
+    .toggle.on { background: #25D366; }
+    .toggle::after {
+      content: ''; position: absolute; top: 2px; left: 2px;
+      width: 20px; height: 20px; border-radius: 50%; background: #fff; transition: transform 0.2s;
+    }
+    .toggle.on::after { transform: translateX(20px); }
+
+    /* Analytics charts */
+    .chart-bar-container { display: flex; align-items: flex-end; gap: 3px; height: 100px; margin: 12px 0; }
+    .chart-bar {
+      flex: 1; background: rgba(37,211,102,0.3); border-radius: 3px 3px 0 0;
+      min-height: 2px; transition: height 0.3s; position: relative;
+    }
+    .chart-bar:hover { background: rgba(37,211,102,0.6); }
+    .chart-bar .bar-tooltip {
+      display: none; position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+      background: #000; color: #fff; font-size: 10px; padding: 2px 6px; border-radius: 4px;
+      white-space: nowrap; margin-bottom: 4px;
+    }
+    .chart-bar:hover .bar-tooltip { display: block; }
+
+    .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 12px 0; }
+    .stat-card {
+      padding: 12px; background: rgba(255,255,255,0.03); border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    .stat-value { font-size: 24px; font-weight: 700; color: #25D366; }
+    .stat-label { font-size: 11px; color: #7a7a9e; margin-top: 2px; }
+
+    /* Label chips */
+    .label-chip {
+      display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px;
+      border-radius: 12px; font-size: 11px; font-weight: 600; margin: 2px;
+      cursor: default;
+    }
+    .label-chip .chip-remove {
+      cursor: pointer; opacity: 0.6; font-size: 10px;
+    }
+    .label-chip .chip-remove:hover { opacity: 1; }
+
+    /* Empty state */
+    .empty-state { text-align: center; padding: 32px; color: #5a5a7e; font-size: 13px; }
+  </style>
+</head>
+<body>
+  <div class="sidebar" id="sidebar">
+    <!-- Header -->
+    <div class="sidebar-header">
+      <div class="title-group">
+        <h1>SupaMsg</h1>
+        <p>Multi-account manager</p>
+      </div>
+      <button class="icon-btn" id="collapseBtn" title="Toggle sidebar">&#9776;</button>
+    </div>
+
+    <div class="dnd-banner" id="dndBanner" title="Click to disable DND">
+      <span>&#9790;</span><span class="dnd-text"> Do Not Disturb</span>
+    </div>
+
+    <!-- Accounts -->
+    <div class="accounts-list" id="accountsList"></div>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <button class="icon-btn" id="btnSplit" title="Split Screen (Cmd+D)">
+        &#9635;<span class="tool-label">Split</span>
+      </button>
+      <button class="icon-btn" id="btnTemplates" title="Templates (Cmd+T)">
+        &#9998;<span class="tool-label">Templates</span>
+      </button>
+      <button class="icon-btn" id="btnSchedule" title="Schedule Message">
+        &#9201;<span class="tool-label">Schedule</span>
+      </button>
+      <button class="icon-btn" id="btnExport" title="Export Chat (Cmd+E)">
+        &#8681;<span class="tool-label">Export</span>
+      </button>
+      <button class="icon-btn" id="btnLabels" title="Contact Labels">
+        &#9873;<span class="tool-label">Labels</span>
+      </button>
+      <button class="icon-btn" id="btnAI" title="AI Assistant (Cmd+J)">
+        &#10024;<span class="tool-label">AI</span>
+      </button>
+      <button class="icon-btn" id="btnAutomations" title="Automations">
+        &#9889;<span class="tool-label">Auto</span>
+      </button>
+      <button class="icon-btn" id="btnBroadcast" title="Broadcast">
+        &#128226;<span class="tool-label">Blast</span>
+      </button>
+      <button class="icon-btn" id="btnAnalytics" title="Analytics">
+        &#9636;<span class="tool-label">Stats</span>
+      </button>
+      <button class="icon-btn" id="btnSettings" title="Settings">
+        &#9881;<span class="tool-label">Settings</span>
+      </button>
+    </div>
+
+    <!-- Shortcuts -->
+    <div class="shortcuts-hint">
+      <span class="kbd">Cmd+1-9</span> switch &nbsp;<span class="kbd">Cmd+\</span> sidebar
+    </div>
+
+    <!-- Footer -->
+    <div class="sidebar-footer">
+      <div class="footer-buttons">
+        <button class="add-btn" id="addBtn">
+          <span class="btn-text">+ Add Account</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- TEMPLATES PANEL -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div class="panel-overlay" id="templatesPanel">
+    <div class="panel" style="width:560px">
+      <button class="panel-close" onclick="closePanel('templatesPanel')">&times;</button>
+      <h2>Message Templates</h2>
+
+      <div id="templatesList"></div>
+
+      <h3>Create New Template</h3>
+      <div class="form-group">
+        <label>Template Name</label>
+        <input class="form-input" id="tplName" placeholder="e.g. Meeting Follow-up">
+      </div>
+      <div class="form-group">
+        <label>Category</label>
+        <input class="form-input" id="tplCategory" placeholder="e.g. Work, Personal">
+      </div>
+      <div class="form-group">
+        <label>Message Body <span style="color:#5a5a7e">(use {date}, {time} for auto-fill)</span></label>
+        <textarea class="form-input" id="tplBody" placeholder="Type your template message..."></textarea>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="tplSave">Save Template</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- SCHEDULED MESSAGES PANEL -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div class="panel-overlay" id="schedulePanel">
+    <div class="panel" style="width:560px">
+      <button class="panel-close" onclick="closePanel('schedulePanel')">&times;</button>
+      <h2>Scheduled Messages</h2>
+
+      <div id="schedulesList"></div>
+
+      <h3>Schedule New Message</h3>
+      <div class="form-group">
+        <label>Account</label>
+        <select class="form-input" id="schedAccount"></select>
+      </div>
+      <div class="form-group">
+        <label>Contact / Chat Name (exact match)</label>
+        <input class="form-input" id="schedContact" placeholder="e.g. John Doe">
+      </div>
+      <div class="form-group">
+        <label>Message</label>
+        <textarea class="form-input" id="schedMessage" placeholder="Your message..."></textarea>
+      </div>
+      <div class="form-group">
+        <label>Send At</label>
+        <input class="form-input" id="schedTime" type="datetime-local">
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="schedSave">Schedule Message</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- CONTACT LABELS PANEL -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div class="panel-overlay" id="labelsPanel">
+    <div class="panel">
+      <button class="panel-close" onclick="closePanel('labelsPanel')">&times;</button>
+      <h2>Contact Labels</h2>
+
+      <div id="labelsList"></div>
+
+      <h3>Create New Label</h3>
+      <div style="display:flex;gap:8px;align-items:flex-end">
+        <div class="form-group" style="flex:1;margin:0">
+          <label>Name</label>
+          <input class="form-input" id="labelName" placeholder="e.g. VIP Client">
+        </div>
+        <div class="form-group" style="width:60px;margin:0">
+          <label>Color</label>
+          <input type="color" id="labelColor" value="#25D366" style="width:100%;height:34px;border:none;border-radius:6px;cursor:pointer;">
+        </div>
+        <button class="btn btn-primary" id="labelSave" style="height:34px">Add</button>
+      </div>
+
+      <h3 style="margin-top:20px">Assign Labels to Contacts</h3>
+      <p style="font-size:12px;color:#5a5a7e;margin-bottom:8px">Type a contact name and select labels to assign.</p>
+      <div style="display:flex;gap:8px;margin-bottom:8px">
+        <input class="form-input" id="assignContact" placeholder="Contact name" style="flex:1">
+        <select class="form-input" id="assignAccount" style="width:140px"></select>
+      </div>
+      <div id="assignLabelChips" style="margin-bottom:8px"></div>
+      <div id="contactLabelsList"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- ANALYTICS PANEL -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div class="panel-overlay" id="analyticsPanel">
+    <div class="panel" style="width:600px">
+      <button class="panel-close" onclick="closePanel('analyticsPanel')">&times;</button>
+      <h2>Analytics Dashboard</h2>
+      <div class="form-group">
+        <select class="form-input" id="analyticsAccount" style="width:200px">
+          <option value="">All Accounts</option>
+        </select>
+      </div>
+      <div id="analyticsContent">
+        <div class="empty-state">Analytics data will appear as you receive messages.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- UPGRADE PANEL -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div class="panel-overlay" id="upgradePanel">
+    <div class="panel" style="width:620px">
+      <button class="panel-close" onclick="closePanel('upgradePanel')">&times;</button>
+      <h2>Upgrade SupaMsg</h2>
+      <p style="font-size:13px;color:#a0a0c0;margin-bottom:16px">Unlock powerful features to manage WhatsApp like a pro.</p>
+
+      <div id="currentPlanBadge" style="margin-bottom:16px"></div>
+
+      <!-- Monthly / Annual toggle -->
+      <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:20px">
+        <span id="billingMonthlyLabel" style="font-size:13px;font-weight:600;color:#25D366">Monthly</span>
+        <div id="billingToggle" style="width:44px;height:24px;background:#333;border-radius:12px;cursor:pointer;position:relative;transition:background 0.2s" onclick="toggleBilling()">
+          <div id="billingDot" style="position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:white;transition:transform 0.2s"></div>
+        </div>
+        <span id="billingAnnualLabel" style="font-size:13px;color:#7a7a9e">Annual</span>
+        <span style="font-size:11px;background:rgba(37,211,102,0.15);color:#25D366;padding:2px 8px;border-radius:10px;font-weight:600">Save up to 35%</span>
+      </div>
+
+      <div style="display:flex;gap:12px">
+        <!-- Free -->
+        <div style="flex:1;padding:16px;background:rgba(255,255,255,0.03);border-radius:10px;border:1px solid rgba(255,255,255,0.08)">
+          <div style="font-size:14px;font-weight:600">Free</div>
+          <div style="font-size:28px;font-weight:700;color:#25D366;margin:8px 0">$0</div>
+          <div style="font-size:11px;color:#7a7a9e;margin-bottom:12px">Forever</div>
+          <ul style="list-style:none;font-size:12px;color:#a0a0c0;line-height:2">
+            <li>3 accounts</li>
+            <li>Notifications & DND</li>
+            <li>Templates</li>
+            <li>Contact labels</li>
+          </ul>
+        </div>
+        <!-- Pro -->
+        <div style="flex:1;padding:16px;background:rgba(37,211,102,0.08);border-radius:10px;border:2px solid rgba(37,211,102,0.3);position:relative">
+          <div style="position:absolute;top:-8px;right:12px;background:#25D366;color:#000;font-size:10px;font-weight:700;padding:2px 10px;border-radius:10px">POPULAR</div>
+          <div style="font-size:14px;font-weight:600">Pro</div>
+          <div id="proPriceDisplay" style="font-size:28px;font-weight:700;color:#25D366;margin:8px 0">$9<span style="font-size:14px;color:#7a7a9e">/mo</span></div>
+          <div id="proSubtext" style="font-size:11px;color:#7a7a9e;margin-bottom:12px">or $79/year (save 27%)</div>
+          <ul style="list-style:none;font-size:12px;color:#a0a0c0;line-height:2">
+            <li>Unlimited accounts</li>
+            <li>AI smart replies (50/day)</li>
+            <li>Scheduled messages</li>
+            <li>Chat export</li>
+            <li>Split screen</li>
+            <li>Analytics</li>
+            <li>Stealth mode</li>
+          </ul>
+          <button class="btn btn-primary" style="width:100%;margin-top:12px" onclick="startUpgrade('pro')">Upgrade to Pro</button>
+        </div>
+        <!-- Business -->
+        <div style="flex:1;padding:16px;background:rgba(255,255,255,0.03);border-radius:10px;border:1px solid rgba(255,255,255,0.08)">
+          <div style="font-size:14px;font-weight:600">Business</div>
+          <div id="bizPriceDisplay" style="font-size:28px;font-weight:700;color:#25D366;margin:8px 0">$19<span style="font-size:14px;color:#7a7a9e">/mo</span></div>
+          <div id="bizSubtext" style="font-size:11px;color:#7a7a9e;margin-bottom:12px">or $149/year (save 35%)</div>
+          <ul style="list-style:none;font-size:12px;color:#a0a0c0;line-height:2">
+            <li>Everything in Pro, plus:</li>
+            <li>Automations & workflows</li>
+            <li>Broadcast campaigns</li>
+            <li>CRM integration</li>
+            <li>Unlimited AI</li>
+          </ul>
+          <button class="btn btn-secondary" style="width:100%;margin-top:12px" onclick="startUpgrade('business')">Upgrade to Business</button>
+        </div>
+      </div>
+
+      <h3 style="margin-top:20px">Already have a license key?</h3>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <input class="form-input" id="licenseKeyInput" placeholder="WH-..." style="flex:1">
+        <input class="form-input" id="licenseEmailInput" placeholder="your@email.com" style="width:180px">
+        <button class="btn btn-primary" id="activateLicenseBtn">Activate</button>
+      </div>
+      <div id="licenseStatus" style="margin-top:8px;font-size:12px"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- SETTINGS PANEL -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div class="panel-overlay" id="settingsPanel">
+    <div class="panel">
+      <button class="panel-close" onclick="closePanel('settingsPanel')">&times;</button>
+      <h2>Settings</h2>
+
+      <!-- License info at top of settings -->
+      <div id="settingsLicenseInfo" style="padding:12px;background:rgba(37,211,102,0.08);border-radius:8px;margin-bottom:16px;border:1px solid rgba(37,211,102,0.2)">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <span style="font-size:13px;font-weight:600" id="settingsTierBadge">Free Plan</span>
+            <span style="font-size:11px;color:#7a7a9e" id="settingsLicenseEmail"></span>
+          </div>
+          <button class="btn btn-primary" style="font-size:11px;padding:4px 12px" id="settingsUpgradeBtn">Upgrade</button>
+        </div>
+      </div>
+
+      <div class="setting-row">
+        <div><div class="setting-label">Notifications</div><div class="setting-desc">Show native macOS notifications</div></div>
+        <div class="toggle" data-key="notifications"></div>
+      </div>
+      <div class="setting-row">
+        <div><div class="setting-label">Notification Sound</div><div class="setting-desc">Play sound with notifications</div></div>
+        <div class="toggle" data-key="notificationSound"></div>
+      </div>
+      <div class="setting-row">
+        <div><div class="setting-label">Do Not Disturb</div><div class="setting-desc">Suppress all notifications</div></div>
+        <div class="toggle" data-key="dnd"></div>
+      </div>
+      <div class="setting-row">
+        <div><div class="setting-label">Launch at Login</div><div class="setting-desc">Start when you log in</div></div>
+        <div class="toggle" data-key="launchAtLogin"></div>
+      </div>
+
+      <h3 style="margin-top:16px">API Keys</h3>
+      <div class="form-group" style="margin-top:8px">
+        <label>Anthropic API Key (for AI features)</label>
+        <input class="form-input" id="anthropicKey" type="password" placeholder="sk-ant-...">
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="saveApiKey">Save API Key</button>
+      </div>
+
+      <h3 style="margin-top:16px">Stealth Mode</h3>
+      <p style="font-size:11px;color:#5a5a7e;margin-bottom:8px">Per-account privacy controls</p>
+      <div id="stealthAccountsList"></div>
+
+      <h3 style="margin-top:16px">CRM Integration</h3>
+      <div class="setting-row">
+        <div><div class="setting-label">HubSpot</div><div class="setting-desc">Connect your HubSpot CRM</div></div>
+        <div class="toggle" id="toggleHubspot" data-crm="hubspot"></div>
+      </div>
+      <div class="form-group" id="hubspotKeyGroup" style="display:none;margin-top:4px">
+        <input class="form-input" id="hubspotKey" type="password" placeholder="HubSpot API Key">
+      </div>
+      <div class="setting-row">
+        <div><div class="setting-label">Zoho CRM</div><div class="setting-desc">Connect your Zoho CRM</div></div>
+        <div class="toggle" id="toggleZoho" data-crm="zoho"></div>
+      </div>
+      <div class="form-group" id="zohoKeyGroup" style="display:none;margin-top:4px">
+        <input class="form-input" id="zohoKey" type="password" placeholder="Zoho OAuth Token">
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="saveCrmSettings">Save CRM Settings</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- AI ASSISTANT PANEL -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div class="panel-overlay" id="aiPanel">
+    <div class="panel" style="width:560px">
+      <button class="panel-close" onclick="closePanel('aiPanel')">&times;</button>
+      <h2>AI Assistant</h2>
+
+      <div class="btn-row" style="flex-wrap:wrap;gap:6px;margin-bottom:16px">
+        <button class="btn btn-primary" id="aiSuggest" style="font-size:12px">Suggest Replies</button>
+        <button class="btn btn-secondary" id="aiSummarize" style="font-size:12px">Summarize Chat</button>
+        <button class="btn btn-secondary" id="aiSentiment" style="font-size:12px">Analyze Sentiment</button>
+      </div>
+
+      <div id="aiResults" class="empty-state">Click a button above to analyze the current chat.</div>
+
+      <h3>Draft a Reply</h3>
+      <div class="form-group">
+        <input class="form-input" id="aiDraftInstruction" placeholder='e.g. "say I\'ll be 10 min late" or "politely decline the meeting"'>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="aiDraft">Generate Draft</button>
+      </div>
+      <div id="aiDraftResult"></div>
+
+      <h3>Translate</h3>
+      <div style="display:flex;gap:8px">
+        <input class="form-input" id="aiTranslateText" placeholder="Text to translate" style="flex:1">
+        <select class="form-input" id="aiTranslateLang" style="width:130px">
+          <option value="English">English</option>
+          <option value="Hindi">Hindi</option>
+          <option value="Spanish">Spanish</option>
+          <option value="French">French</option>
+          <option value="Arabic">Arabic</option>
+          <option value="Portuguese">Portuguese</option>
+          <option value="German">German</option>
+          <option value="Japanese">Japanese</option>
+          <option value="Chinese">Chinese</option>
+        </select>
+        <button class="btn btn-primary" id="aiTranslate">Go</button>
+      </div>
+      <div id="aiTranslateResult"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- AUTOMATIONS PANEL -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div class="panel-overlay" id="automationsPanel">
+    <div class="panel" style="width:580px">
+      <button class="panel-close" onclick="closePanel('automationsPanel')">&times;</button>
+      <h2>Automations</h2>
+
+      <div id="automationsList"></div>
+
+      <h3>Create Automation</h3>
+      <div class="form-group">
+        <label>Name</label>
+        <input class="form-input" id="autoName" placeholder="e.g. Auto-reply to price inquiries">
+      </div>
+      <div style="display:flex;gap:8px">
+        <div class="form-group" style="flex:1">
+          <label>Account</label>
+          <select class="form-input" id="autoAccount">
+            <option value="*">All Accounts</option>
+          </select>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <div class="form-group" style="flex:1">
+          <label>When (Trigger)</label>
+          <select class="form-input" id="autoTriggerType">
+            <option value="message_contains">Message contains keyword</option>
+            <option value="message_from">Message from contact</option>
+            <option value="new_message">Any new message</option>
+            <option value="keyword_match">Regex keyword match</option>
+          </select>
+        </div>
+        <div class="form-group" style="flex:1">
+          <label>Value</label>
+          <input class="form-input" id="autoTriggerValue" placeholder="keyword or contact name">
+        </div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <div class="form-group" style="flex:1">
+          <label>Then (Action)</label>
+          <select class="form-input" id="autoActionType">
+            <option value="auto_reply">Send auto-reply</option>
+            <option value="send_template">Send template</option>
+            <option value="assign_label">Assign label</option>
+            <option value="notify">Send notification</option>
+          </select>
+        </div>
+        <div class="form-group" style="flex:1">
+          <label>Value</label>
+          <input class="form-input" id="autoActionValue" placeholder="reply text or template ID">
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="autoSave">Create Automation</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- BROADCAST PANEL -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div class="panel-overlay" id="broadcastPanel">
+    <div class="panel" style="width:580px">
+      <button class="panel-close" onclick="closePanel('broadcastPanel')">&times;</button>
+      <h2>Broadcast Campaign</h2>
+
+      <div id="campaignsList"></div>
+
+      <h3>Create Campaign</h3>
+      <div class="form-group">
+        <label>Campaign Name</label>
+        <input class="form-input" id="campName" placeholder="e.g. March Price Update">
+      </div>
+      <div class="form-group">
+        <label>Account</label>
+        <select class="form-input" id="campAccount"></select>
+      </div>
+      <div class="form-group">
+        <label>Message <span style="color:#5a5a7e">(use {name} for personalization)</span></label>
+        <textarea class="form-input" id="campMessage" placeholder="Hi {name}, we wanted to let you know..."></textarea>
+      </div>
+      <div class="form-group">
+        <label>Contacts <span style="color:#5a5a7e">(one name per line, must match WhatsApp chat names)</span></label>
+        <textarea class="form-input" id="campContacts" placeholder="John Doe&#10;Jane Smith&#10;Bob Wilson" style="min-height:100px"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Delay between messages (seconds, min 3)</label>
+        <input class="form-input" id="campDelay" type="number" value="5" min="3" max="60">
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="campCreate">Create Campaign</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- COMMAND PALETTE -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div class="panel-overlay" id="commandPalette" style="align-items:flex-start;padding-top:15vh">
+    <div class="panel" style="width:500px;padding:12px">
+      <input class="form-input" id="cmdInput" placeholder="Search accounts, actions, features..." style="font-size:15px;padding:12px 16px;background:transparent;border:none;border-bottom:1px solid rgba(255,255,255,0.1)">
+      <div id="cmdResults" style="max-height:300px;overflow-y:auto;margin-top:4px"></div>
+    </div>
+  </div>
+
+  <script>
+    // ── Dialog helpers (use native Electron dialogs that render above BrowserViews) ──
+    function showDialog({ title, message, placeholder, defaultValue, isConfirm }) {
+      if (isConfirm) {
+        return hub.showConfirmDialog({ title, message });
+      }
+      return hub.showInputDialog({ title, message, placeholder, defaultValue });
+    }
+
+    // ── State ──
+    let currentAccounts = [];
+    let activeId = null;
+    let unreadCounts = {};
+    let currentSettings = {};
+    let dragSrcId = null;
+    let templates = [];
+    let schedules = [];
+    let labelsData = { labels: [], contactLabels: {} };
+
+    // ── Panel management (hide BrowserViews so panels are visible) ──
+    function openPanel(id) {
+      hub.hideViews();
+      document.getElementById(id).classList.add('visible');
+    }
+    function closePanel(id) {
+      document.getElementById(id).classList.remove('visible');
+      // Only restore views if no other panels are open
+      const anyOpen = document.querySelectorAll('.panel-overlay.visible').length > 0;
+      if (!anyOpen) hub.showViews();
+    }
+
+    document.querySelectorAll('.panel-overlay').forEach(el => {
+      el.addEventListener('click', e => { if (e.target === el) closePanel(el.id); });
+    });
+
+    // ── Render accounts ──
+    function renderAccounts(accounts) {
+      currentAccounts = accounts;
+      const list = document.getElementById('accountsList');
+      list.innerHTML = '';
+
+      accounts.forEach((account) => {
+        const item = document.createElement('div');
+        item.className = `account-item ${account.id === activeId ? 'active' : ''}`;
+        item.draggable = true;
+        item.dataset.id = account.id;
+        const unread = unreadCounts[account.id] || 0;
+
+        item.innerHTML = `
+          <div class="account-dot" style="background:${account.color}"></div>
+          <span class="account-name">${account.name}</span>
+          <span class="unread-badge ${unread > 0 ? 'has-unread' : ''}">${unread}</span>
+          <div class="account-actions">
+            <button title="Reload" onclick="event.stopPropagation();hub.reloadAccount('${account.id}')">&#8635;</button>
+            <button title="Rename" onclick="event.stopPropagation();renameAccount('${account.id}','${account.name.replace(/'/g,"\\'")}')">&#9998;</button>
+            <button class="remove" title="Remove" onclick="event.stopPropagation();removeAccount('${account.id}','${account.name.replace(/'/g,"\\'")}')">&#10005;</button>
+          </div>`;
+
+        item.addEventListener('click', () => hub.switchAccount(account.id));
+
+        // Drag to reorder
+        item.addEventListener('dragstart', e => { dragSrcId = account.id; item.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; });
+        item.addEventListener('dragend', () => { item.classList.remove('dragging'); dragSrcId = null; });
+        item.addEventListener('dragover', e => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; });
+        item.addEventListener('drop', e => {
+          e.preventDefault();
+          if (dragSrcId && dragSrcId !== account.id) {
+            const ids = currentAccounts.map(a => a.id);
+            const from = ids.indexOf(dragSrcId), to = ids.indexOf(account.id);
+            ids.splice(from, 1); ids.splice(to, 0, dragSrcId);
+            hub.reorderAccounts(ids);
+          }
+        });
+
+        list.appendChild(item);
+      });
+
+      // Update account selects in panels
+      updateAccountSelects();
+    }
+
+    async function renameAccount(id, name) {
+      const n = await showDialog({ title: 'Rename Account', placeholder: 'Account name', defaultValue: name });
+      if (n?.trim()) hub.renameAccount(id, n.trim());
+    }
+    async function removeAccount(id, name) {
+      const ok = await showDialog({ title: 'Remove Account', message: `Remove "${name}"? This will log out of this WhatsApp session.`, isConfirm: true });
+      if (ok) hub.removeAccount(id);
+    }
+
+    function updateAccountSelects() {
+      ['schedAccount', 'assignAccount', 'analyticsAccount', 'campAccount'].forEach(selId => {
+        const sel = document.getElementById(selId);
+        if (!sel) return;
+        const val = sel.value;
+        const hasAllOption = selId === 'analyticsAccount' || selId === 'autoAccount';
+        sel.innerHTML = hasAllOption ? '<option value="*">All Accounts</option>' : '';
+        currentAccounts.forEach(a => {
+          sel.innerHTML += `<option value="${a.id}">${a.name}</option>`;
+        });
+        if (val) sel.value = val;
+      });
+    }
+
+    // ── Settings ──
+    function updateSettingsUI(s) {
+      currentSettings = s;
+      document.querySelectorAll('.toggle').forEach(el => {
+        el.classList.toggle('on', !!s[el.dataset.key]);
+      });
+      document.getElementById('dndBanner').classList.toggle('active', !!s.dnd);
+      document.getElementById('sidebar').classList.toggle('collapsed', !!s.sidebarCollapsed);
+      renderAccounts(currentAccounts);
+    }
+
+    document.querySelectorAll('.toggle').forEach(el => {
+      el.addEventListener('click', () => {
+        currentSettings[el.dataset.key] = !currentSettings[el.dataset.key];
+        hub.updateSettings(currentSettings);
+      });
+    });
+
+    document.getElementById('dndBanner').addEventListener('click', () => {
+      currentSettings.dnd = false;
+      hub.updateSettings(currentSettings);
+    });
+
+    // ── Templates ──
+    function renderTemplates(tpls) {
+      templates = tpls;
+      const list = document.getElementById('templatesList');
+      if (!tpls.length) { list.innerHTML = '<div class="empty-state">No templates yet. Create one below.</div>'; return; }
+      list.innerHTML = tpls.map(t => `
+        <div class="list-item">
+          <div class="item-info">
+            <div class="item-title">${t.name} <span style="color:#5a5a7e;font-size:11px">${t.category || ''}</span></div>
+            <div class="item-sub">${t.body.substring(0, 80)}${t.body.length > 80 ? '...' : ''}</div>
+          </div>
+          <div class="item-actions">
+            <button class="btn btn-secondary" style="font-size:11px;padding:4px 10px" onclick="hub.insertTemplate('${t.id}')">Insert</button>
+            <button class="btn btn-danger" style="font-size:11px;padding:4px 8px" onclick="hub.deleteTemplate('${t.id}')">&#10005;</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    document.getElementById('tplSave').addEventListener('click', () => {
+      const name = document.getElementById('tplName').value.trim();
+      const body = document.getElementById('tplBody').value.trim();
+      const category = document.getElementById('tplCategory').value.trim();
+      if (!name || !body) return showDialog({ title: 'Missing Fields', message: 'Name and body are required.', isConfirm: true });
+      hub.saveTemplate({ name, body, category });
+      document.getElementById('tplName').value = '';
+      document.getElementById('tplBody').value = '';
+      document.getElementById('tplCategory').value = '';
+    });
+
+    // ── Scheduled messages ──
+    function renderSchedules(scheds) {
+      schedules = scheds;
+      const list = document.getElementById('schedulesList');
+      if (!scheds.length) { list.innerHTML = '<div class="empty-state">No scheduled messages. Create one below.</div>'; return; }
+      list.innerHTML = scheds.map(s => {
+        const statusClass = s.status === 'sent' ? 'status-sent' : s.status === 'failed' ? 'status-failed' : 'status-pending';
+        const acct = currentAccounts.find(a => a.id === s.accountId);
+        return `
+          <div class="list-item">
+            <div class="item-info">
+              <div class="item-title">${s.contactName} <span style="color:#5a5a7e;font-size:11px">via ${acct?.name || '?'}</span></div>
+              <div class="item-sub">${s.message.substring(0, 60)}${s.message.length > 60 ? '...' : ''}</div>
+              <div class="item-sub">Send: ${new Date(s.sendAt).toLocaleString()} &nbsp;<span class="status-badge ${statusClass}">${s.status}</span></div>
+              ${s.error ? `<div class="item-sub" style="color:#ff6b6b">${s.error}</div>` : ''}
+            </div>
+            ${s.status === 'pending' ? `<div class="item-actions"><button class="btn btn-danger" style="font-size:11px;padding:4px 8px" onclick="hub.cancelSchedule('${s.id}')">Cancel</button></div>` : ''}
+          </div>`;
+      }).join('');
+    }
+
+    document.getElementById('schedSave').addEventListener('click', () => {
+      const accountId = document.getElementById('schedAccount').value;
+      const contactName = document.getElementById('schedContact').value.trim();
+      const message = document.getElementById('schedMessage').value.trim();
+      const sendAt = document.getElementById('schedTime').value;
+      if (!accountId || !contactName || !message || !sendAt) return showDialog({ title: 'Missing Fields', message: 'All fields are required.', isConfirm: true });
+      hub.addSchedule({ accountId, contactName, message, sendAt: new Date(sendAt).toISOString() });
+      document.getElementById('schedContact').value = '';
+      document.getElementById('schedMessage').value = '';
+      document.getElementById('schedTime').value = '';
+    });
+
+    // ── Contact labels ──
+    function renderLabels(data) {
+      labelsData = data;
+      const list = document.getElementById('labelsList');
+      list.innerHTML = data.labels.map(l => `
+        <div class="list-item">
+          <div class="label-chip" style="background:${l.color}22;color:${l.color};border:1px solid ${l.color}44">
+            ${l.name}
+          </div>
+          <div style="flex:1"></div>
+          <button class="btn btn-danger" style="font-size:11px;padding:4px 8px" onclick="hub.deleteLabel('${l.id}')">&#10005;</button>
+        </div>
+      `).join('');
+
+      // Render assign chips
+      const chips = document.getElementById('assignLabelChips');
+      chips.innerHTML = data.labels.map(l =>
+        `<span class="label-chip" style="background:${l.color}22;color:${l.color};border:1px solid ${l.color}44;cursor:pointer" onclick="assignLabelToContact('${l.id}')">${l.name}</span>`
+      ).join('');
+
+      // Render assigned contacts
+      const clList = document.getElementById('contactLabelsList');
+      const entries = Object.entries(data.contactLabels);
+      if (!entries.length) { clList.innerHTML = '<div class="empty-state">No contacts labeled yet.</div>'; return; }
+      clList.innerHTML = entries.map(([key, labelIds]) => {
+        const chips = labelIds.map(lid => {
+          const l = data.labels.find(x => x.id === lid);
+          return l ? `<span class="label-chip" style="background:${l.color}22;color:${l.color};border:1px solid ${l.color}44">${l.name} <span class="chip-remove" onclick="hub.removeLabelFromContact('${key}','${lid}')">&times;</span></span>` : '';
+        }).join('');
+        return `<div class="list-item"><div class="item-info"><div class="item-title">${key}</div><div>${chips}</div></div></div>`;
+      }).join('');
+    }
+
+    document.getElementById('labelSave').addEventListener('click', () => {
+      const name = document.getElementById('labelName').value.trim();
+      const color = document.getElementById('labelColor').value;
+      if (!name) return;
+      hub.createLabel(name, color);
+      document.getElementById('labelName').value = '';
+    });
+
+    function assignLabelToContact(labelId) {
+      const contact = document.getElementById('assignContact').value.trim();
+      const account = document.getElementById('assignAccount').value;
+      if (!contact || !account) return showDialog({ title: 'Missing Fields', message: 'Enter a contact name and select an account.', isConfirm: true });
+      hub.assignLabel(`${contact}:${account}`, labelId);
+    }
+
+    // ── Analytics ──
+    async function renderAnalytics() {
+      const accountId = document.getElementById('analyticsAccount').value || undefined;
+      const summary = await hub.getAnalyticsSummary(accountId);
+      const content = document.getElementById('analyticsContent');
+
+      const entries = Object.entries(summary);
+      if (!entries.length) {
+        content.innerHTML = '<div class="empty-state">No analytics data yet. Data is collected as messages arrive.</div>';
+        return;
+      }
+
+      let html = '';
+      for (const [accId, s] of entries) {
+        const acct = currentAccounts.find(a => a.id === accId);
+        const name = acct?.name || accId;
+
+        html += `<h3 style="color:#25D366">${name}</h3>`;
+        html += `<div class="stat-grid">
+          <div class="stat-card"><div class="stat-value">${s.messagesThisWeek}</div><div class="stat-label">This Week</div></div>
+          <div class="stat-card"><div class="stat-value">${s.messagesThisMonth}</div><div class="stat-label">This Month</div></div>
+          <div class="stat-card"><div class="stat-value">${s.avgDailyMessages}</div><div class="stat-label">Avg Daily</div></div>
+          <div class="stat-card"><div class="stat-value">${s.peakHour}</div><div class="stat-label">Peak Hour</div></div>
+        </div>`;
+
+        // Hourly distribution bar chart
+        const hourly = s.hourlyDistribution || {};
+        const maxH = Math.max(...Object.values(hourly), 1);
+        html += `<p style="font-size:12px;color:#7a7a9e;margin-top:12px">Hourly Distribution</p>`;
+        html += `<div class="chart-bar-container">`;
+        for (let h = 0; h < 24; h++) {
+          const val = hourly[h] || 0;
+          const pct = (val / maxH) * 100;
+          html += `<div class="chart-bar" style="height:${Math.max(pct, 2)}%"><div class="bar-tooltip">${h}:00 — ${val} msgs</div></div>`;
+        }
+        html += `</div>`;
+
+        // Last 7 days
+        if (s.last7Days?.length) {
+          const maxD = Math.max(...s.last7Days.map(d => d.received), 1);
+          html += `<p style="font-size:12px;color:#7a7a9e;margin-top:12px">Last 7 Days</p>`;
+          html += `<div class="chart-bar-container">`;
+          for (const day of s.last7Days.reverse()) {
+            const pct = (day.received / maxD) * 100;
+            const label = day.date.split('-').slice(1).join('/');
+            html += `<div class="chart-bar" style="height:${Math.max(pct, 2)}%"><div class="bar-tooltip">${label}: ${day.received} msgs</div></div>`;
+          }
+          html += `</div>`;
+        }
+      }
+
+      content.innerHTML = html;
+    }
+
+    document.getElementById('analyticsAccount').addEventListener('change', renderAnalytics);
+
+    // ── Toolbar buttons (with feature gates) ──
+    document.getElementById('btnSplit').addEventListener('click', async () => {
+      if (await requireFeature('splitScreen', 'Split Screen')) hub.toggleSplitScreen();
+    });
+    document.getElementById('btnTemplates').addEventListener('click', async () => {
+      templates = await hub.getTemplates();
+      renderTemplates(templates);
+      openPanel('templatesPanel');
+    });
+    document.getElementById('btnSchedule').addEventListener('click', async () => {
+      if (!(await requireFeature('scheduling', 'Scheduled Messages'))) return;
+      schedules = await hub.getSchedules();
+      renderSchedules(schedules);
+      openPanel('schedulePanel');
+    });
+    document.getElementById('btnExport').addEventListener('click', async () => {
+      if (!(await requireFeature('chatExport', 'Chat Export'))) return;
+      const result = await hub.exportChat({ format: 'text' });
+      if (result.success) showDialog({ title: 'Export Complete', message: `Exported ${result.messageCount} messages.`, isConfirm: true });
+      else if (result.error !== 'Cancelled') showDialog({ title: 'Export Failed', message: result.error, isConfirm: true });
+    });
+    document.getElementById('btnLabels').addEventListener('click', async () => {
+      labelsData = await hub.getLabels();
+      renderLabels(labelsData);
+      openPanel('labelsPanel');
+    });
+    document.getElementById('btnAnalytics').addEventListener('click', async () => {
+      if (!(await requireFeature('analytics', 'Analytics Dashboard'))) return;
+      openPanel('analyticsPanel');
+      renderAnalytics();
+    });
+    document.getElementById('btnSettings').addEventListener('click', async () => {
+      // Load stealth + CRM settings when opening settings
+      const stealth = await hub.getStealthSettings();
+      renderStealthSettings(stealth);
+      const crm = await hub.getCrmSettings();
+      renderCrmSettings(crm);
+      openPanel('settingsPanel');
+    });
+    document.getElementById('collapseBtn').addEventListener('click', () => hub.toggleSidebar());
+    document.getElementById('addBtn').addEventListener('click', async () => {
+      const name = await showDialog({
+        title: 'Add WhatsApp Account',
+        message: 'Give this account a name so you can identify it.',
+        placeholder: 'e.g. Work, Personal, Client Phone',
+      });
+      if (name?.trim()) hub.addAccount(name.trim());
+    });
+
+    // ── Split screen indicator ──
+    hub.onSplitScreenChanged((data) => {
+      document.getElementById('btnSplit').classList.toggle('active', data.active);
+    });
+
+    // ── AI Assistant ──
+    document.getElementById('btnAI').addEventListener('click', async () => {
+      if (await requireFeature('aiReplies', 'AI Assistant')) openPanel('aiPanel');
+    });
+
+    async function aiAction(action) {
+      const results = document.getElementById('aiResults');
+      results.innerHTML = '<div class="empty-state">Thinking...</div>';
+      try {
+        const messages = await hub.aiGetChatMessages();
+        if (messages.error) { results.innerHTML = `<div class="empty-state" style="color:#ff6b6b">${messages.error}</div>`; return; }
+        if (!messages.length) { results.innerHTML = '<div class="empty-state">No messages found in current chat.</div>'; return; }
+
+        let result;
+        if (action === 'suggest') result = await hub.aiSuggestReplies(messages);
+        else if (action === 'summarize') result = await hub.aiSummarize(messages);
+        else if (action === 'sentiment') result = await hub.aiAnalyzeSentiment(messages);
+
+        if (result.error) { results.innerHTML = `<div class="empty-state" style="color:#ff6b6b">${result.error}</div>`; return; }
+
+        if (action === 'suggest' && result.replies) {
+          results.innerHTML = result.replies.map(r =>
+            `<div class="list-item" style="cursor:pointer" onclick="hub.insertTemplate(null, {}); navigator.clipboard.writeText(this.dataset.text)" data-text="${r.replace(/"/g,'&quot;')}">
+              <div class="item-info"><div class="item-title" style="font-size:13px">${r}</div></div>
+              <div class="item-actions"><span style="font-size:11px;color:#5a5a7e">Click to copy</span></div>
+            </div>`
+          ).join('');
+        } else if (action === 'summarize') {
+          results.innerHTML = `<div class="list-item"><div class="item-info"><div class="item-sub" style="white-space:pre-wrap;color:#e0e0e0">${result.summary}</div></div></div>`;
+        } else if (action === 'sentiment') {
+          const colors = { positive: '#25D366', negative: '#ff6b6b', neutral: '#7a7a9e', urgent: '#FFD700' };
+          results.innerHTML = `<div class="list-item">
+            <div class="item-info">
+              <div class="item-title"><span class="status-badge" style="background:${colors[result.sentiment] || '#7a7a9e'}33;color:${colors[result.sentiment] || '#7a7a9e'}">${result.sentiment}</span></div>
+              <div class="item-sub" style="margin-top:8px">${result.summary}</div>
+            </div></div>`;
+        }
+      } catch (e) {
+        results.innerHTML = `<div class="empty-state" style="color:#ff6b6b">${e.message}</div>`;
+      }
+    }
+
+    document.getElementById('aiSuggest').addEventListener('click', () => aiAction('suggest'));
+    document.getElementById('aiSummarize').addEventListener('click', () => aiAction('summarize'));
+    document.getElementById('aiSentiment').addEventListener('click', () => aiAction('sentiment'));
+
+    document.getElementById('aiDraft').addEventListener('click', async () => {
+      const instruction = document.getElementById('aiDraftInstruction').value.trim();
+      if (!instruction) return;
+      const el = document.getElementById('aiDraftResult');
+      el.innerHTML = '<div class="empty-state">Drafting...</div>';
+      const messages = await hub.aiGetChatMessages();
+      const result = await hub.aiDraftReply(messages.error ? [] : messages, instruction);
+      if (result.error) el.innerHTML = `<div class="empty-state" style="color:#ff6b6b">${result.error}</div>`;
+      else el.innerHTML = `<div class="list-item" style="cursor:pointer" onclick="navigator.clipboard.writeText(this.dataset.text)" data-text="${(result.draft||'').replace(/"/g,'&quot;')}"><div class="item-info"><div class="item-title">${result.draft}</div><div class="item-sub">Click to copy</div></div></div>`;
+    });
+
+    document.getElementById('aiTranslate').addEventListener('click', async () => {
+      const text = document.getElementById('aiTranslateText').value.trim();
+      const lang = document.getElementById('aiTranslateLang').value;
+      if (!text) return;
+      const el = document.getElementById('aiTranslateResult');
+      el.innerHTML = '<div class="empty-state">Translating...</div>';
+      const result = await hub.aiTranslate(text, lang);
+      if (result.error) el.innerHTML = `<div class="empty-state" style="color:#ff6b6b">${result.error}</div>`;
+      else el.innerHTML = `<div class="list-item" style="margin-top:8px;cursor:pointer" onclick="navigator.clipboard.writeText(this.dataset.text)" data-text="${(result.translated||'').replace(/"/g,'&quot;')}"><div class="item-info"><div class="item-title">${result.translated}</div><div class="item-sub">Click to copy</div></div></div>`;
+    });
+
+    // ── Automations ──
+    document.getElementById('btnAutomations').addEventListener('click', async () => {
+      if (!(await requireFeature('automations', 'Automations'))) return;
+      const autos = await hub.getAutomations();
+      renderAutomations(autos);
+      openPanel('automationsPanel');
+    });
+
+    function renderAutomations(rules) {
+      const list = document.getElementById('automationsList');
+      if (!rules.length) { list.innerHTML = '<div class="empty-state">No automations yet.</div>'; return; }
+      list.innerHTML = rules.map(r => `
+        <div class="list-item">
+          <div class="item-info">
+            <div class="item-title">${r.name} <span class="status-badge ${r.enabled ? 'status-sent' : 'status-failed'}">${r.enabled ? 'ON' : 'OFF'}</span></div>
+            <div class="item-sub">When: ${r.trigger.type} "${r.trigger.value || 'any'}" → ${r.action.type}</div>
+            <div class="item-sub">Triggered ${r.triggerCount || 0} times</div>
+          </div>
+          <div class="item-actions">
+            <button class="btn btn-secondary" style="font-size:11px;padding:4px 8px" onclick="hub.toggleAutomation('${r.id}')">${r.enabled ? 'Disable' : 'Enable'}</button>
+            <button class="btn btn-danger" style="font-size:11px;padding:4px 8px" onclick="hub.deleteAutomation('${r.id}')">&#10005;</button>
+          </div>
+        </div>`).join('');
+    }
+
+    document.getElementById('autoSave').addEventListener('click', () => {
+      const name = document.getElementById('autoName').value.trim();
+      if (!name) return;
+      hub.saveAutomation({
+        name,
+        accountId: document.getElementById('autoAccount').value,
+        trigger: { type: document.getElementById('autoTriggerType').value, value: document.getElementById('autoTriggerValue').value.trim() },
+        action: { type: document.getElementById('autoActionType').value, value: document.getElementById('autoActionValue').value.trim() },
+      });
+      document.getElementById('autoName').value = '';
+      document.getElementById('autoTriggerValue').value = '';
+      document.getElementById('autoActionValue').value = '';
+    });
+
+    hub.onAutomationsUpdated(renderAutomations);
+
+    // ── Broadcast ──
+    document.getElementById('btnBroadcast').addEventListener('click', async () => {
+      if (!(await requireFeature('broadcast', 'Broadcast Campaigns'))) return;
+      const camps = await hub.getCampaigns();
+      renderCampaigns(camps);
+      openPanel('broadcastPanel');
+    });
+
+    function renderCampaigns(campaigns) {
+      const list = document.getElementById('campaignsList');
+      if (!campaigns.length) { list.innerHTML = '<div class="empty-state">No campaigns yet.</div>'; return; }
+      list.innerHTML = campaigns.map(c => {
+        const statusClass = c.status === 'completed' ? 'status-sent' : c.status === 'running' ? 'status-pending' : 'status-failed';
+        return `
+          <div class="list-item">
+            <div class="item-info">
+              <div class="item-title">${c.name} <span class="status-badge ${statusClass}">${c.status}</span></div>
+              <div class="item-sub">${c.stats.sent}/${c.stats.total} sent${c.stats.failed ? `, ${c.stats.failed} failed` : ''}</div>
+            </div>
+            <div class="item-actions">
+              ${c.status === 'draft' ? `<button class="btn btn-primary" style="font-size:11px;padding:4px 10px" onclick="hub.startCampaign('${c.id}')">Start</button>` : ''}
+              ${c.status === 'running' ? `<button class="btn btn-secondary" style="font-size:11px;padding:4px 10px" onclick="hub.pauseCampaign('${c.id}')">Pause</button>` : ''}
+              ${c.status === 'paused' ? `<button class="btn btn-primary" style="font-size:11px;padding:4px 10px" onclick="hub.resumeCampaign('${c.id}')">Resume</button>` : ''}
+              <button class="btn btn-danger" style="font-size:11px;padding:4px 8px" onclick="hub.deleteCampaign('${c.id}')">&#10005;</button>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    document.getElementById('campCreate').addEventListener('click', () => {
+      const name = document.getElementById('campName').value.trim();
+      const accountId = document.getElementById('campAccount').value;
+      const message = document.getElementById('campMessage').value.trim();
+      const contactsText = document.getElementById('campContacts').value.trim();
+      const delay = parseInt(document.getElementById('campDelay').value) || 5;
+      if (!name || !accountId || !message || !contactsText) return showDialog({ title: 'Missing Fields', message: 'All fields are required.', isConfirm: true });
+      const contacts = contactsText.split('\n').map(c => c.trim()).filter(Boolean).map(name => ({ name, status: 'pending' }));
+      hub.saveCampaign({ name, accountId, message, contacts, delayBetween: Math.max(delay, 3) });
+      document.getElementById('campName').value = '';
+      document.getElementById('campMessage').value = '';
+      document.getElementById('campContacts').value = '';
+    });
+
+    hub.onCampaignProgress(renderCampaigns);
+
+    // ── Stealth Mode (in Settings) ──
+    function renderStealthSettings(stealthData) {
+      const container = document.getElementById('stealthAccountsList');
+      container.innerHTML = currentAccounts.map(acc => {
+        const s = stealthData[acc.id] || {};
+        return `
+          <div style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
+            <div style="font-size:13px;font-weight:500;margin-bottom:6px">${acc.name}</div>
+            <div style="display:flex;gap:12px;font-size:12px">
+              <label style="display:flex;align-items:center;gap:4px;cursor:pointer;color:#a0a0c0">
+                <input type="checkbox" ${s.readReceipts === false ? 'checked' : ''} onchange="updateStealthFor('${acc.id}','readReceipts',!this.checked)"> Hide read receipts
+              </label>
+              <label style="display:flex;align-items:center;gap:4px;cursor:pointer;color:#a0a0c0">
+                <input type="checkbox" ${s.typing === false ? 'checked' : ''} onchange="updateStealthFor('${acc.id}','typing',!this.checked)"> Hide typing
+              </label>
+              <label style="display:flex;align-items:center;gap:4px;cursor:pointer;color:#a0a0c0">
+                <input type="checkbox" ${s.online === false ? 'checked' : ''} onchange="updateStealthFor('${acc.id}','online',!this.checked)"> Hide online
+              </label>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    window.updateStealthFor = function(accountId, key, value) {
+      hub.updateStealth(accountId, { [key]: value });
+    };
+
+    // ── CRM (in Settings) ──
+    function renderCrmSettings(crm) {
+      document.getElementById('toggleHubspot').classList.toggle('on', crm.hubspot?.enabled);
+      document.getElementById('toggleZoho').classList.toggle('on', crm.zoho?.enabled);
+      document.getElementById('hubspotKeyGroup').style.display = crm.hubspot?.enabled ? 'block' : 'none';
+      document.getElementById('zohoKeyGroup').style.display = crm.zoho?.enabled ? 'block' : 'none';
+      if (crm.hubspot?.apiKey) document.getElementById('hubspotKey').value = crm.hubspot.apiKey;
+      if (crm.zoho?.apiKey) document.getElementById('zohoKey').value = crm.zoho.apiKey;
+    }
+
+    document.getElementById('toggleHubspot').addEventListener('click', function() {
+      this.classList.toggle('on');
+      document.getElementById('hubspotKeyGroup').style.display = this.classList.contains('on') ? 'block' : 'none';
+    });
+    document.getElementById('toggleZoho').addEventListener('click', function() {
+      this.classList.toggle('on');
+      document.getElementById('zohoKeyGroup').style.display = this.classList.contains('on') ? 'block' : 'none';
+    });
+
+    document.getElementById('saveCrmSettings').addEventListener('click', () => {
+      hub.updateCrmSettings({
+        hubspot: { enabled: document.getElementById('toggleHubspot').classList.contains('on'), apiKey: document.getElementById('hubspotKey').value.trim() },
+        zoho: { enabled: document.getElementById('toggleZoho').classList.contains('on'), apiKey: document.getElementById('zohoKey').value.trim() },
+      });
+      showDialog({ title: 'Saved', message: 'CRM settings saved.', isConfirm: true });
+    });
+
+    // API Key save
+    document.getElementById('saveApiKey').addEventListener('click', () => {
+      const key = document.getElementById('anthropicKey').value.trim();
+      if (!key) return;
+      currentSettings.anthropicApiKey = key;
+      hub.updateSettings(currentSettings);
+      showDialog({ title: 'Saved', message: 'API key saved. AI features are now active.', isConfirm: true });
+    });
+
+    // ── Licensing & Upgrade ──
+    let currentLicense = { tier: 'free', features: {} };
+
+    async function loadLicense() {
+      currentLicense = await hub.getLicense();
+      updateLicenseUI();
+    }
+
+    function updateLicenseUI() {
+      const tier = currentLicense.tier || 'free';
+      const tierColors = { free: '#7a7a9e', pro: '#25D366', business: '#FFD700' };
+      const tierNames = { free: 'Free Plan', pro: 'Pro Plan', business: 'Business Plan' };
+
+      // Settings panel
+      const badge = document.getElementById('settingsTierBadge');
+      if (badge) {
+        badge.textContent = tierNames[tier];
+        badge.style.color = tierColors[tier];
+      }
+      const emailEl = document.getElementById('settingsLicenseEmail');
+      if (emailEl) emailEl.textContent = currentLicense.email ? ` (${currentLicense.email})` : '';
+
+      const upgradeBtn = document.getElementById('settingsUpgradeBtn');
+      if (upgradeBtn) {
+        upgradeBtn.textContent = tier === 'free' ? 'Upgrade' : 'Manage Plan';
+      }
+
+      // Upgrade panel current plan badge
+      const planBadge = document.getElementById('currentPlanBadge');
+      if (planBadge) {
+        planBadge.innerHTML = `<span class="status-badge" style="background:${tierColors[tier]}33;color:${tierColors[tier]}">Current: ${tierNames[tier]}</span>`;
+      }
+    }
+
+    let isAnnualBilling = false;
+
+    function toggleBilling() {
+      isAnnualBilling = !isAnnualBilling;
+      document.getElementById('billingDot').style.transform = isAnnualBilling ? 'translateX(20px)' : 'translateX(0)';
+      document.getElementById('billingToggle').style.background = isAnnualBilling ? '#25D366' : '#333';
+      document.getElementById('billingMonthlyLabel').style.color = isAnnualBilling ? '#7a7a9e' : '#25D366';
+      document.getElementById('billingAnnualLabel').style.color = isAnnualBilling ? '#25D366' : '#7a7a9e';
+
+      if (isAnnualBilling) {
+        document.getElementById('proPriceDisplay').innerHTML = '$79<span style="font-size:14px;color:#7a7a9e">/year</span>';
+        document.getElementById('proSubtext').textContent = '$6.58/mo — save 27% vs monthly';
+        document.getElementById('bizPriceDisplay').innerHTML = '$149<span style="font-size:14px;color:#7a7a9e">/year</span>';
+        document.getElementById('bizSubtext').textContent = '$12.42/mo — save 35% vs monthly';
+      } else {
+        document.getElementById('proPriceDisplay').innerHTML = '$9<span style="font-size:14px;color:#7a7a9e">/mo</span>';
+        document.getElementById('proSubtext').textContent = 'or $79/year (save 27%)';
+        document.getElementById('bizPriceDisplay').innerHTML = '$19<span style="font-size:14px;color:#7a7a9e">/mo</span>';
+        document.getElementById('bizSubtext').textContent = 'or $149/year (save 35%)';
+      }
+    }
+
+    async function startUpgrade(tier) {
+      const url = await hub.getCheckoutUrl(tier, isAnnualBilling);
+      if (url) {
+        window.open(url, '_blank');
+        showDialog({
+          title: 'Checkout Opened',
+          message: 'Complete the payment in your browser.\n\nAfter payment, Lemon Squeezy will email you a license key.\n\nPaste it below to activate your plan.',
+          isConfirm: true,
+        });
+      } else {
+        showDialog({
+          title: 'Payment',
+          message: `Visit supamsg.com to subscribe to ${tier}. After payment, enter your license key below.`,
+          isConfirm: true,
+        });
+      }
+    }
+
+    document.getElementById('activateLicenseBtn').addEventListener('click', async () => {
+      const key = document.getElementById('licenseKeyInput').value.trim();
+      const email = document.getElementById('licenseEmailInput').value.trim();
+      const status = document.getElementById('licenseStatus');
+
+      if (!key) { status.innerHTML = '<span style="color:#ff6b6b">Enter a license key.</span>'; return; }
+
+      status.innerHTML = '<span style="color:#7a7a9e">Activating...</span>';
+      const result = await hub.activateLicense(key, email);
+
+      if (result.success) {
+        status.innerHTML = `<span style="color:#25D366">Activated! You're now on the ${result.tier} plan.</span>`;
+        loadLicense();
+        closePanel('upgradePanel');
+      } else {
+        status.innerHTML = `<span style="color:#ff6b6b">${result.error}</span>`;
+      }
+    });
+
+    document.getElementById('settingsUpgradeBtn').addEventListener('click', () => {
+      if (currentLicense.tier === 'free') {
+        closePanel('settingsPanel');
+        openPanel('upgradePanel');
+      } else {
+        // Open customer portal for managing subscription
+        const portalUrl = await hub.getCustomerPortalUrl();
+        window.open(portalUrl, '_blank');
+      }
+    });
+
+    // Feature gate check — shows upgrade prompt if feature is locked
+    async function requireFeature(featureName, friendlyName) {
+      const allowed = await hub.checkFeature(featureName);
+      if (!allowed) {
+        closePanel('settingsPanel'); // close any open panel
+        openPanel('upgradePanel');
+        showDialog({
+          title: 'Upgrade Required',
+          message: `"${friendlyName}" is available on the Pro or Business plan. Upgrade to unlock it.`,
+          isConfirm: true,
+        });
+        return false;
+      }
+      return true;
+    }
+
+    hub.onLicenseUpdated((data) => {
+      currentLicense = data;
+      updateLicenseUI();
+    });
+
+    // Load license on start
+    setTimeout(loadLicense, 1000);
+
+    // ── Command Palette (Cmd+K) ──
+    const cmdActions = [
+      { name: 'Switch to Split Screen', action: () => { closePanel('commandPalette'); hub.toggleSplitScreen(); }, keywords: 'split dual' },
+      { name: 'Open Templates', action: () => { closePanel('commandPalette'); document.getElementById('btnTemplates').click(); }, keywords: 'template quick reply' },
+      { name: 'Schedule a Message', action: () => { closePanel('commandPalette'); document.getElementById('btnSchedule').click(); }, keywords: 'schedule later timer' },
+      { name: 'Export Current Chat', action: () => { closePanel('commandPalette'); document.getElementById('btnExport').click(); }, keywords: 'export save download' },
+      { name: 'Open Contact Labels', action: () => { closePanel('commandPalette'); document.getElementById('btnLabels').click(); }, keywords: 'label tag contact' },
+      { name: 'View Analytics', action: () => { closePanel('commandPalette'); document.getElementById('btnAnalytics').click(); }, keywords: 'analytics stats chart' },
+      { name: 'AI Suggest Replies', action: () => { closePanel('commandPalette'); openPanel('aiPanel'); aiAction('suggest'); }, keywords: 'ai smart reply suggest' },
+      { name: 'AI Summarize Chat', action: () => { closePanel('commandPalette'); openPanel('aiPanel'); aiAction('summarize'); }, keywords: 'ai summarize tldr' },
+      { name: 'Open Automations', action: () => { closePanel('commandPalette'); document.getElementById('btnAutomations').click(); }, keywords: 'automation rule workflow' },
+      { name: 'Open Broadcast', action: () => { closePanel('commandPalette'); document.getElementById('btnBroadcast').click(); }, keywords: 'broadcast campaign bulk' },
+      { name: 'Open Settings', action: () => { closePanel('commandPalette'); document.getElementById('btnSettings').click(); }, keywords: 'settings preferences config' },
+      { name: 'Toggle Sidebar', action: () => { closePanel('commandPalette'); hub.toggleSidebar(); }, keywords: 'sidebar collapse expand' },
+      { name: 'Add New Account', action: () => { closePanel('commandPalette'); document.getElementById('addBtn').click(); }, keywords: 'add new account whatsapp' },
+    ];
+
+    function renderCommandResults(query) {
+      const el = document.getElementById('cmdResults');
+      const q = query.toLowerCase();
+
+      // Dynamic: add account switching
+      const allActions = [
+        ...currentAccounts.map(a => ({
+          name: `Switch to ${a.name}`,
+          action: () => { closePanel('commandPalette'); hub.switchAccount(a.id); },
+          keywords: `switch ${a.name.toLowerCase()}`,
+        })),
+        ...cmdActions,
+      ];
+
+      const filtered = q ? allActions.filter(a =>
+        a.name.toLowerCase().includes(q) || a.keywords.includes(q)
+      ) : allActions;
+
+      el.innerHTML = filtered.slice(0, 10).map((a, i) =>
+        `<div class="list-item" style="cursor:pointer;padding:8px 12px;${i === 0 ? 'background:rgba(37,211,102,0.1)' : ''}" onclick="cmdActions_exec(${allActions.indexOf(a)})" data-idx="${allActions.indexOf(a)}">
+          <div class="item-info"><div class="item-title" style="font-size:13px">${a.name}</div></div>
+        </div>`
+      ).join('');
+
+      // Store for keyboard nav
+      window._cmdFiltered = filtered.slice(0, 10);
+      window._cmdAllActions = allActions;
+    }
+
+    window.cmdActions_exec = function(idx) {
+      if (window._cmdAllActions && window._cmdAllActions[idx]) window._cmdAllActions[idx].action();
+    };
+
+    document.getElementById('cmdInput').addEventListener('input', (e) => renderCommandResults(e.target.value));
+    document.getElementById('cmdInput').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && window._cmdFiltered?.length) {
+        e.preventDefault();
+        window._cmdFiltered[0].action();
+      }
+    });
+
+    // ── Keyboard shortcuts (updated) ──
+    document.addEventListener('keydown', (e) => {
+      if (e.metaKey && e.key >= '1' && e.key <= '9') {
+        const idx = parseInt(e.key) - 1;
+        if (idx < currentAccounts.length) { e.preventDefault(); hub.switchAccount(currentAccounts[idx].id); }
+      }
+      if (e.metaKey && e.key === '\\') { e.preventDefault(); hub.toggleSidebar(); }
+      if (e.metaKey && e.key === 'd') { e.preventDefault(); hub.toggleSplitScreen(); }
+      if (e.metaKey && e.key === 't') {
+        e.preventDefault();
+        hub.getTemplates().then(t => { renderTemplates(t); openPanel('templatesPanel'); });
+      }
+      if (e.metaKey && e.key === 'e') { e.preventDefault(); document.getElementById('btnExport').click(); }
+      if (e.metaKey && e.key === 'j') { e.preventDefault(); openPanel('aiPanel'); }
+      if (e.metaKey && e.key === 'k') {
+        e.preventDefault();
+        openPanel('commandPalette');
+        document.getElementById('cmdInput').value = '';
+        renderCommandResults('');
+        setTimeout(() => document.getElementById('cmdInput').focus(), 100);
+      }
+      if (e.key === 'Escape') {
+        document.querySelectorAll('.panel-overlay.visible').forEach(p => closePanel(p.id));
+      }
+    });
+
+    // ── IPC listeners ──
+    hub.onLoadAccounts(renderAccounts);
+    hub.onAccountSwitched(id => { activeId = id; renderAccounts(currentAccounts); });
+    hub.onSettingsUpdated(updateSettingsUI);
+    hub.onUnreadCounts(c => { unreadCounts = c; renderAccounts(currentAccounts); });
+    hub.onSchedulesUpdated(renderSchedules);
+    hub.onTemplatesUpdated(renderTemplates);
+    hub.onLabelsUpdated(renderLabels);
+  </script>
+</body>
+</html>

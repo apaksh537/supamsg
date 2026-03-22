@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Welcome to SupaMsg</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #1a1a2e;
+      color: #e0e0e0;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      -webkit-app-region: drag;
+    }
+
+    .onboarding {
+      width: 600px;
+      text-align: center;
+      -webkit-app-region: no-drag;
+    }
+
+    .slides { position: relative; height: 420px; }
+
+    .slide {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      opacity: 0;
+      transform: translateX(40px);
+      transition: all 0.4s ease;
+      pointer-events: none;
+    }
+
+    .slide.active {
+      opacity: 1;
+      transform: translateX(0);
+      pointer-events: all;
+    }
+
+    .slide-icon {
+      font-size: 64px;
+      margin-bottom: 24px;
+    }
+
+    .slide h2 {
+      font-size: 28px;
+      font-weight: 700;
+      color: #25D366;
+      margin-bottom: 12px;
+    }
+
+    .slide p {
+      font-size: 16px;
+      color: #a0a0c0;
+      line-height: 1.6;
+      max-width: 460px;
+      margin: 0 auto 24px;
+    }
+
+    .step-list {
+      text-align: left;
+      max-width: 380px;
+      margin: 0 auto;
+    }
+
+    .step-list li {
+      list-style: none;
+      padding: 10px 0;
+      font-size: 14px;
+      color: #c0c0d8;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .step-num {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: rgba(37, 211, 102, 0.2);
+      color: #25D366;
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .shortcut-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      max-width: 400px;
+      margin: 0 auto;
+      text-align: left;
+    }
+
+    .shortcut-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 8px;
+    }
+
+    .shortcut-key {
+      background: rgba(255,255,255,0.1);
+      color: #25D366;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-family: monospace;
+      white-space: nowrap;
+    }
+
+    .shortcut-label {
+      font-size: 12px;
+      color: #a0a0c0;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      margin-top: 32px;
+    }
+
+    .dots {
+      display: flex;
+      gap: 8px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.15);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .dot.active {
+      background: #25D366;
+      width: 24px;
+      border-radius: 4px;
+    }
+
+    .nav-btn {
+      padding: 10px 28px;
+      border-radius: 8px;
+      border: none;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-next {
+      background: #25D366;
+      color: #000;
+    }
+    .btn-next:hover { background: #20c45a; }
+
+    .btn-skip {
+      background: none;
+      color: #7a7a9e;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .btn-skip:hover { color: #e0e0e0; border-color: rgba(255,255,255,0.2); }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      max-width: 440px;
+      margin: 0 auto;
+      text-align: left;
+    }
+
+    .feature-item {
+      padding: 10px 14px;
+      background: rgba(37, 211, 102, 0.06);
+      border-radius: 8px;
+      border: 1px solid rgba(37, 211, 102, 0.1);
+    }
+
+    .feature-item strong {
+      color: #25D366;
+      font-size: 13px;
+    }
+
+    .feature-item span {
+      display: block;
+      font-size: 11px;
+      color: #7a7a9e;
+      margin-top: 2px;
+    }
+  </style>
+</head>
+<body>
+  <div class="onboarding">
+    <div class="slides">
+      <!-- Slide 1: Welcome -->
+      <div class="slide active" data-slide="0">
+        <div class="slide-icon">&#128172;&#128172;</div>
+        <h2>Welcome to SupaMsg</h2>
+        <p>Manage all your WhatsApp accounts from one beautiful window. No more switching between phones.</p>
+      </div>
+
+      <!-- Slide 2: How it works -->
+      <div class="slide" data-slide="1">
+        <div class="slide-icon">&#128241;</div>
+        <h2>Getting Started</h2>
+        <p>Setting up is simple — just scan QR codes like you would for WhatsApp Web.</p>
+        <ul class="step-list">
+          <li><span class="step-num">1</span> Each account shows a WhatsApp Web QR code</li>
+          <li><span class="step-num">2</span> Open WhatsApp on the phone for that number</li>
+          <li><span class="step-num">3</span> Go to Linked Devices and scan the QR code</li>
+          <li><span class="step-num">4</span> Repeat for each phone — you're done!</li>
+        </ul>
+      </div>
+
+      <!-- Slide 3: Keyboard shortcuts -->
+      <div class="slide" data-slide="2">
+        <div class="slide-icon">&#9000;</div>
+        <h2>Keyboard Shortcuts</h2>
+        <p>Power through your messages with these shortcuts.</p>
+        <div class="shortcut-grid">
+          <div class="shortcut-item">
+            <span class="shortcut-key">Cmd+1-9</span>
+            <span class="shortcut-label">Switch accounts</span>
+          </div>
+          <div class="shortcut-item">
+            <span class="shortcut-key">Cmd+\</span>
+            <span class="shortcut-label">Toggle sidebar</span>
+          </div>
+          <div class="shortcut-item">
+            <span class="shortcut-key">Cmd+D</span>
+            <span class="shortcut-label">Split screen</span>
+          </div>
+          <div class="shortcut-item">
+            <span class="shortcut-key">Ctrl+Shift+W</span>
+            <span class="shortcut-label">Show/hide app</span>
+          </div>
+          <div class="shortcut-item">
+            <span class="shortcut-key">Cmd+T</span>
+            <span class="shortcut-label">Templates</span>
+          </div>
+          <div class="shortcut-item">
+            <span class="shortcut-key">Cmd+E</span>
+            <span class="shortcut-label">Export chat</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 4: Features -->
+      <div class="slide" data-slide="3">
+        <div class="slide-icon">&#9889;</div>
+        <h2>Power Features</h2>
+        <p>Everything you need to manage WhatsApp like a pro.</p>
+        <div class="feature-grid">
+          <div class="feature-item">
+            <strong>Scheduled Messages</strong>
+            <span>Send messages at the perfect time</span>
+          </div>
+          <div class="feature-item">
+            <strong>Templates</strong>
+            <span>Quick replies in one click</span>
+          </div>
+          <div class="feature-item">
+            <strong>Split Screen</strong>
+            <span>View 2 accounts at once</span>
+          </div>
+          <div class="feature-item">
+            <strong>Chat Export</strong>
+            <span>Save conversations to PDF</span>
+          </div>
+          <div class="feature-item">
+            <strong>Contact Labels</strong>
+            <span>Tag & organize contacts</span>
+          </div>
+          <div class="feature-item">
+            <strong>Analytics</strong>
+            <span>Message stats & insights</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav">
+      <button class="nav-btn btn-skip" id="skipBtn">Skip</button>
+      <div class="dots" id="dots"></div>
+      <button class="nav-btn btn-next" id="nextBtn">Next</button>
+    </div>
+  </div>
+
+  <script>
+    const slides = document.querySelectorAll('.slide');
+    const dotsContainer = document.getElementById('dots');
+    let current = 0;
+
+    // Create dots
+    slides.forEach((_, i) => {
+      const dot = document.createElement('div');
+      dot.className = `dot ${i === 0 ? 'active' : ''}`;
+      dot.addEventListener('click', () => goTo(i));
+      dotsContainer.appendChild(dot);
+    });
+
+    function goTo(index) {
+      slides[current].classList.remove('active');
+      dotsContainer.children[current].classList.remove('active');
+      current = index;
+      slides[current].classList.add('active');
+      dotsContainer.children[current].classList.add('active');
+
+      const nextBtn = document.getElementById('nextBtn');
+      nextBtn.textContent = current === slides.length - 1 ? "Let's Go!" : 'Next';
+    }
+
+    document.getElementById('nextBtn').addEventListener('click', () => {
+      if (current === slides.length - 1) {
+        window.hub.finishOnboarding();
+      } else {
+        goTo(current + 1);
+      }
+    });
+
+    document.getElementById('skipBtn').addEventListener('click', () => {
+      window.hub.finishOnboarding();
+    });
+
+    // Arrow key navigation
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'Enter') {
+        if (current === slides.length - 1) window.hub.finishOnboarding();
+        else goTo(current + 1);
+      }
+      if (e.key === 'ArrowLeft' && current > 0) goTo(current - 1);
+    });
+  </script>
+</body>
+</html>

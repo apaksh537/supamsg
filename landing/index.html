@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SupaMsg — All Your WhatsApps. One Window.</title>
+<link rel="icon" type="image/png" href="favicon.png">
+<meta name="description" content="Manage multiple WhatsApp accounts from one macOS app. Multi-account switching, scheduled messages, unified notifications, and more.">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg-primary: #0d0d1a;
+  --bg-secondary: #1a1a2e;
+  --bg-tertiary: #16213e;
+  --green: #25D366;
+  --green-dark: #1da851;
+  --green-glow: rgba(37, 211, 102, 0.15);
+  --text-primary: #f0f0f5;
+  --text-secondary: #a0a0b8;
+  --text-muted: #6b6b80;
+  --border: rgba(255,255,255,0.06);
+  --border-hover: rgba(255,255,255,0.12);
+  --card-bg: rgba(26, 26, 46, 0.6);
+  --radius: 16px;
+  --radius-sm: 10px;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', system-ui, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Utility */
+.container { max-width: 1140px; margin: 0 auto; padding: 0 24px; }
+section { padding: 100px 0; }
+
+/* Animated background gradient */
+.bg-glow {
+  position: fixed;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at 30% 20%, rgba(37, 211, 102, 0.04) 0%, transparent 50%),
+              radial-gradient(circle at 70% 80%, rgba(22, 33, 62, 0.3) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Navbar */
+nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  padding: 16px 0;
+  transition: background 0.3s, backdrop-filter 0.3s;
+}
+nav.scrolled {
+  background: rgba(13, 13, 26, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+}
+nav .container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-decoration: none;
+}
+.nav-logo .logo-icon {
+  width: 32px;
+  height: 32px;
+  background: var(--green);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+.nav-links { display: flex; align-items: center; gap: 32px; list-style: none; }
+.nav-links a {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--text-primary); }
+.btn-nav {
+  background: var(--green);
+  color: #000;
+  padding: 8px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+.btn-nav:hover { background: var(--green-dark); transform: translateY(-1px); }
+
+/* Hero */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  position: relative;
+  padding-top: 80px;
+}
+.hero-content { position: relative; z-index: 1; max-width: 800px; }
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--green-glow);
+  border: 1px solid rgba(37, 211, 102, 0.2);
+  color: var(--green);
+  padding: 6px 16px;
+  border-radius: 100px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 28px;
+}
+.hero-badge .dot {
+  width: 6px;
+  height: 6px;
+  background: var(--green);
+  border-radius: 50%;
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+h1 {
+  font-size: clamp(3rem, 6.5vw, 5rem);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  margin-bottom: 24px;
+  background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+h1 .highlight {
+  background: linear-gradient(135deg, var(--green) 0%, #20c95c 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+.hero-subtitle {
+  font-size: clamp(1.05rem, 2vw, 1.25rem);
+  color: var(--text-secondary);
+  max-width: 600px;
+  margin: 0 auto 40px;
+  line-height: 1.7;
+}
+.hero-ctas {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--green);
+  color: #000;
+  padding: 14px 32px;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.25s;
+  border: none;
+  cursor: pointer;
+}
+.btn-primary:hover { background: var(--green-dark); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(37, 211, 102, 0.25); }
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255,255,255,0.05);
+  color: var(--text-primary);
+  padding: 14px 32px;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  border: 1px solid var(--border-hover);
+  transition: all 0.25s;
+}
+.btn-secondary:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); transform: translateY(-2px); }
+.hero-meta {
+  margin-top: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+.hero-meta span { display: flex; align-items: center; gap: 6px; }
+
+/* App Preview */
+.hero-preview {
+  margin-top: 64px;
+  position: relative;
+}
+.app-window {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-hover);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 40px 80px rgba(0,0,0,0.5), 0 0 120px rgba(37, 211, 102, 0.05);
+  max-width: 860px;
+  margin: 0 auto;
+}
+.app-titlebar {
+  display: flex;
+  align-items: center;
+  padding: 14px 18px;
+  gap: 8px;
+  background: rgba(0,0,0,0.2);
+  border-bottom: 1px solid var(--border);
+}
+.app-titlebar .dot-r { width: 12px; height: 12px; border-radius: 50%; background: #ff5f57; }
+.app-titlebar .dot-y { width: 12px; height: 12px; border-radius: 50%; background: #febc2e; }
+.app-titlebar .dot-g { width: 12px; height: 12px; border-radius: 50%; background: #28c840; }
+.app-titlebar span { flex: 1; text-align: center; font-size: 0.8rem; color: var(--text-muted); }
+.app-body {
+  display: flex;
+  height: 380px;
+}
+.app-sidebar {
+  width: 220px;
+  border-right: 1px solid var(--border);
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.account-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  cursor: default;
+  transition: background 0.15s;
+}
+.account-item.active { background: var(--green-glow); }
+.account-item .avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #000;
+  flex-shrink: 0;
+}
+.account-item .info { flex: 1; min-width: 0; }
+.account-item .name { font-size: 0.82rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.account-item .status { font-size: 0.72rem; color: var(--text-muted); }
+.account-item .badge-count {
+  background: var(--green);
+  color: #000;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 100px;
+  min-width: 20px;
+  text-align: center;
+}
+.app-main { flex: 1; display: flex; flex-direction: column; }
+.app-main-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.app-main-header .chat-avatar { width: 32px; height: 32px; border-radius: 50%; background: #3b82f6; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; color: #fff; }
+.app-main-header .chat-name { font-size: 0.9rem; font-weight: 600; }
+.app-chat { flex: 1; padding: 20px; display: flex; flex-direction: column; gap: 12px; overflow: hidden; }
+.msg {
+  max-width: 65%;
+  padding: 10px 14px;
+  border-radius: 14px;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+.msg.in { background: rgba(255,255,255,0.06); align-self: flex-start; border-bottom-left-radius: 4px; }
+.msg.out { background: rgba(37, 211, 102, 0.15); color: var(--text-primary); align-self: flex-end; border-bottom-right-radius: 4px; }
+.msg .time { font-size: 0.65rem; color: var(--text-muted); margin-top: 4px; }
+
+/* Social proof */
+.social-proof {
+  padding: 80px 0;
+  background: linear-gradient(180deg, transparent 0%, rgba(37, 211, 102, 0.02) 50%, transparent 100%);
+}
+.social-proof .container { text-align: center; }
+.proof-label {
+  font-size: 0.85rem;
+  color: var(--green);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+.proof-heading {
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+  font-weight: 700;
+  margin-bottom: 48px;
+  letter-spacing: -0.02em;
+}
+.proof-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+.proof-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px 24px;
+  text-align: left;
+  transition: all 0.3s;
+}
+.proof-card:hover { border-color: var(--border-hover); transform: translateY(-2px); }
+.proof-stars { color: #fbbf24; font-size: 0.85rem; margin-bottom: 14px; letter-spacing: 2px; }
+.proof-quote { font-size: 0.92rem; color: var(--text-secondary); line-height: 1.65; margin-bottom: 18px; }
+.proof-author { display: flex; align-items: center; gap: 12px; }
+.proof-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #000;
+}
+.proof-name { font-size: 0.82rem; font-weight: 600; }
+.proof-role { font-size: 0.75rem; color: var(--text-muted); }
+
+/* Section headers */
+.section-label {
+  font-size: 0.85rem;
+  color: var(--green);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  text-align: center;
+}
+.section-title {
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  font-weight: 800;
+  text-align: center;
+  letter-spacing: -0.02em;
+  margin-bottom: 16px;
+}
+.section-desc {
+  text-align: center;
+  color: var(--text-secondary);
+  max-width: 560px;
+  margin: 0 auto 56px;
+  font-size: 1.05rem;
+  line-height: 1.7;
+}
+
+/* Features */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+}
+.feature-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px 24px;
+  transition: all 0.35s cubic-bezier(0.23, 1, 0.32, 1);
+  opacity: 0;
+  transform: translateY(24px);
+}
+.feature-card.visible { opacity: 1; transform: translateY(0); }
+.feature-card:hover { border-color: rgba(37, 211, 102, 0.2); background: rgba(26, 26, 46, 0.8); transform: translateY(-4px); }
+.feature-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--green-glow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  margin-bottom: 18px;
+}
+.feature-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 8px; }
+.feature-card p { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6; }
+
+/* Pricing */
+#pricing { background: linear-gradient(180deg, transparent 0%, rgba(22, 33, 62, 0.15) 50%, transparent 100%); }
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+.pricing-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 36px 32px;
+  position: relative;
+  transition: all 0.35s cubic-bezier(0.23, 1, 0.32, 1);
+  opacity: 0;
+  transform: translateY(24px);
+  display: flex;
+  flex-direction: column;
+}
+.pricing-card.visible { opacity: 1; transform: translateY(0); }
+.pricing-card.featured {
+  border-color: rgba(37, 211, 102, 0.3);
+  background: linear-gradient(180deg, rgba(37, 211, 102, 0.06) 0%, var(--card-bg) 100%);
+  box-shadow: 0 0 60px rgba(37, 211, 102, 0.08);
+}
+.pricing-card:hover { transform: translateY(-4px); }
+.popular-badge {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--green);
+  color: #000;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 16px;
+  border-radius: 100px;
+  letter-spacing: 0.04em;
+}
+.pricing-tier { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+.pricing-price { font-size: 3rem; font-weight: 800; margin-bottom: 4px; letter-spacing: -0.03em; }
+.pricing-price span { font-size: 1rem; font-weight: 500; color: var(--text-muted); }
+.pricing-desc { font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 28px; }
+.pricing-features { list-style: none; margin-bottom: 32px; flex: 1; }
+.pricing-features li {
+  padding: 8px 0;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.pricing-features li::before {
+  content: '\2713';
+  color: var(--green);
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.pricing-btn {
+  display: block;
+  text-align: center;
+  padding: 14px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-decoration: none;
+  transition: all 0.25s;
+  border: none;
+  cursor: pointer;
+}
+.pricing-btn.primary { background: var(--green); color: #000; }
+.pricing-btn.primary:hover { background: var(--green-dark); transform: translateY(-1px); }
+.pricing-btn.outline { background: transparent; color: var(--text-primary); border: 1px solid var(--border-hover); }
+.pricing-btn.outline:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.2); }
+
+/* FAQ */
+.faq-list { max-width: 700px; margin: 0 auto; }
+.faq-item {
+  border-bottom: 1px solid var(--border);
+  opacity: 0;
+  transform: translateY(16px);
+  transition: all 0.4s;
+}
+.faq-item.visible { opacity: 1; transform: translateY(0); }
+.faq-question {
+  width: 100%;
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 24px 0;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  font-family: inherit;
+}
+.faq-question:hover { color: var(--green); }
+.faq-arrow {
+  font-size: 1.2rem;
+  transition: transform 0.3s;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+.faq-item.open .faq-arrow { transform: rotate(45deg); color: var(--green); }
+.faq-answer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.35s ease, padding 0.35s ease;
+}
+.faq-item.open .faq-answer { max-height: 200px; }
+.faq-answer p {
+  padding-bottom: 24px;
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+/* Footer / Waitlist */
+.footer-cta {
+  text-align: center;
+  padding: 100px 0 40px;
+  position: relative;
+}
+.footer-cta::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(37, 211, 102, 0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+.footer-cta h2 {
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin-bottom: 16px;
+  position: relative;
+}
+.footer-cta .sub {
+  color: var(--text-secondary);
+  font-size: 1.05rem;
+  margin-bottom: 36px;
+  position: relative;
+}
+.waitlist-form {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  max-width: 480px;
+  margin: 0 auto;
+  position: relative;
+  flex-wrap: wrap;
+}
+.waitlist-form input {
+  flex: 1;
+  min-width: 240px;
+  padding: 14px 20px;
+  border-radius: 12px;
+  border: 1px solid var(--border-hover);
+  background: rgba(255,255,255,0.04);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  font-family: inherit;
+  outline: none;
+  transition: all 0.2s;
+}
+.waitlist-form input::placeholder { color: var(--text-muted); }
+.waitlist-form input:focus { border-color: var(--green); background: rgba(37, 211, 102, 0.04); }
+.waitlist-form button {
+  padding: 14px 28px;
+  border-radius: 12px;
+  background: var(--green);
+  color: #000;
+  font-weight: 700;
+  font-size: 0.95rem;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.25s;
+  white-space: nowrap;
+}
+.waitlist-form button:hover { background: var(--green-dark); transform: translateY(-1px); }
+.waitlist-success {
+  display: none;
+  color: var(--green);
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-top: 16px;
+}
+.waitlist-success.show { display: block; }
+
+footer {
+  border-top: 1px solid var(--border);
+  padding: 40px 0;
+}
+footer .container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+footer .copy { font-size: 0.82rem; color: var(--text-muted); }
+footer .footer-links { display: flex; gap: 24px; }
+footer .footer-links a { color: var(--text-muted); text-decoration: none; font-size: 0.82rem; transition: color 0.2s; }
+footer .footer-links a:hover { color: var(--text-primary); }
+
+/* Responsive */
+@media (max-width: 768px) {
+  section { padding: 72px 0; }
+  .nav-links { display: none; }
+  .app-body { height: 280px; }
+  .app-sidebar { width: 170px; padding: 12px 8px; }
+  .account-item { padding: 8px 8px; }
+  .account-item .avatar { width: 30px; height: 30px; font-size: 0.75rem; }
+  .pricing-grid { grid-template-columns: 1fr; max-width: 400px; }
+  .hero-meta { flex-direction: column; gap: 8px; }
+}
+@media (max-width: 480px) {
+  .app-sidebar { display: none; }
+}
+
+/* Animations */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-in {
+  animation: fade-up 0.7s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+}
+.delay-1 { animation-delay: 0.1s; }
+.delay-2 { animation-delay: 0.2s; }
+.delay-3 { animation-delay: 0.3s; }
+.delay-4 { animation-delay: 0.4s; }
+.hero-content > * { opacity: 0; animation: fade-up 0.7s cubic-bezier(0.23, 1, 0.32, 1) forwards; }
+.hero-content > *:nth-child(1) { animation-delay: 0.1s; }
+.hero-content > *:nth-child(2) { animation-delay: 0.2s; }
+.hero-content > *:nth-child(3) { animation-delay: 0.3s; }
+.hero-content > *:nth-child(4) { animation-delay: 0.4s; }
+.hero-content > *:nth-child(5) { animation-delay: 0.5s; }
+.hero-preview { opacity: 0; animation: fade-up 0.9s cubic-bezier(0.23, 1, 0.32, 1) 0.6s forwards; }
+</style>
+</head>
+<body>
+<div class="bg-glow"></div>
+
+<!-- Nav -->
+<nav id="navbar">
+  <div class="container">
+    <a href="#" class="nav-logo">
+      <img src="logo.png" alt="SupaMsg" style="width:32px;height:32px;border-radius:8px">
+      SupaMsg
+    </a>
+    <ul class="nav-links">
+      <li><a href="#features">Features</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+      <li><a href="#faq">FAQ</a></li>
+      <li><a href="#download" class="btn-nav">Download</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero" id="hero">
+  <div class="container">
+    <div class="hero-content">
+      <img src="logo.png" alt="SupaMsg" style="width:100px;height:100px;border-radius:22px;margin-bottom:24px;box-shadow:0 10px 40px rgba(37,211,102,0.3)">
+      <div class="hero-badge"><span class="dot"></span> Now available for macOS</div>
+      <h1>All Your WhatsApps.<br><span class="highlight">One Window.</span></h1>
+      <p class="hero-subtitle">Manage multiple WhatsApp accounts, schedule messages, get unified notifications &mdash; all from your Mac.</p>
+      <div class="hero-ctas">
+        <a href="#download" class="btn-primary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download for Mac
+        </a>
+        <a href="#features" class="btn-secondary">See Features</a>
+      </div>
+      <div class="hero-meta">
+        <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Privacy-first</span>
+        <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg> Native macOS app</span>
+        <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg> Free to start</span>
+      </div>
+    </div>
+    <div class="hero-preview">
+      <div class="app-window">
+        <div class="app-titlebar">
+          <div class="dot-r"></div><div class="dot-y"></div><div class="dot-g"></div>
+          <span>SupaMsg</span>
+          <div style="width:36px"></div>
+        </div>
+        <div class="app-body">
+          <div class="app-sidebar">
+            <div class="account-item active">
+              <div class="avatar" style="background:#25D366">P</div>
+              <div class="info"><div class="name">Personal</div><div class="status">Online</div></div>
+              <div class="badge-count">3</div>
+            </div>
+            <div class="account-item">
+              <div class="avatar" style="background:#3b82f6">W</div>
+              <div class="info"><div class="name">Work</div><div class="status">2 unread</div></div>
+              <div class="badge-count">2</div>
+            </div>
+            <div class="account-item">
+              <div class="avatar" style="background:#f59e0b">S</div>
+              <div class="info"><div class="name">Startup</div><div class="status">Last seen 2m</div></div>
+            </div>
+            <div class="account-item">
+              <div class="avatar" style="background:#ef4444">C</div>
+              <div class="info"><div class="name">Client Line</div><div class="status">DND active</div></div>
+            </div>
+          </div>
+          <div class="app-main">
+            <div class="app-main-header">
+              <div class="chat-avatar">AK</div>
+              <div><div class="chat-name">Ankit Kapoor</div></div>
+            </div>
+            <div class="app-chat">
+              <div class="msg in">Hey, can we push the call to 4pm? Need to prep the deck.<div class="time">2:32 PM</div></div>
+              <div class="msg out">Sure! I'll send the updated link. Also check the Q3 report I shared.<div class="time">2:33 PM</div></div>
+              <div class="msg in">Perfect, got it. See you at 4 then!<div class="time">2:34 PM</div></div>
+              <div class="msg out">Sounds good. I'll pull in Priya too.<div class="time">2:34 PM</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Social Proof -->
+<section class="social-proof" id="proof">
+  <div class="container">
+    <p class="proof-label">Built for professionals</p>
+    <h2 class="proof-heading">Trusted by people juggling multiple numbers</h2>
+    <div class="proof-grid">
+      <div class="proof-card">
+        <div class="proof-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <p class="proof-quote">"I run 4 WhatsApp accounts for different businesses. This app finally lets me manage them without carrying 4 phones."</p>
+        <div class="proof-author">
+          <div class="proof-avatar" style="background:#25D366">RM</div>
+          <div><div class="proof-name">Rahul M.</div><div class="proof-role">E-commerce Founder</div></div>
+        </div>
+      </div>
+      <div class="proof-card">
+        <div class="proof-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <p class="proof-quote">"The scheduled messages feature alone saves me an hour a day. Absolute game-changer for client management."</p>
+        <div class="proof-author">
+          <div class="proof-avatar" style="background:#3b82f6">SP</div>
+          <div><div class="proof-name">Sarah P.</div><div class="proof-role">Real Estate Agent</div></div>
+        </div>
+      </div>
+      <div class="proof-card">
+        <div class="proof-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <p class="proof-quote">"Native notifications that actually show which account got the message. Finally someone built this properly."</p>
+        <div class="proof-author">
+          <div class="proof-avatar" style="background:#8b5cf6">DJ</div>
+          <div><div class="proof-name">Dev J.</div><div class="proof-role">Product Manager</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Features -->
+<section id="features">
+  <div class="container">
+    <p class="section-label">Features</p>
+    <h2 class="section-title">Everything you need, nothing you don't</h2>
+    <p class="section-desc">A thoughtfully designed toolkit for managing multiple WhatsApp accounts like a pro.</p>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">&#8644;</div>
+        <h3>Multi-Account Switching</h3>
+        <p>Switch between all your WhatsApp accounts instantly with a single click. No more juggling multiple devices.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">&#128276;</div>
+        <h3>Native Notifications</h3>
+        <p>Real macOS notifications with unread badges per account. Always know which number got the message.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">&#128339;</div>
+        <h3>Scheduled Messages</h3>
+        <p>Compose now, send later. Schedule messages across any account for the perfect timing.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">&#128196;</div>
+        <h3>Message Templates</h3>
+        <p>Save and reuse frequently sent messages. Insert templates with a shortcut in any chat.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">&#9642;&#9642;</div>
+        <h3>Split-Screen View</h3>
+        <p>View two accounts side by side. Compare conversations or manage chats simultaneously.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">&#128230;</div>
+        <h3>Chat Export</h3>
+        <p>Export conversations to PDF, CSV, or plain text. Keep records of important business chats.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">&#127991;</div>
+        <h3>Contact Labels</h3>
+        <p>Organize contacts with custom labels and tags. Build your own lightweight CRM inside WhatsApp.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">&#128200;</div>
+        <h3>Analytics Dashboard</h3>
+        <p>Track message volume, response times, and engagement metrics across all your accounts.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">&#127769;</div>
+        <h3>Do Not Disturb</h3>
+        <p>Silence notifications per account on your schedule. Focus mode that respects your boundaries.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">&#9000;</div>
+        <h3>Global Hotkey</h3>
+        <p>Summon SupaMsg from anywhere with a customizable keyboard shortcut. Instant access.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">&#9678;</div>
+        <h3>System Tray</h3>
+        <p>Lives quietly in your menu bar. Quick-glance unread counts without opening the full app.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">&#9889;</div>
+        <h3>Launch at Login</h3>
+        <p>Start automatically with your Mac. Your accounts are ready the moment you sit down.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Pricing -->
+<section id="pricing">
+  <div class="container">
+    <p class="section-label">Pricing</p>
+    <h2 class="section-title">Simple, transparent pricing</h2>
+    <p class="section-desc">Start free. Upgrade when you need more power.</p>
+    <div class="pricing-grid">
+      <div class="pricing-card">
+        <div class="pricing-tier">Free</div>
+        <div class="pricing-price">$0 <span>/mo</span></div>
+        <p class="pricing-desc">Perfect for getting started with multiple accounts.</p>
+        <ul class="pricing-features">
+          <li>Up to 3 WhatsApp accounts</li>
+          <li>Native macOS notifications</li>
+          <li>Unread badges per account</li>
+          <li>Do Not Disturb mode</li>
+          <li>System tray &amp; menu bar</li>
+          <li>Launch at login</li>
+          <li>Global hotkey access</li>
+        </ul>
+        <a href="#download" class="pricing-btn outline">Download Free</a>
+      </div>
+      <div class="pricing-card featured">
+        <div class="popular-badge">MOST POPULAR</div>
+        <div class="pricing-tier">Pro</div>
+        <div class="pricing-price">$7 <span>/mo</span></div>
+        <p class="pricing-desc">For professionals who need scheduling and templates.</p>
+        <ul class="pricing-features">
+          <li>Unlimited WhatsApp accounts</li>
+          <li>Everything in Free</li>
+          <li>Scheduled messages</li>
+          <li>Message templates</li>
+          <li>Split-screen view</li>
+          <li>Chat export (PDF, CSV, TXT)</li>
+          <li>Priority support</li>
+        </ul>
+        <!-- Replace with your Stripe Payment Link for Pro -->
+        <a href="https://buy.stripe.com/YOUR_PRO_LINK" class="pricing-btn primary">Start Free Trial</a>
+      </div>
+      <div class="pricing-card">
+        <div class="pricing-tier">Business</div>
+        <div class="pricing-price">$15 <span>/mo</span></div>
+        <p class="pricing-desc">Full suite for teams and power users.</p>
+        <ul class="pricing-features">
+          <li>Everything in Pro</li>
+          <li>Analytics dashboard</li>
+          <li>Contact labels &amp; CRM</li>
+          <li>Bulk messaging</li>
+          <li>AI smart replies</li>
+          <li>Team collaboration (coming soon)</li>
+          <li>Dedicated support</li>
+        </ul>
+        <!-- Replace with your Stripe Payment Link for Business -->
+        <a href="https://buy.stripe.com/YOUR_BUSINESS_LINK" class="pricing-btn outline">Start Free Trial</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq">
+  <div class="container">
+    <p class="section-label">FAQ</p>
+    <h2 class="section-title">Frequently asked questions</h2>
+    <p class="section-desc">Got questions? We have answers.</p>
+    <div class="faq-list">
+      <div class="faq-item">
+        <button class="faq-question">How does SupaMsg work? <span class="faq-arrow">+</span></button>
+        <div class="faq-answer"><p>SupaMsg uses WhatsApp Web under the hood. Each account opens in its own sandboxed session within the app. You scan the QR code once per account, and you're set. Your messages are never stored on our servers.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question">Is it safe to use? <span class="faq-arrow">+</span></button>
+        <div class="faq-answer"><p>Absolutely. SupaMsg runs entirely on your Mac. We don't intercept, store, or read any of your messages. All data stays local on your machine, protected by macOS security.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question">Will my WhatsApp account get banned? <span class="faq-arrow">+</span></button>
+        <div class="faq-answer"><p>No. SupaMsg uses the official WhatsApp Web protocol, the same way you'd use WhatsApp on your browser. It doesn't modify or hack anything, so there's no risk of account bans.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question">Does it work with WhatsApp Business accounts? <span class="faq-arrow">+</span></button>
+        <div class="faq-answer"><p>Yes! SupaMsg supports both regular WhatsApp and WhatsApp Business accounts. You can mix and match any combination of account types.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question">What macOS versions are supported? <span class="faq-arrow">+</span></button>
+        <div class="faq-answer"><p>SupaMsg supports macOS 12 (Monterey) and later, including full native support for Apple Silicon (M1/M2/M3/M4) Macs.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question">Can I cancel my subscription anytime? <span class="faq-arrow">+</span></button>
+        <div class="faq-answer"><p>Yes, you can cancel anytime with no questions asked. You'll keep access to paid features until the end of your billing period, then you'll simply move to the Free plan.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer CTA -->
+<section class="footer-cta" id="download">
+  <div class="container">
+    <h2>Ready to simplify your<br>WhatsApp workflow?</h2>
+    <p class="sub">Join the waitlist and be the first to know when we launch.</p>
+    <form class="waitlist-form" id="waitlistForm">
+      <input type="email" placeholder="you@email.com" required aria-label="Email address">
+      <button type="submit">Join Waitlist</button>
+    </form>
+    <p class="waitlist-success" id="waitlistSuccess">You're on the list! We'll be in touch soon.</p>
+    <p style="font-size:12px;color:#666;margin-top:8px">Already have a license? Open SupaMsg → Settings → Enter your license key</p>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <span class="copy">&copy; 2026 SupaMsg. All rights reserved.</span>
+    <div class="footer-links">
+      <a href="#">Privacy</a>
+      <a href="#">Terms</a>
+      <a href="#">Twitter</a>
+      <a href="#">Support</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+// Navbar scroll
+const nav = document.getElementById('navbar');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 40);
+}, { passive: true });
+
+// Scroll animations via IntersectionObserver
+const observerOpts = { threshold: 0.15, rootMargin: '0px 0px -40px 0px' };
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry, i) => {
+    if (entry.isIntersecting) {
+      const delay = entry.target.dataset.delay || 0;
+      setTimeout(() => entry.target.classList.add('visible'), delay * 80);
+      observer.unobserve(entry.target);
+    }
+  });
+}, observerOpts);
+
+document.querySelectorAll('.feature-card').forEach((el, i) => {
+  el.dataset.delay = i % 4;
+  observer.observe(el);
+});
+document.querySelectorAll('.pricing-card').forEach((el, i) => {
+  el.dataset.delay = i;
+  observer.observe(el);
+});
+document.querySelectorAll('.faq-item').forEach((el, i) => {
+  el.dataset.delay = i;
+  observer.observe(el);
+});
+
+// FAQ accordion
+document.querySelectorAll('.faq-question').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const item = btn.parentElement;
+    const wasOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item.open').forEach(el => el.classList.remove('open'));
+    if (!wasOpen) item.classList.add('open');
+  });
+});
+
+// Waitlist form
+document.getElementById('waitlistForm').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const form = e.target;
+  const success = document.getElementById('waitlistSuccess');
+  form.style.display = 'none';
+  success.classList.add('show');
+});
+
+// Smooth scroll for anchor links
+document.querySelectorAll('a[href^="#"]').forEach(link => {
+  link.addEventListener('click', (e) => {
+    const target = document.querySelector(link.getAttribute('href'));
+    if (target) {
+      e.preventDefault();
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
+});
+</script>
+</body>
+</html>
