@@ -264,7 +264,7 @@ function createViewForAccount(account) {
 // ── View Management (Bulletproof) ────────────────────────────
 // Single function calculates bounds. Used everywhere. No drift possible.
 
-const ACCOUNT_STRIP_WIDTH = 78;
+const ACCOUNT_STRIP_WIDTH = 68;
 
 function getViewBounds() {
   if (!mainWindow) return { x: 0, y: 0, width: 800, height: 600 };
