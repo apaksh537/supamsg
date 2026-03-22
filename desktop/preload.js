@@ -104,4 +104,8 @@ contextBridge.exposeInMainWorld('hub', {
   onCampaignProgress: (cb) => ipcRenderer.on('campaign-progress', (_e, d) => cb(d)),
   onAutomationsUpdated: (cb) => ipcRenderer.on('automations-updated', (_e, d) => cb(d)),
   onLicenseUpdated: (cb) => ipcRenderer.on('license-updated', (_e, d) => cb(d)),
+  onUpdateReady: (cb) => ipcRenderer.on('update-ready', (_e, d) => cb(d)),
+  onUpdateStatus: (cb) => ipcRenderer.on('update-status', (_e, d) => cb(d)),
+  checkForUpdates: () => ipcRenderer.send('check-for-updates'),
+  installUpdate: () => ipcRenderer.send('install-update'),
 });

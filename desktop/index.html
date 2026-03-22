@@ -53,6 +53,15 @@
     .dnd-banner.active { display: block; }
     .sidebar.collapsed .dnd-banner .dnd-text { display: none; }
 
+    /* Update banner */
+    .update-banner {
+      display: none; padding: 6px 12px; background: rgba(37,211,102,0.15);
+      border-bottom: 1px solid rgba(37,211,102,0.2);
+      font-size: 11px; color: #25D366; text-align: center; cursor: pointer;
+      -webkit-app-region: no-drag;
+    }
+    .update-banner.active { display: block; }
+
     /* Accounts list */
     .accounts-list { flex: 1; overflow-y: auto; padding: 8px; }
 
@@ -257,6 +266,10 @@
 
     <div class="dnd-banner" id="dndBanner" title="Click to disable DND">
       <span>&#9790;</span><span class="dnd-text"> Do Not Disturb</span>
+    </div>
+
+    <div class="update-banner" id="updateBanner" title="Click to restart and update">
+      Update ready — click to restart
     </div>
 
     <!-- Accounts -->
@@ -1415,6 +1428,17 @@
 
     // Load license on start
     setTimeout(loadLicense, 1000);
+
+    // ── Auto-updater ──
+    hub.onUpdateReady((data) => {
+      const banner = document.getElementById('updateBanner');
+      banner.textContent = `Update v${data.version} ready — click to restart`;
+      banner.classList.add('active');
+    });
+
+    document.getElementById('updateBanner').addEventListener('click', () => {
+      hub.installUpdate();
+    });
 
     // ── Command Palette (Cmd+K) ──
     const cmdActions = [

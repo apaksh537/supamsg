@@ -29,6 +29,7 @@ const { initStealthMode, applyStealthToView } = require('./features/stealth-mode
 const { initCrmIntegration } = require('./features/crm-integration');
 const { initLicensing } = require('./features/licensing');
 const { initMobileRelay, broadcastNotification } = require('./features/mobile-relay');
+const { initAutoUpdater } = require('./features/auto-updater');
 
 const DATA_PATH = path.join(app.getPath('userData'), 'accounts.json');
 const SETTINGS_PATH = path.join(app.getPath('userData'), 'settings.json');
@@ -630,6 +631,7 @@ app.whenReady().then(async () => {
   initCrmIntegration({ app, ipcMain, getMainWindow });
   initLicensing({ app, ipcMain, getMainWindow });
   initMobileRelay({ ipcMain, getMainWindow, getViews, getAccounts });
+  initAutoUpdater({ getMainWindow });
 
   // Global shortcut
   if (settings.globalShortcut) {
