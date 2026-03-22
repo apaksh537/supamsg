@@ -171,9 +171,9 @@ struct AccountRow: View {
 struct PairingSheet: View {
     @EnvironmentObject var pairingService: PairingService
     @Environment(\.dismiss) var dismiss
-    @State private var manualCode = ""
-    @State private var serverIP = ""
-    @State private var showManualEntry = false
+    @State private var codeInput = ""
+    @State private var ipInput = ""
+    @State private var showAdvanced = false
 
     var body: some View {
         NavigationStack {
@@ -184,92 +184,86 @@ struct PairingSheet: View {
                     VStack(spacing: 24) {
                         // Header
                         VStack(spacing: 8) {
-                            Image(systemName: "link.circle.fill")
-                                .font(.system(size: 64))
-                                .foregroundColor(.smAccent)
+                            Image("Logo")
+                                .resizable()
+                                .frame(width: 64, height: 64)
+                                .clipShape(RoundedRectangle(cornerRadius: 14))
 
-                            Text("Pair with Desktop")
+                            Text("Connect to Desktop")
                                 .font(.title2)
                                 .fontWeight(.bold)
                                 .foregroundColor(.smText)
 
-                            Text("Connect to your SupaMsg desktop app\nto receive notifications on this device")
+                            Text("Get all your WhatsApp notifications\non this phone")
                                 .font(.subheadline)
                                 .foregroundColor(.smTextSecondary)
                                 .multilineTextAlignment(.center)
                         }
                         .padding(.top, 24)
 
-                        // Steps
+                        // Simple steps
                         VStack(alignment: .leading, spacing: 16) {
-                            PairingStep(number: 1, text: "Open SupaMsg on your computer")
-                            PairingStep(number: 2, text: "Go to Settings > Mobile Notifications")
-                            PairingStep(number: 3, text: "Enter the pairing code shown below")
+                            PairingStep(number: 1, text: "Open SupaMsg on your Mac or PC")
+                            PairingStep(number: 2, text: "Click Settings → Connect Phone")
+                            PairingStep(number: 3, text: "Enter the 6-digit code below")
                         }
                         .padding(.horizontal)
 
-                        // Pairing code display
-                        if let code = pairingService.pairingCode {
+                        // Code input — just the code, nice and big
+                        VStack(spacing: 8) {
+                            Text("Enter code from desktop")
+                                .font(.caption)
+                                .foregroundColor(.smTextSecondary)
+                                .textCase(.uppercase)
+                                .tracking(1)
+
+                            TextField("000 000", text: $codeInput)
+                                .font(.system(size: 32, weight: .bold, design: .monospaced))
+                                .multilineTextAlignment(.center)
+                                .keyboardType(.numberPad)
+                                .padding(.horizontal, 24)
+                                .padding(.vertical, 16)
+                                .background(Color.smSurface)
+                                .cornerRadius(12)
+                                .foregroundColor(.smText)
+                        }
+
+                        // Connect button
+                        Button {
+                            // Auto-detect IP or use manual
+                            let ip = ipInput.isEmpty ? "192.168.1.1" : ipInput
+                            pairingService.connectManually(host: ip, code: codeInput)
+                            dismiss()
+                        } label: {
+                            Text("Connect")
+                                .font(.headline)
+                                .foregroundColor(.white)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 14)
+                                .background(codeInput.count >= 6 ? Color.smAccent : Color.smTextSecondary.opacity(0.3))
+                                .cornerRadius(12)
+                        }
+                        .disabled(codeInput.count < 6)
+                        .padding(.horizontal)
+
+                        // Advanced: IP entry (hidden by default)
+                        Button {
+                            withAnimation { showAdvanced.toggle() }
+                        } label: {
+                            Text(showAdvanced ? "Hide advanced options" : "Having trouble connecting?")
+                                .font(.caption)
+                                .foregroundColor(.smAccent)
+                        }
+
+                        if showAdvanced {
                             VStack(spacing: 8) {
-                                Text("Your Pairing Code")
+                                Text("Desktop IP address (found in desktop Settings)")
                                     .font(.caption)
                                     .foregroundColor(.smTextSecondary)
-                                    .textCase(.uppercase)
-                                    .tracking(1)
-
-                                Text(code)
-                                    .font(.system(size: 36, weight: .bold, design: .monospaced))
-                                    .foregroundColor(.smAccent)
-                                    .tracking(8)
-                                    .padding(.horizontal, 24)
-                                    .padding(.vertical, 16)
-                                    .background(Color.smSurface)
-                                    .cornerRadius(12)
-                            }
-                        }
-
-                        Divider()
-                            .background(Color.smSurfaceLight)
-                            .padding(.horizontal, 32)
-
-                        // Manual connection
-                        Button {
-                            withAnimation { showManualEntry.toggle() }
-                        } label: {
-                            HStack {
-                                Text("Connect manually")
-                                    .font(.subheadline)
-                                    .foregroundColor(.smAccent)
-                                Image(systemName: showManualEntry ? "chevron.up" : "chevron.down")
-                                    .font(.caption)
-                                    .foregroundColor(.smAccent)
-                            }
-                        }
-
-                        if showManualEntry {
-                            VStack(spacing: 12) {
-                                TextField("Desktop IP address", text: $serverIP)
+                                TextField("e.g. 192.168.1.34", text: $ipInput)
                                     .textFieldStyle(SMTextFieldStyle())
                                     .keyboardType(.decimalPad)
                                     .autocorrectionDisabled()
-
-                                TextField("Pairing code", text: $manualCode)
-                                    .textFieldStyle(SMTextFieldStyle())
-                                    .keyboardType(.numberPad)
-
-                                Button {
-                                    pairingService.connectManually(host: serverIP, code: manualCode)
-                                    dismiss()
-                                } label: {
-                                    Text("Connect")
-                                        .font(.headline)
-                                        .foregroundColor(.smBackground)
-                                        .frame(maxWidth: .infinity)
-                                        .padding(.vertical, 14)
-                                        .background(Color.smAccent)
-                                        .cornerRadius(12)
-                                }
-                                .disabled(serverIP.isEmpty || manualCode.isEmpty)
                             }
                             .padding(.horizontal)
                         }
