@@ -20,18 +20,18 @@ let license = {
 // Feature gates per tier
 const TIER_FEATURES = {
   free: {
-    maxAccounts: 3,
+    maxAccounts: 10,
     templates: true,
-    scheduling: false,
-    aiReplies: false,
-    automations: false,
-    broadcast: false,
-    chatExport: false,
+    scheduling: true,
+    aiReplies: true,
+    automations: true,
+    broadcast: true,
+    chatExport: true,
     contactLabels: true,
-    analytics: false,
-    stealthMode: false,
-    crmIntegration: false,
-    splitScreen: false,
+    analytics: true,
+    stealthMode: true,
+    crmIntegration: true,
+    splitScreen: true,
   },
   pro: {
     maxAccounts: Infinity,

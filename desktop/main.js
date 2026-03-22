@@ -311,16 +311,9 @@ function switchToAccount(accountId) {
   const hiddenBounds = { x: -9999, y: -9999, width: bounds.width, height: bounds.height };
 
   for (const [id, view] of Object.entries(views)) {
-    // Ensure all views are attached
-    try { mainWindow.addBrowserView(view); } catch (e) {} // Silently ignore if already added
-
-    if (id === accountId) {
-      // Show this one
-      view.setBounds(bounds);
-    } else {
-      // Hide others offscreen (same size, just not visible)
-      view.setBounds(hiddenBounds);
-    }
+    try { mainWindow.addBrowserView(view); } catch (e) {}
+    view.webContents.setZoomFactor(1.0);
+    view.setBounds(id === accountId ? bounds : hiddenBounds);
   }
 
   activeAccountId = accountId;
@@ -485,18 +478,19 @@ function createWindow() {
 
 // Hide/show all BrowserViews so panel overlays are visible
 ipcMain.on('hide-views', () => {
-  // Move all views offscreen so UI panels are visible
-  const bounds = getViewBounds();
+  // REMOVE all BrowserViews so HTML panels are fully visible and clickable
   for (const view of Object.values(views)) {
-    view.setBounds({ x: -9999, y: -9999, width: bounds.width, height: bounds.height });
+    try { mainWindow.removeBrowserView(view); } catch (e) {}
   }
 });
 
 ipcMain.on('show-views', () => {
-  // Restore active view to visible position, keep others offscreen
+  // Re-add all views, position active one visible, others offscreen
   const bounds = getViewBounds();
   const hiddenBounds = { x: -9999, y: -9999, width: bounds.width, height: bounds.height };
   for (const [id, view] of Object.entries(views)) {
+    try { mainWindow.addBrowserView(view); } catch (e) {}
+    view.setZoomFactor(1.0);
     view.setBounds(id === activeAccountId ? bounds : hiddenBounds);
   }
 });
