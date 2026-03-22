@@ -1,5 +1,6 @@
 import Foundation
 import Combine
+import UIKit
 
 final class PairingService: ObservableObject {
     @Published var isConnected = false

@@ -1,0 +1,371 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		026EE6629066C936CD23EB67 /* AccountsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46F15BA4632249BF34E107EA /* AccountsView.swift */; };
+		18A4FB197B7B355AFEA359F2 /* MessageStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DD1B61CD5B383D6E94735B2 /* MessageStore.swift */; };
+		3584539328F845CE9302EF3B /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3E7E3BCE2FEEC523BC6468A /* Message.swift */; };
+		3657F5214DE21BC499EA54EC /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 981AFAEABE4B05E19EB1A1D2 /* ContentView.swift */; };
+		3D015DE9E77898561216B727 /* PairingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E955D9BBFEB14FCD31CF80E /* PairingService.swift */; };
+		43F573E6282A27748652128C /* Account.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0109D9D781261333AA1482CC /* Account.swift */; };
+		4AE7D82862CD66910706628A /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAD04D6A786F800CEDC21F56 /* SettingsView.swift */; };
+		88D1F1781D7D9FAC6FB2C631 /* SupaMsgApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34353F1644E7FA4A78292980 /* SupaMsgApp.swift */; };
+		C95B90C7726207FD8EE0C755 /* InboxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E8D85B7FFF2D2098F5B851A /* InboxView.swift */; };
+		E9A60A05B4FC0DCD8D3F36F6 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEC2F87353B78C526F674A5E /* NotificationService.swift */; };
+		F35013484267F8AADDA447A4 /* QuickReplyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48ED7FD167EEF373F0D0178A /* QuickReplyView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		0109D9D781261333AA1482CC /* Account.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Account.swift; sourceTree = "<group>"; };
+		0B85F92E3135FF95B2452E5A /* SupaMsg.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SupaMsg.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		2E955D9BBFEB14FCD31CF80E /* PairingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PairingService.swift; sourceTree = "<group>"; };
+		34353F1644E7FA4A78292980 /* SupaMsgApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupaMsgApp.swift; sourceTree = "<group>"; };
+		46F15BA4632249BF34E107EA /* AccountsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountsView.swift; sourceTree = "<group>"; };
+		48ED7FD167EEF373F0D0178A /* QuickReplyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickReplyView.swift; sourceTree = "<group>"; };
+		7DD1B61CD5B383D6E94735B2 /* MessageStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageStore.swift; sourceTree = "<group>"; };
+		7E8D85B7FFF2D2098F5B851A /* InboxView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InboxView.swift; sourceTree = "<group>"; };
+		981AFAEABE4B05E19EB1A1D2 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		F3E7E3BCE2FEEC523BC6468A /* Message.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
+		FAD04D6A786F800CEDC21F56 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		FEC2F87353B78C526F674A5E /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		33744DFF954BAEC4BD5B5859 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				7DD1B61CD5B383D6E94735B2 /* MessageStore.swift */,
+				FEC2F87353B78C526F674A5E /* NotificationService.swift */,
+				2E955D9BBFEB14FCD31CF80E /* PairingService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		7B562CD3C86FF33F59FD4730 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				46F15BA4632249BF34E107EA /* AccountsView.swift */,
+				981AFAEABE4B05E19EB1A1D2 /* ContentView.swift */,
+				7E8D85B7FFF2D2098F5B851A /* InboxView.swift */,
+				48ED7FD167EEF373F0D0178A /* QuickReplyView.swift */,
+				FAD04D6A786F800CEDC21F56 /* SettingsView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		7C4B341EE03FA8BCA0F2248A = {
+			isa = PBXGroup;
+			children = (
+				CE12979F797A4E953383A47F /* SupaMsg */,
+				A5BF5531B0E8D781FE136CC1 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		7E75762C09D2B293394CC08F /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				0109D9D781261333AA1482CC /* Account.swift */,
+				F3E7E3BCE2FEEC523BC6468A /* Message.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		A5BF5531B0E8D781FE136CC1 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				0B85F92E3135FF95B2452E5A /* SupaMsg.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		CE12979F797A4E953383A47F /* SupaMsg */ = {
+			isa = PBXGroup;
+			children = (
+				34353F1644E7FA4A78292980 /* SupaMsgApp.swift */,
+				7E75762C09D2B293394CC08F /* Models */,
+				33744DFF954BAEC4BD5B5859 /* Services */,
+				7B562CD3C86FF33F59FD4730 /* Views */,
+			);
+			path = SupaMsg;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		057E6A704AA3AC486C1DD1F3 /* SupaMsg */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 360E9A8C6379E4FE5FCE5A07 /* Build configuration list for PBXNativeTarget "SupaMsg" */;
+			buildPhases = (
+				1EE67F3A4510A1ACEA07FA5F /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SupaMsg;
+			packageProductDependencies = (
+			);
+			productName = SupaMsg;
+			productReference = 0B85F92E3135FF95B2452E5A /* SupaMsg.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		27D7EFB52D9567F7B4F6E119 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 2630;
+				TargetAttributes = {
+					057E6A704AA3AC486C1DD1F3 = {
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = C97838CC8DEC43DC1C439C40 /* Build configuration list for PBXProject "SupaMsg" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 7C4B341EE03FA8BCA0F2248A;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = A5BF5531B0E8D781FE136CC1 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				057E6A704AA3AC486C1DD1F3 /* SupaMsg */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		1EE67F3A4510A1ACEA07FA5F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				43F573E6282A27748652128C /* Account.swift in Sources */,
+				026EE6629066C936CD23EB67 /* AccountsView.swift in Sources */,
+				3657F5214DE21BC499EA54EC /* ContentView.swift in Sources */,
+				C95B90C7726207FD8EE0C755 /* InboxView.swift in Sources */,
+				3584539328F845CE9302EF3B /* Message.swift in Sources */,
+				18A4FB197B7B355AFEA359F2 /* MessageStore.swift in Sources */,
+				E9A60A05B4FC0DCD8D3F36F6 /* NotificationService.swift in Sources */,
+				3D015DE9E77898561216B727 /* PairingService.swift in Sources */,
+				F35013484267F8AADDA447A4 /* QuickReplyView.swift in Sources */,
+				4AE7D82862CD66910706628A /* SettingsView.swift in Sources */,
+				88D1F1781D7D9FAC6FB2C631 /* SupaMsgApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		49047413DE95B018E4B9A884 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = FZ89RW26TK;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		8E5B68E775EC370E898F315A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = SupaMsg;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.supamsg.ios;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		A94CC27C5003B0CD134E3555 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = FZ89RW26TK;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		F8B755519A0C9D913E7562ED /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = SupaMsg;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.supamsg.ios;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		360E9A8C6379E4FE5FCE5A07 /* Build configuration list for PBXNativeTarget "SupaMsg" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F8B755519A0C9D913E7562ED /* Debug */,
+				8E5B68E775EC370E898F315A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		C97838CC8DEC43DC1C439C40 /* Build configuration list for PBXProject "SupaMsg" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A94CC27C5003B0CD134E3555 /* Debug */,
+				49047413DE95B018E4B9A884 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 27D7EFB52D9567F7B4F6E119 /* Project object */;
+}

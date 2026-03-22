@@ -32,12 +32,11 @@ struct SupaMsgApp: App {
     private func handleDeepLink(_ url: URL) {
         // supamsg://chat?accountId=xxx&contact=yyy
         guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return }
-        let params = Dictionary(
-            uniqueKeysWithValues: (components.queryItems ?? []).compactMap {
-                guard let value = $0.value else { return nil }
-                return ($0.name, value)
-            }
-        )
+        let paramPairs: [(String, String)] = (components.queryItems ?? []).compactMap {
+            guard let value = $0.value else { return nil }
+            return ($0.name, value)
+        }
+        let params = Dictionary(uniqueKeysWithValues: paramPairs)
         if let accountId = params["accountId"] {
             deepLinkAccountId = accountId
             deepLinkContactName = params["contact"]

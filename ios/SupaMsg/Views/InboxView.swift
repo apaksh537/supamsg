@@ -55,7 +55,7 @@ struct InboxView: View {
                         .environmentObject(pairingService)
                 }
             }
-            .onChange(of: deepLinkAccountId) { _, newValue in
+            .onChange(of: deepLinkAccountId) { newValue in
                 if newValue != nil {
                     // Scroll to / highlight the account section
                     deepLinkAccountId = nil
