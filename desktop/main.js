@@ -284,20 +284,38 @@ function resizeView(view) {
   // Left account strip (narrow sidebar with account icons)
   const accountStripWidth = 72;
 
-  let x = accountStripWidth;
-  let y = 0;
-  let w = contentWidth - accountStripWidth;
-  let h = contentHeight;
+  const x = accountStripWidth;
+  const y = 0;
+  const w = Math.max(contentWidth - accountStripWidth, 0);
+  const h = Math.max(contentHeight, 0);
 
-  view.setBounds({ x, y, width: Math.max(w, 0), height: Math.max(h, 0) });
-  view.setAutoResize({ width: true, height: true });
+  // Disable auto-resize first, then set exact bounds
+  // This prevents accumulated offset drift between views
+  view.setAutoResize({ width: false, height: false, horizontal: false, vertical: false });
+  view.setBounds({ x, y, width: w, height: h });
+}
+
+// Resize ALL views to same bounds (fixes dimension mismatch between accounts)
+function resizeAllViewsToSameBounds() {
+  if (!mainWindow) return;
+  const contentBounds = mainWindow.getContentBounds();
+  const accountStripWidth = 72;
+  const x = accountStripWidth;
+  const w = Math.max(contentBounds.width - accountStripWidth, 0);
+  const h = Math.max(contentBounds.height, 0);
+
+  for (const view of Object.values(views)) {
+    view.setAutoResize({ width: false, height: false, horizontal: false, vertical: false });
+    view.setBounds({ x, y: 0, width: w, height: h });
+  }
 }
 
 function resizeAllViews() {
   if (splitScreen && splitScreen.isSplit()) {
     splitScreen.resizeSplit(mainWindow, views, getSidebarWidth());
-  } else if (activeAccountId && views[activeAccountId]) {
-    resizeView(views[activeAccountId]);
+  } else {
+    // Resize ALL views to identical bounds (prevents dimension mismatch)
+    resizeAllViewsToSameBounds();
   }
 }
 
