@@ -485,26 +485,19 @@ function createWindow() {
 
 // Hide/show all BrowserViews so panel overlays are visible
 ipcMain.on('hide-views', () => {
+  // Move all views offscreen so UI panels are visible
+  const bounds = getViewBounds();
   for (const view of Object.values(views)) {
-    try { mainWindow.removeBrowserView(view); } catch (e) {}
+    view.setBounds({ x: -9999, y: -9999, width: bounds.width, height: bounds.height });
   }
 });
 
 ipcMain.on('show-views', () => {
-  // Re-add only the active view (or split views)
-  if (splitScreen && splitScreen.isSplit()) {
-    const { leftId, rightId } = splitScreen.getSplitIds();
-    if (leftId && views[leftId]) { mainWindow.addBrowserView(views[leftId]); }
-    if (rightId && views[rightId]) { mainWindow.addBrowserView(views[rightId]); }
-    splitScreen.resizeSplit(mainWindow, views, getSidebarWidth());
-  } else if (activeAccountId && views[activeAccountId]) {
-    mainWindow.addBrowserView(views[activeAccountId]);
-    const bounds = getViewBounds();
-    views[activeAccountId].setBounds(bounds);
-    setTimeout(() => {
-      views[activeAccountId]?.setBounds(bounds);
-      views[activeAccountId]?.webContents.executeJavaScript('window.dispatchEvent(new Event("resize"))').catch(() => {});
-    }, 50);
+  // Restore active view to visible position, keep others offscreen
+  const bounds = getViewBounds();
+  const hiddenBounds = { x: -9999, y: -9999, width: bounds.width, height: bounds.height };
+  for (const [id, view] of Object.entries(views)) {
+    view.setBounds(id === activeAccountId ? bounds : hiddenBounds);
   }
 });
 
