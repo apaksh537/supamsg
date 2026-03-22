@@ -12,7 +12,7 @@ const PANEL_CONFIGS = {
   dashboard: { width: 560, height: 500, title: 'Dashboard' },
   settings: { width: 440, height: 600, title: 'Settings' },
   'add-account': { width: 400, height: 480, title: 'Add Account' },
-  upgrade: { width: 520, height: 500, title: 'Upgrade' },
+  upgrade: { width: 580, height: 700, title: 'Upgrade' },
   'connect-phone': { width: 440, height: 600, title: 'Settings', file: 'settings' },
   'command-palette': { width: 500, height: 400, title: 'Search' },
 };
