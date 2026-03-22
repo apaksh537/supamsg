@@ -141,12 +141,18 @@ body {
     <div class="section-label">Connect Phone</div>
     <div class="pairing-card">
       <div style="font-size:14px;font-weight:600;color:#111B21;margin-bottom:4px">Pair with SupaMsg Mobile</div>
-      <div class="pairing-desc">Connect your iPhone to see all your WhatsApp notifications in one place</div>
+      <div class="pairing-desc">Both devices must be on the same WiFi network</div>
+
+      <div style="margin:16px 0 4px;font-size:11px;font-weight:600;color:#667781;text-transform:uppercase;letter-spacing:0.5px">Your Code</div>
       <div class="pairing-code" id="pairingCode">------</div>
+
+      <div style="margin:12px 0 4px;font-size:11px;font-weight:600;color:#667781;text-transform:uppercase;letter-spacing:0.5px">Your Desktop IP</div>
+      <div style="font-size:18px;font-weight:700;color:#111B21;text-align:center;padding:8px;background:#F0F2F5;border-radius:8px;font-family:'SF Mono','Fira Code',monospace;letter-spacing:1px;margin-bottom:12px" id="desktopIp">Loading...</div>
+
       <div class="pairing-steps">
-        <div class="pairing-step"><span class="pairing-step-num">1</span> Open SupaMsg on your iPhone</div>
-        <div class="pairing-step"><span class="pairing-step-num">2</span> Go to Accounts → Pair with Desktop</div>
-        <div class="pairing-step"><span class="pairing-step-num">3</span> Enter the code shown above</div>
+        <div class="pairing-step"><span class="pairing-step-num">1</span> Open <strong>SupaMsg</strong> on your iPhone</div>
+        <div class="pairing-step"><span class="pairing-step-num">2</span> Tap <strong>Accounts</strong> → <strong>Pair with Desktop</strong></div>
+        <div class="pairing-step"><span class="pairing-step-num">3</span> Enter the <strong>IP address</strong> and <strong>code</strong> shown above</div>
       </div>
       <button class="pairing-gen-btn" onclick="generateCode()">Generate New Code</button>
     </div>
@@ -205,6 +211,9 @@ body {
       // Generate initial pairing code
       generateCode();
 
+      // Show desktop IP address
+      showDesktopIp();
+
       // Check AI key status
       checkAiStatus();
     })();
@@ -213,6 +222,37 @@ body {
     function generateCode() {
       const code = String(Math.floor(100000 + Math.random() * 900000));
       document.getElementById('pairingCode').textContent = code.slice(0,3) + ' ' + code.slice(3);
+    }
+
+    // Desktop IP
+    function showDesktopIp() {
+      // Use Node's os module via a simple approach — the preload exposes require indirectly
+      // For now, make an IPC call or just show a helpful message
+      try {
+        // Try to detect IP from WebRTC (works in renderer)
+        const pc = new RTCPeerConnection({ iceServers: [] });
+        pc.createDataChannel('');
+        pc.createOffer().then(offer => pc.setLocalDescription(offer));
+        pc.onicecandidate = (e) => {
+          if (!e.candidate) return;
+          const match = e.candidate.candidate.match(/([0-9]{1,3}\.){3}[0-9]{1,3}/);
+          if (match) {
+            document.getElementById('desktopIp').textContent = match[0];
+            pc.close();
+          }
+        };
+        // Fallback after 3 seconds
+        setTimeout(() => {
+          const el = document.getElementById('desktopIp');
+          if (el.textContent === 'Loading...') {
+            el.textContent = 'Check System Preferences → Network';
+            el.style.fontSize = '13px';
+          }
+        }, 3000);
+      } catch (e) {
+        document.getElementById('desktopIp').textContent = 'Check System Preferences → Network';
+        document.getElementById('desktopIp').style.fontSize = '13px';
+      }
     }
 
     // Toggle settings
