@@ -201,6 +201,12 @@ function createViewForAccount(account) {
 
   view.webContents.loadURL(WHATSAPP_URL);
 
+  // Force consistent zoom level across all views — prevents DPR mismatch
+  view.webContents.setZoomFactor(1.0);
+  view.webContents.on('did-finish-load', () => {
+    view.webContents.setZoomFactor(1.0);
+  });
+
   view.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url);
     return { action: 'deny' };
