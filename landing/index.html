@@ -1043,6 +1043,14 @@ document.getElementById('waitlistForm').addEventListener('submit', (e) => {
   success.classList.add('show');
 });
 
+// Privacy trust badge — inject before footer
+(function() {
+  const trustBadge = document.createElement('div');
+  trustBadge.style.cssText = 'text-align:center;padding:40px 20px;background:#111B21;border-top:1px solid rgba(255,255,255,0.05)';
+  trustBadge.innerHTML = '<div style="font-size:32px;margin-bottom:12px">&#128274;</div><h3 style="font-size:18px;color:#fff;margin-bottom:8px">Your messages are 100% private</h3><p style="font-size:14px;color:#a0a0b8;max-width:500px;margin:0 auto;line-height:1.6">SupaMsg has <strong style=color:#25D366>zero access</strong> to your WhatsApp messages. Your conversations stay <strong style=color:#25D366>end-to-end encrypted</strong> as per WhatsApp security policies. We never read, store, or transmit your messages to any server. Everything runs locally on your device.</p>';
+  document.body.insertBefore(trustBadge, document.querySelector('script'));
+})();
+
 // Smooth scroll for anchor links
 document.querySelectorAll('a[href^="#"]').forEach(link => {
   link.addEventListener('click', (e) => {
