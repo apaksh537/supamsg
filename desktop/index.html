@@ -1559,6 +1559,57 @@
       return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
     }
 
+    // ── Tab context menu ──
+    function showTabContextMenu(x, y, account) {
+      // Remove existing context menu if any
+      const existing = document.getElementById('tabContextMenu');
+      if (existing) existing.remove();
+
+      const menu = document.createElement('div');
+      menu.id = 'tabContextMenu';
+      menu.style.cssText = `position:fixed;top:${y}px;left:${x}px;background:#fff;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,0.15);padding:4px 0;z-index:9999;min-width:160px;font-size:14px;color:#303030;`;
+
+      menu.innerHTML = `
+        <div style="padding:8px 16px;cursor:pointer;hover-bg:#f0f0f0" onmouseover="this.style.background='#f5f5f5'" onmouseout="this.style.background=''" onclick="tabMenuAction('rename','${account.id}','${escapeHtml(account.name)}')">Rename</div>
+        <div style="padding:8px 16px;cursor:pointer" onmouseover="this.style.background='#f5f5f5'" onmouseout="this.style.background=''" onclick="tabMenuAction('reload','${account.id}')">Reload</div>
+        <div style="height:1px;background:#e8e8e8;margin:4px 0"></div>
+        <div style="padding:8px 16px;cursor:pointer;color:#FF3B30" onmouseover="this.style.background='#fff5f5'" onmouseout="this.style.background=''" onclick="tabMenuAction('remove','${account.id}','${escapeHtml(account.name)}')">Remove</div>
+      `;
+
+      document.body.appendChild(menu);
+
+      // Close on click outside
+      setTimeout(() => {
+        document.addEventListener('click', function closeMenu() {
+          menu.remove();
+          document.removeEventListener('click', closeMenu);
+        });
+      }, 10);
+    }
+
+    async function tabMenuAction(action, accountId, accountName) {
+      const menu = document.getElementById('tabContextMenu');
+      if (menu) menu.remove();
+
+      if (action === 'rename') {
+        const newName = await showDialog({
+          title: 'Rename Account',
+          placeholder: 'Account name',
+          defaultValue: accountName,
+        });
+        if (newName?.trim()) hub.renameAccount(accountId, newName.trim());
+      } else if (action === 'reload') {
+        hub.reloadAccount(accountId);
+      } else if (action === 'remove') {
+        const ok = await showDialog({
+          title: 'Remove Account',
+          message: `Remove "${accountName}"? This will log out of this WhatsApp session.`,
+          isConfirm: true,
+        });
+        if (ok) hub.removeAccount(accountId);
+      }
+    }
+
     // ── Mode switching ──
     function switchMode(mode) {
       currentMode = mode;
@@ -1641,6 +1692,19 @@
           <span class="tab-unread ${unread > 0 ? 'has-unread' : ''}">${unread}</span>
         `;
         tab.addEventListener('click', () => hub.switchAccount(account.id));
+        tab.addEventListener('dblclick', async (e) => {
+          e.preventDefault();
+          const newName = await showDialog({
+            title: 'Rename Account',
+            placeholder: 'Account name',
+            defaultValue: account.name,
+          });
+          if (newName?.trim()) hub.renameAccount(account.id, newName.trim());
+        });
+        tab.addEventListener('contextmenu', (e) => {
+          e.preventDefault();
+          showTabContextMenu(e.clientX, e.clientY, account);
+        });
         tabsContainer.appendChild(tab);
       });
 
