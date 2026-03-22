@@ -750,7 +750,10 @@ app.whenReady().then(async () => {
 
   // Safe feature initialization — wraps each in try-catch so one failure doesn't crash the app
   function safeInit(name, fn) {
-    try { fn(); } catch (e) { console.error(`[SupaMsg] Failed to init ${name}:`, e.message); }
+    try { fn(); } catch (e) {
+      console.error(`[SupaMsg] Failed to init ${name}:`, e.message);
+      trackEvent('feature_init_failed', { feature: name, error: e.message?.substring(0, 100) });
+    }
   }
 
   const featureCtx = { app, ipcMain, getMainWindow, getViews, getActiveAccountId, getAccounts, getSidebarWidth, accounts };
