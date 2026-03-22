@@ -245,6 +245,11 @@ function createViewForAccount(account) {
   });
 
   views[account.id] = view;
+
+  // Position offscreen initially (will be shown when switchToAccount is called)
+  const bounds = getViewBounds();
+  view.setBounds({ x: -9999, y: -9999, width: bounds.width, height: bounds.height });
+
   return view;
 }
 
@@ -294,29 +299,26 @@ function switchToAccount(accountId) {
     mainWindow.webContents.send('split-screen-changed', { active: false });
   }
 
-  // Remove current view
-  if (activeAccountId && views[activeAccountId]) {
-    mainWindow.removeBrowserView(views[activeAccountId]);
-  }
+  // NEW APPROACH: Don't remove/add views.
+  // Keep ALL views attached. Hide inactive by moving offscreen, show active at correct position.
+  const bounds = getViewBounds();
+  const hiddenBounds = { x: -9999, y: -9999, width: bounds.width, height: bounds.height };
 
-  // Add new view with exact same bounds
-  const view = views[accountId];
-  if (view) {
-    mainWindow.addBrowserView(view);
+  for (const [id, view] of Object.entries(views)) {
+    // Ensure all views are attached
+    try { mainWindow.addBrowserView(view); } catch (e) {} // Silently ignore if already added
 
-    // Set bounds TWICE with a delay — forces Electron to apply correctly
-    const bounds = getViewBounds();
-    view.setBounds(bounds);
-
-    // Force WhatsApp Web to recalculate its layout to match current viewport
-    setTimeout(() => {
+    if (id === accountId) {
+      // Show this one
       view.setBounds(bounds);
-      view.webContents.executeJavaScript('window.dispatchEvent(new Event("resize"))').catch(() => {});
-    }, 50);
-
-    activeAccountId = accountId;
-    mainWindow.webContents.send('account-switched', accountId);
+    } else {
+      // Hide others offscreen (same size, just not visible)
+      view.setBounds(hiddenBounds);
+    }
   }
+
+  activeAccountId = accountId;
+  mainWindow.webContents.send('account-switched', accountId);
 }
 
 // Legacy wrappers (other modules may call these)
@@ -325,7 +327,13 @@ function resizeAllViews() {
   if (splitScreen && splitScreen.isSplit()) {
     splitScreen.resizeSplit(mainWindow, views, getSidebarWidth());
   } else {
-    applyBoundsToAllViews();
+    // On resize, reposition all views — active one visible, others offscreen
+    const bounds = getViewBounds();
+    const hiddenBounds = { x: -9999, y: -9999, width: bounds.width, height: bounds.height };
+
+    for (const [id, view] of Object.entries(views)) {
+      view.setBounds(id === activeAccountId ? bounds : hiddenBounds);
+    }
   }
 }
 
