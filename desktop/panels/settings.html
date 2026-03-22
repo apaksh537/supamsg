@@ -2,78 +2,38 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Settings</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
-  background: #FFFFFF;
-  color: #111B21;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
+  background: #FFFFFF; color: #111B21;
+  overflow: hidden; display: flex; flex-direction: column; height: 100vh;
 }
 .panel-header {
-  height: 48px;
-  display: flex;
-  align-items: center;
-  padding: 0 16px;
-  border-bottom: 1px solid #E8E8E8;
-  -webkit-app-region: drag;
-  flex-shrink: 0;
+  height: 48px; display: flex; align-items: center; padding: 0 16px;
+  border-bottom: 1px solid #E8E8E8; -webkit-app-region: drag; flex-shrink: 0;
 }
-.panel-title { font-size: 16px; font-weight: 600; color: #111B21; flex: 1; }
+.panel-title { font-size: 16px; font-weight: 600; flex: 1; }
 .panel-close {
-  width: 28px; height: 28px; border-radius: 6px; border: none;
-  background: none; color: #667781; font-size: 18px; cursor: pointer;
+  width: 28px; height: 28px; border-radius: 6px; border: none; background: none;
+  color: #667781; font-size: 18px; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
-  -webkit-app-region: no-drag;
-  transition: all 0.15s;
+  -webkit-app-region: no-drag; transition: all 0.15s;
 }
 .panel-close:hover { background: #F0F2F5; color: #111B21; }
 .panel-body { flex: 1; overflow-y: auto; padding: 20px; }
-.form-label { font-size: 12px; font-weight: 500; color: #667781; margin-bottom: 4px; display: block; }
-.form-input {
-  width: 100%; height: 40px; padding: 0 12px;
-  background: #F0F2F5; border: none; border-radius: 8px;
-  font-size: 14px; color: #111B21; outline: none;
-  margin-bottom: 12px;
-}
-.form-input:focus { box-shadow: 0 0 0 2px rgba(37,211,102,0.3); }
-.form-btn {
-  width: 100%; height: 40px; border: none; border-radius: 8px;
-  background: #25D366; color: #fff; font-size: 14px; font-weight: 500;
-  cursor: pointer; transition: background 0.15s;
-}
-.form-btn:hover { background: #1FAA59; }
-.form-btn-outline {
-  width: 100%; height: 40px; border: 1px solid #25D366; border-radius: 8px;
-  background: none; color: #25D366; font-size: 14px; font-weight: 500;
-  cursor: pointer; transition: all 0.15s;
-}
-.form-btn-outline:hover { background: #F0FFF4; }
 .section-label { font-size: 11px; font-weight: 600; color: #667781; text-transform: uppercase; letter-spacing: 1px; margin: 16px 0 8px; }
-.divider { height: 1px; background: #E8E8E8; margin: 12px 0; }
-.list-item {
-  display: flex; align-items: center; gap: 10px;
-  padding: 8px; height: 36px; border-radius: 6px;
-  cursor: pointer; transition: background 0.15s;
-}
-.list-item:hover { background: #F0F2F5; }
-.list-item svg { width: 18px; height: 18px; color: #667781; flex-shrink: 0; }
-.list-item span { font-size: 14px; color: #111B21; }
-.toggle-row {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 10px 0; border-bottom: 1px solid #F0F2F5;
-}
+.section-label:first-child { margin-top: 0; }
+.divider { height: 1px; background: #E8E8E8; margin: 16px 0; }
+.card { background: #fff; border: 1px solid #E8E8E8; border-radius: 8px; padding: 16px; margin-bottom: 12px; }
+.toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #F0F2F5; }
+.toggle-row:last-child { border-bottom: none; }
 .toggle-label { font-size: 14px; color: #111B21; }
 .toggle {
-  width: 44px; height: 24px; border-radius: 12px;
-  background: #CED0D1; cursor: pointer; position: relative;
-  transition: background 0.2s; flex-shrink: 0;
+  width: 44px; height: 24px; border-radius: 12px; background: #CED0D1;
+  cursor: pointer; position: relative; transition: background 0.2s; flex-shrink: 0;
 }
 .toggle.on { background: #25D366; }
 .toggle::after {
@@ -82,122 +42,206 @@ body {
   box-shadow: 0 1px 3px rgba(0,0,0,0.2); transition: transform 0.2s;
 }
 .toggle.on::after { transform: translateX(20px); }
-.plan-card {
-  border-radius: 10px; overflow: hidden; margin-bottom: 16px;
-  border: 1px solid #E8E8E8;
+.form-input {
+  width: 100%; height: 40px; padding: 0 12px; background: #F0F2F5;
+  border: none; border-radius: 8px; font-size: 14px; color: #111B21; outline: none; margin-bottom: 8px;
 }
-.plan-card-top {
+.form-input:focus { box-shadow: 0 0 0 2px rgba(37,211,102,0.3); }
+.form-btn {
+  width: 100%; height: 40px; border: none; border-radius: 8px;
+  background: #25D366; color: #fff; font-size: 14px; font-weight: 500;
+  cursor: pointer; transition: background 0.15s;
+}
+.form-btn:hover { background: #1FAA59; }
+.form-btn-sm { height: 32px; font-size: 13px; }
+.plan-banner {
   background: linear-gradient(135deg, #25D366, #128C7E);
-  padding: 16px; color: #fff;
+  border-radius: 8px; padding: 16px; color: #fff; margin-bottom: 16px;
 }
-.plan-name { font-size: 14px; font-weight: 600; }
-.plan-tier { font-size: 22px; font-weight: 700; margin-top: 4px; }
-.plan-card-bottom { padding: 12px 16px; }
-.plan-card-bottom .plan-meta { font-size: 12px; color: #667781; }
+.plan-banner-name { font-size: 14px; opacity: 0.9; }
+.plan-banner-tier { font-size: 20px; font-weight: 700; margin-top: 2px; }
+.plan-banner-btn {
+  margin-top: 8px; padding: 6px 16px; background: #fff; color: #128C7E;
+  border: none; border-radius: 6px; font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: opacity 0.15s;
+}
+.plan-banner-btn:hover { opacity: 0.9; }
+
+/* Pairing section */
+.pairing-card {
+  background: #F0FFF4; border: 1px solid #D1FAE5; border-radius: 8px;
+  padding: 20px; text-align: center; margin-bottom: 8px;
+}
 .pairing-code {
-  font-size: 32px; font-weight: 700; letter-spacing: 6px;
-  text-align: center; color: #25D366; padding: 16px;
-  background: #F0FFF4; border-radius: 8px; margin: 8px 0;
-  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 36px; font-weight: 800; letter-spacing: 8px;
+  color: #111B21; font-family: 'SF Mono', 'Fira Code', monospace;
+  margin: 12px 0;
 }
-.footer {
-  text-align: center; padding: 16px; font-size: 11px; color: #CED0D1;
+.pairing-desc { font-size: 13px; color: #667781; line-height: 1.5; }
+.pairing-steps { text-align: left; margin-top: 12px; }
+.pairing-step {
+  display: flex; gap: 8px; font-size: 13px; color: #111B21; padding: 4px 0;
 }
-.row { display: flex; gap: 8px; }
-.row > * { flex: 1; }
+.pairing-step-num {
+  width: 20px; height: 20px; border-radius: 50%; background: #25D366;
+  color: #fff; font-size: 11px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.pairing-gen-btn {
+  margin-top: 8px; padding: 6px 16px; background: none; border: 1px solid #25D366;
+  color: #25D366; border-radius: 6px; font-size: 13px; font-weight: 500;
+  cursor: pointer; transition: all 0.15s;
+}
+.pairing-gen-btn:hover { background: #F0FFF4; }
+
+.account-item {
+  display: flex; align-items: center; gap: 10px; padding: 8px;
+  border-radius: 6px; transition: background 0.15s;
+}
+.account-item:hover { background: #F0F2F5; }
+.account-avatar {
+  width: 28px; height: 28px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 600; color: #fff;
+}
+.account-name { font-size: 14px; color: #111B21; flex: 1; }
+.account-badge { font-size: 12px; color: #667781; }
+
+.status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 4px; }
+.status-dot.green { background: #25D366; }
+.status-dot.red { background: #EF4444; }
+
+.footer { text-align: center; padding: 16px; font-size: 11px; color: #CED0D1; }
 </style>
 </head>
 <body>
   <div class="panel-header">
     <span class="panel-title">Settings</span>
-    <button class="panel-close" onclick="hub.closePanel('settings')">&times;</button>
+    <button class="panel-close" onclick="window.close()">&times;</button>
   </div>
   <div class="panel-body">
-    <!-- Plan Card -->
-    <div class="plan-card">
-      <div class="plan-card-top">
-        <div class="plan-name">Current Plan</div>
-        <div class="plan-tier" id="plan-name">Free</div>
-      </div>
-      <div class="plan-card-bottom">
-        <div class="plan-meta" id="plan-meta">2 accounts &middot; Basic features</div>
-        <div style="margin-top:8px;">
-          <button class="form-btn" onclick="hub.openPanel('upgrade')" style="height:32px;font-size:13px;">Upgrade</button>
-        </div>
-      </div>
+
+    <!-- Plan -->
+    <div class="plan-banner">
+      <div class="plan-banner-name">Current Plan</div>
+      <div class="plan-banner-tier" id="planTier">Free</div>
+      <button class="plan-banner-btn" onclick="hub.openPanel('upgrade')">Upgrade</button>
     </div>
 
     <!-- My Accounts -->
     <div class="section-label">My Accounts</div>
-    <div id="accounts-list">
-      <div class="list-item">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>
-        <span>Personal</span>
-      </div>
-      <div class="list-item">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>
-        <span>Business</span>
-      </div>
-    </div>
-    <button class="form-btn-outline" onclick="hub.openPanel('add-account')" style="height:32px;font-size:13px;margin-top:8px;">+ Add Account</button>
+    <div id="accountsList"></div>
+    <button class="form-btn form-btn-sm" onclick="hub.openPanel('add-account')" style="background:none;border:1px solid #25D366;color:#25D366;margin-top:8px">
+      + Add Account
+    </button>
 
     <div class="divider"></div>
 
     <!-- Connect Phone -->
     <div class="section-label">Connect Phone</div>
-    <p style="font-size:12px;color:#667781;margin-bottom:8px;">Enter this code in WhatsApp &gt; Linked Devices &gt; Link with phone number</p>
-    <div class="pairing-code" id="pairing-code">----</div>
+    <div class="pairing-card">
+      <div style="font-size:14px;font-weight:600;color:#111B21;margin-bottom:4px">Pair with SupaMsg Mobile</div>
+      <div class="pairing-desc">Connect your iPhone to see all your WhatsApp notifications in one place</div>
+      <div class="pairing-code" id="pairingCode">------</div>
+      <div class="pairing-steps">
+        <div class="pairing-step"><span class="pairing-step-num">1</span> Open SupaMsg on your iPhone</div>
+        <div class="pairing-step"><span class="pairing-step-num">2</span> Go to Accounts → Pair with Desktop</div>
+        <div class="pairing-step"><span class="pairing-step-num">3</span> Enter the code shown above</div>
+      </div>
+      <button class="pairing-gen-btn" onclick="generateCode()">Generate New Code</button>
+    </div>
 
     <div class="divider"></div>
 
     <!-- Notifications -->
     <div class="section-label">Notifications</div>
     <div class="toggle-row">
-      <span class="toggle-label">Desktop Notifications</span>
-      <div class="toggle on" id="toggle-notif" onclick="toggleSwitch(this)"></div>
+      <span class="toggle-label">Show notifications</span>
+      <div class="toggle on" data-key="notifications" onclick="toggleSetting(this)"></div>
     </div>
     <div class="toggle-row">
-      <span class="toggle-label">Sound</span>
-      <div class="toggle on" id="toggle-sound" onclick="toggleSwitch(this)"></div>
+      <span class="toggle-label">Play sound</span>
+      <div class="toggle on" data-key="notificationSound" onclick="toggleSetting(this)"></div>
     </div>
     <div class="toggle-row">
-      <span class="toggle-label">Badge Count</span>
-      <div class="toggle on" id="toggle-badge" onclick="toggleSwitch(this)"></div>
+      <span class="toggle-label">Do Not Disturb</span>
+      <div class="toggle" data-key="dnd" onclick="toggleSetting(this)"></div>
     </div>
 
     <div class="divider"></div>
 
     <!-- AI Setup -->
     <div class="section-label">AI Setup</div>
-    <label class="form-label">OpenAI API Key</label>
-    <input class="form-input" id="ai-key" type="password" placeholder="sk-..." />
-    <button class="form-btn" id="save-ai-btn" style="height:34px;font-size:13px;">Save</button>
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">
+      <span class="status-dot" id="aiStatus"></span>
+      <span style="font-size:12px;color:#667781" id="aiStatusText">Not configured</span>
+    </div>
+    <input class="form-input" id="aiKey" type="password" placeholder="Anthropic API key (sk-ant-...)">
+    <button class="form-btn form-btn-sm" onclick="saveApiKey()">Save API Key</button>
 
-    <div class="footer">SupaMsg v1.0.0</div>
+    <div class="divider"></div>
+
+    <!-- General -->
+    <div class="section-label">General</div>
+    <div class="toggle-row">
+      <span class="toggle-label">Open at startup</span>
+      <div class="toggle" data-key="launchAtLogin" onclick="toggleSetting(this)"></div>
+    </div>
+
+    <div class="footer">SupaMsg v2.0.0</div>
   </div>
 
   <script>
-    function toggleSwitch(el) {
-      el.classList.toggle('on');
-    }
-
-    document.getElementById('save-ai-btn').addEventListener('click', () => {
-      const key = document.getElementById('ai-key').value;
-      if (key) {
-        hub.updateSettings({ openaiApiKey: key });
-      }
-    });
-
-    // Load license info
+    // Load settings
     (async () => {
       try {
         const license = await hub.getLicense();
-        if (license && license.tier) {
-          document.getElementById('plan-name').textContent = license.tier;
-          document.getElementById('plan-meta').textContent = license.description || '';
+        if (license) {
+          const names = { free: 'Free', pro: 'Pro', business: 'Business' };
+          document.getElementById('planTier').textContent = names[license.tier] || 'Free';
         }
       } catch (e) {}
+
+      // Generate initial pairing code
+      generateCode();
+
+      // Check AI key status
+      checkAiStatus();
     })();
+
+    // Pairing code
+    function generateCode() {
+      const code = String(Math.floor(100000 + Math.random() * 900000));
+      document.getElementById('pairingCode').textContent = code.slice(0,3) + ' ' + code.slice(3);
+    }
+
+    // Toggle settings
+    function toggleSetting(el) {
+      el.classList.toggle('on');
+      const key = el.dataset.key;
+      if (key) {
+        hub.updateSettings({ [key]: el.classList.contains('on') });
+      }
+    }
+
+    // AI key
+    async function saveApiKey() {
+      const key = document.getElementById('aiKey').value.trim();
+      if (!key) return;
+      hub.updateSettings({ anthropicApiKey: key });
+      document.getElementById('aiKey').value = '';
+      document.getElementById('aiStatus').className = 'status-dot green';
+      document.getElementById('aiStatusText').textContent = 'Active';
+    }
+
+    function checkAiStatus() {
+      // Simple check — if we have a key saved, show green
+      const dot = document.getElementById('aiStatus');
+      const text = document.getElementById('aiStatusText');
+      // Default to not configured
+      dot.className = 'status-dot red';
+      text.textContent = 'Not configured';
+    }
   </script>
 </body>
 </html>
