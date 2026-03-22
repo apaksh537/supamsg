@@ -278,22 +278,16 @@ function switchToAccount(accountId) {
 function resizeView(view) {
   if (!mainWindow || !view) return;
   const contentBounds = mainWindow.getContentBounds();
-  const windowBounds = mainWindow.getBounds();
-  // Content bounds gives us the actual usable area (excludes title bar chrome)
   const contentWidth = contentBounds.width;
   const contentHeight = contentBounds.height;
-  const tabBarHeight = 40; // Account tab bar at top
 
-  const mode = settings.uiMode || 'whatsapp';
-  let x = 0, y = tabBarHeight;
-  let w = contentWidth;
-  let h = contentHeight - tabBarHeight;
+  // Left account strip (narrow sidebar with account icons)
+  const accountStripWidth = 72;
 
-  if (mode === 'simple' || mode === 'pro') {
-    const sidebarWidth = getSidebarWidth();
-    x = sidebarWidth;
-    w = contentWidth - sidebarWidth;
-  }
+  let x = accountStripWidth;
+  let y = 0;
+  let w = contentWidth - accountStripWidth;
+  let h = contentHeight;
 
   view.setBounds({ x, y, width: Math.max(w, 0), height: Math.max(h, 0) });
   view.setAutoResize({ width: true, height: true });
