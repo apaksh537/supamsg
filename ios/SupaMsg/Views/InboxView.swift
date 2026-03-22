@@ -9,6 +9,7 @@ struct InboxView: View {
     @State private var showingQuickReply = false
     @State private var quickReplyMessage: Message?
     @State private var searchText = ""
+    @State private var showingPairSheet = false
 
     var filteredMessages: [Message] {
         let messages = messageStore.recentMessages
@@ -57,9 +58,12 @@ struct InboxView: View {
             }
             .onChange(of: deepLinkAccountId) { newValue in
                 if newValue != nil {
-                    // Scroll to / highlight the account section
                     deepLinkAccountId = nil
                 }
+            }
+            .sheet(isPresented: $showingPairSheet) {
+                PairingSheet()
+                    .environmentObject(pairingService)
             }
         }
     }
@@ -81,7 +85,7 @@ struct InboxView: View {
                 .foregroundColor(.smTextSecondary)
                 .multilineTextAlignment(.center)
             if !pairingService.isPaired {
-                Button(action: {}) {
+                Button(action: { showingPairSheet = true }) {
                     Label("Pair with Desktop", systemImage: "qrcode")
                         .font(.headline)
                         .foregroundColor(.smBackground)
