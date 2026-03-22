@@ -28,7 +28,7 @@ const { initBroadcast } = require('./features/broadcast');
 const { initStealthMode, applyStealthToView } = require('./features/stealth-mode');
 const { initCrmIntegration } = require('./features/crm-integration');
 const { initLicensing } = require('./features/licensing');
-const { initMobileRelay, broadcastNotification } = require('./features/mobile-relay');
+const { initMobileRelay, broadcastNotification, broadcastUnreadUpdate, broadcastAccountUpdate } = require('./features/mobile-relay');
 const { initAutoUpdater } = require('./features/auto-updater');
 
 // New feature modules (30 features)
@@ -230,6 +230,21 @@ function createViewForAccount(account) {
 
     if (count > prevCount && (activeAccountId !== account.id || !mainWindow.isFocused())) {
       showNotification(account.id, 'New message', `${count} unread message${count > 1 ? 's' : ''}`);
+
+      // Broadcast to paired mobile devices
+      try {
+        broadcastNotification({
+          accountId: account.id,
+          accountName: account.name,
+          contactName: 'New message',
+          text: `${count} unread message${count > 1 ? 's' : ''}`,
+        });
+        broadcastUnreadUpdate({
+          accountId: account.id,
+          accountName: account.name,
+          unreadCount: count,
+        });
+      } catch (e) {}
     }
   });
 
@@ -631,6 +646,7 @@ ipcMain.on('add-account', (_event, name) => {
   switchToAccount(id);
   updateTrayMenu();
   trackEvent('account_added', { accountCount: accounts.length });
+  try { broadcastAccountUpdate(accounts); } catch (e) {}
 });
 
 ipcMain.on('rename-account', (_event, { id, name }) => {

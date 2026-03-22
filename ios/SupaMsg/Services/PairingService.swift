@@ -243,9 +243,12 @@ final class PairingService: ObservableObject {
         case "pair_ack":
             // Pairing acknowledged by desktop
             print("[SupaMsg] Pairing acknowledged by desktop")
+            isPaired = true
             if let host = payload.host {
                 savePairingState(host: host, code: payload.code ?? "")
             }
+            // Request a sync to get accounts
+            requestSync()
 
         case "pong":
             break // Keep-alive response
