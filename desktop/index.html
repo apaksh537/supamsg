@@ -21,7 +21,7 @@
 
     /* ── Account Strip (Left Sidebar) ── */
     .account-strip {
-      width: 72px;
+      width: 78px;
       height: 100vh;
       background: #075E54;
       display: flex;
@@ -36,6 +36,51 @@
       overflow-x: hidden;
     }
     .account-strip::-webkit-scrollbar { display: none; }
+
+    .strip-section-label {
+      font-size: 8px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: rgba(255,255,255,0.35);
+      margin: 8px 0 4px;
+      -webkit-app-region: no-drag;
+    }
+
+    .strip-divider {
+      width: 40px;
+      height: 1px;
+      background: rgba(255,255,255,0.15);
+      margin: 10px 0;
+    }
+
+    .strip-tool-btn {
+      width: 62px;
+      padding: 6px 2px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1px;
+      cursor: pointer;
+      border-radius: 10px;
+      border: none;
+      background: none;
+      transition: all 0.15s;
+      -webkit-app-region: no-drag;
+      margin-bottom: 2px;
+    }
+    .strip-tool-btn:hover { background: rgba(255,255,255,0.12); }
+    .strip-tool-btn:active { background: rgba(255,255,255,0.2); }
+
+    .strip-tool-icon {
+      font-size: 18px;
+      line-height: 1;
+    }
+    .strip-tool-text {
+      font-size: 8px;
+      color: rgba(255,255,255,0.6);
+      text-align: center;
+    }
+    .strip-tool-btn:hover .strip-tool-text { color: rgba(255,255,255,0.9); }
 
     /* Hide old tab bar */
     .account-tab-bar {
@@ -975,11 +1020,53 @@
 <body class="mode-whatsapp">
 
   <!-- ═══════════════════════════ ACCOUNT TAB BAR ═══════════════════════════ -->
-  <!-- ═══════ LEFT ACCOUNT STRIP ═══════ -->
+  <!-- ═══════ LEFT NAVIGATION STRIP ═══════ -->
   <div class="account-strip" id="accountStrip">
+    <!-- Accounts section -->
+    <div class="strip-section-label">Accounts</div>
     <div id="accountTabs"></div>
     <button class="strip-add-btn" id="addBtn" title="Add Account">+</button>
-    <button class="strip-settings-btn" id="btnSettings" title="Settings">&#9881;</button>
+
+    <!-- Divider -->
+    <div class="strip-divider"></div>
+
+    <!-- Quick access tools -->
+    <div class="strip-section-label">Tools</div>
+    <button class="strip-tool-btn" id="btnSchedule" title="Send Later">
+      <span class="strip-tool-icon">&#128339;</span>
+      <span class="strip-tool-text">Schedule</span>
+    </button>
+    <button class="strip-tool-btn" id="btnTemplates" title="Quick Replies">
+      <span class="strip-tool-icon">&#128203;</span>
+      <span class="strip-tool-text">Replies</span>
+    </button>
+    <button class="strip-tool-btn" id="btnAI" title="AI Helper">
+      <span class="strip-tool-icon">&#10024;</span>
+      <span class="strip-tool-text">AI</span>
+    </button>
+    <button class="strip-tool-btn" id="btnBroadcast" title="Broadcast">
+      <span class="strip-tool-icon">&#128226;</span>
+      <span class="strip-tool-text">Blast</span>
+    </button>
+    <button class="strip-tool-btn" id="btnExport" title="Save Chat">
+      <span class="strip-tool-icon">&#128190;</span>
+      <span class="strip-tool-text">Export</span>
+    </button>
+    <button class="strip-tool-btn" id="btnAnalytics" title="Analytics">
+      <span class="strip-tool-icon">&#128200;</span>
+      <span class="strip-tool-text">Stats</span>
+    </button>
+
+    <!-- Bottom section -->
+    <div style="margin-top:auto"></div>
+    <button class="strip-tool-btn" id="btnPairMobile" title="Connect Phone">
+      <span class="strip-tool-icon">&#128241;</span>
+      <span class="strip-tool-text">Mobile</span>
+    </button>
+    <button class="strip-tool-btn" id="btnSettings" title="Settings">
+      <span class="strip-tool-icon">&#9881;</span>
+      <span class="strip-tool-text">Settings</span>
+    </button>
   </div>
 
   <!-- Hidden old tab bar (keeping for JS compatibility) -->
@@ -1859,6 +1946,56 @@
     document.getElementById('settingsBack').addEventListener('click', () => {
       document.getElementById('settingsPanel').classList.remove('visible');
       hub.showViews();
+    });
+
+    // ── Strip tool buttons ──
+    document.getElementById('btnSchedule').addEventListener('click', async () => {
+      if (!(await requireFeature('scheduling', 'Send Later'))) return;
+      hub.hideViews();
+      const scheds = await hub.getSchedules();
+      renderSchedules(scheds);
+      openPanel('schedulePanel');
+    });
+
+    document.getElementById('btnTemplates').addEventListener('click', async () => {
+      hub.hideViews();
+      const tpls = await hub.getTemplates();
+      renderTemplates(tpls);
+      openPanel('templatesPanel');
+    });
+
+    document.getElementById('btnAI').addEventListener('click', async () => {
+      if (!(await requireFeature('aiReplies', 'AI Helper'))) return;
+      hub.hideViews();
+      openPanel('aiPanel');
+    });
+
+    document.getElementById('btnBroadcast').addEventListener('click', async () => {
+      if (!(await requireFeature('broadcast', 'Broadcast'))) return;
+      hub.hideViews();
+      const camps = await hub.getCampaigns();
+      renderCampaigns(camps);
+      openPanel('broadcastPanel');
+    });
+
+    document.getElementById('btnExport').addEventListener('click', async () => {
+      if (!(await requireFeature('chatExport', 'Save Chat'))) return;
+      const result = await hub.exportChat({ format: 'text' });
+      if (result.success) showDialog({ title: 'Saved', message: `Exported ${result.messageCount} messages.`, isConfirm: true });
+      else if (result.error !== 'Cancelled') showDialog({ title: 'Export Failed', message: result.error, isConfirm: true });
+    });
+
+    document.getElementById('btnAnalytics').addEventListener('click', async () => {
+      if (!(await requireFeature('analytics', 'Analytics'))) return;
+      hub.hideViews();
+      openPanel('analyticsPanel');
+      renderAnalytics();
+    });
+
+    document.getElementById('btnPairMobile').addEventListener('click', () => {
+      hub.hideViews();
+      openPanel('settingsPanel');
+      // TODO: scroll to mobile pairing section
     });
 
     // Sidebar menu button (opens automations as a secondary action)
