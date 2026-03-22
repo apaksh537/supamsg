@@ -278,12 +278,19 @@ function switchToAccount(accountId) {
 function resizeView(view) {
   if (!mainWindow || !view) return;
   const bounds = mainWindow.getBounds();
-  const sidebarWidth = getSidebarWidth();
-  view.setBounds({
-    x: sidebarWidth, y: 0,
-    width: bounds.width - sidebarWidth,
-    height: bounds.height,
-  });
+  const tabBarHeight = 40; // Account tab bar at top
+  // In WhatsApp Mode: BrowserView takes full width, starts below tab bar
+  // In Simple/Pro Mode: BrowserView starts after sidebar
+  const mode = settings.uiMode || 'whatsapp';
+  let x = 0, y = tabBarHeight, w = bounds.width, h = bounds.height - tabBarHeight;
+
+  if (mode === 'simple' || mode === 'pro') {
+    const sidebarWidth = getSidebarWidth();
+    x = sidebarWidth;
+    w = bounds.width - sidebarWidth;
+  }
+
+  view.setBounds({ x, y, width: w, height: h });
   view.setAutoResize({ width: true, height: true });
 }
 
@@ -638,6 +645,12 @@ ipcMain.on('toggle-sidebar', () => {
   saveSettings();
   resizeAllViews();
   mainWindow.webContents.send('settings-updated', settings);
+});
+
+ipcMain.on('set-ui-mode', (_event, mode) => {
+  settings.uiMode = mode;
+  saveSettings();
+  resizeAllViews();
 });
 
 ipcMain.on('wa-notification', (_event, { accountId, title, body }) => {

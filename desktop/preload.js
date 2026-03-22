@@ -12,6 +12,7 @@ contextBridge.exposeInMainWorld('hub', {
   // Settings
   updateSettings: (s) => ipcRenderer.send('update-settings', s),
   toggleSidebar: () => ipcRenderer.send('toggle-sidebar'),
+  setUiMode: (mode) => ipcRenderer.send('set-ui-mode', mode),
 
   // Split screen
   toggleSplitScreen: (opts) => ipcRenderer.send('toggle-split-screen', opts),
