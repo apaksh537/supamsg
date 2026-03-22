@@ -73,9 +73,11 @@ struct InboxView: View {
     private var emptyStateView: some View {
         VStack(spacing: 16) {
             Spacer()
-            Image(systemName: "tray")
-                .font(.system(size: 56))
-                .foregroundColor(.smTextSecondary)
+            Image("Logo")
+                .resizable()
+                .frame(width: 80, height: 80)
+                .clipShape(RoundedRectangle(cornerRadius: 18))
+                .shadow(color: .smAccent.opacity(0.3), radius: 12, y: 4)
             Text("No messages yet")
                 .font(.title2)
                 .fontWeight(.semibold)
@@ -88,7 +90,7 @@ struct InboxView: View {
                 Button(action: { showingPairSheet = true }) {
                     Label("Pair with Desktop", systemImage: "qrcode")
                         .font(.headline)
-                        .foregroundColor(.smBackground)
+                        .foregroundColor(.white)
                         .padding(.horizontal, 24)
                         .padding(.vertical, 12)
                         .background(Color.smAccent)
@@ -225,7 +227,7 @@ struct MessageRow: View {
                         Label("Reply", systemImage: "arrowshape.turn.up.left.fill")
                             .font(.caption)
                             .fontWeight(.medium)
-                            .foregroundColor(.smBackground)
+                            .foregroundColor(.white)
                             .padding(.horizontal, 16)
                             .padding(.vertical, 8)
                             .background(Color.smAccent)

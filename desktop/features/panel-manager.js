@@ -13,6 +13,8 @@ const PANEL_CONFIGS = {
   settings: { width: 440, height: 600, title: 'Settings' },
   'add-account': { width: 400, height: 480, title: 'Add Account' },
   upgrade: { width: 520, height: 500, title: 'Upgrade' },
+  'connect-phone': { width: 440, height: 600, title: 'Settings', file: 'settings' },
+  'command-palette': { width: 500, height: 400, title: 'Search' },
 };
 
 function initPanelManager({ getMainWindow }) {
@@ -56,7 +58,8 @@ function openPanel(name) {
     },
   });
 
-  panelWin.loadFile(path.join(__dirname, '..', 'panels', `${name}.html`));
+  const fileName = config.file || name;
+  panelWin.loadFile(path.join(__dirname, '..', 'panels', `${fileName}.html`));
 
   panelWin.once('ready-to-show', () => {
     panelWin.show();

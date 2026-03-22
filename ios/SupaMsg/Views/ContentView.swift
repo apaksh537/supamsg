@@ -3,15 +3,19 @@ import SwiftUI
 // MARK: - Theme Colors
 
 extension Color {
-    static let smBackground = Color(hex: "1a1a2e")
-    static let smSurface = Color(hex: "16213e")
-    static let smSurfaceLight = Color(hex: "1f3460")
+    // Approved Notion-style light theme
+    static let smBackground = Color(hex: "FFFFFF")
+    static let smSurface = Color(hex: "F5F5F5")
+    static let smSurfaceLight = Color(hex: "F0F2F5")
     static let smAccent = Color(hex: "25D366")
-    static let smAccentDim = Color(hex: "1da851")
-    static let smText = Color.white
-    static let smTextSecondary = Color(hex: "8892b0")
-    static let smDanger = Color(hex: "e74c3c")
-    static let smWarning = Color(hex: "f39c12")
+    static let smAccentDim = Color(hex: "1FAA59")
+    static let smText = Color(hex: "111B21")
+    static let smTextSecondary = Color(hex: "667781")
+    static let smDanger = Color(hex: "EF4444")
+    static let smWarning = Color(hex: "F5A623")
+    static let smBorder = Color(hex: "E8E8E8")
+    static let smNavBg = Color(hex: "FAFAFA")
+    static let smActiveItem = Color(hex: "F0FFF4")
 }
 
 extension Color {
@@ -76,7 +80,7 @@ struct ContentView: View {
             }
             .tint(.smAccent)
         }
-        .preferredColorScheme(.dark)
+        .preferredColorScheme(.light)
     }
 }
 
