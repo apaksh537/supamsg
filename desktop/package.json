@@ -42,7 +42,9 @@
       "preload-onboarding.js",
       "index.html",
       "onboarding.html",
-      "features/**/*"
+      "features/**/*",
+      "panels/**/*",
+      "build/icon.png"
     ],
     "publish": {
       "provider": "github",
