@@ -340,6 +340,14 @@ function updateTrayMenu() {
 
 function showOnboarding() {
   return new Promise((resolve) => {
+    let resolved = false;
+    function resolveOnce() {
+      if (!resolved) {
+        resolved = true;
+        resolve();
+      }
+    }
+
     onboardingWindow = new BrowserWindow({
       width: 700,
       height: 560,
@@ -359,7 +367,13 @@ function showOnboarding() {
       fs.writeFileSync(ONBOARDING_PATH, '1');
       onboardingWindow.close();
       onboardingWindow = null;
-      resolve();
+      resolveOnce();
+    });
+
+    onboardingWindow.on('closed', () => {
+      fs.writeFileSync(ONBOARDING_PATH, '1');
+      onboardingWindow = null;
+      resolveOnce();
     });
   });
 }
@@ -405,6 +419,16 @@ function createWindow() {
     if (accounts.length > 0) {
       switchToAccount(accounts[0].id);
     }
+
+    // Monitor memory usage
+    setInterval(() => {
+      const memUsage = process.memoryUsage();
+      const heapUsedMB = Math.round(memUsage.heapUsed / 1024 / 1024);
+      const rssMB = Math.round(memUsage.rss / 1024 / 1024);
+      if (rssMB > 2000) { // Over 2GB
+        mainWindow.webContents.send('memory-warning', { rssMB, heapUsedMB, accounts: Object.keys(views).length });
+      }
+    }, 60000); // Check every minute
   });
 }
 
@@ -657,46 +681,51 @@ app.whenReady().then(async () => {
   initContactLabels({ app, ipcMain, getMainWindow });
   initAnalytics({ app, ipcMain, getMainWindow });
   initAiReplies({ app, ipcMain, getMainWindow, getViews, getActiveAccountId });
-  initAutomations({ app, ipcMain, getMainWindow, getViews, getAccounts });
-  initBroadcast({ app, ipcMain, getMainWindow, getViews });
-  initStealthMode({ app, ipcMain, getViews });
-  initCrmIntegration({ app, ipcMain, getMainWindow });
-  initLicensing({ app, ipcMain, getMainWindow });
-  initMobileRelay({ ipcMain, getMainWindow, getViews, getAccounts });
-  initAutoUpdater({ getMainWindow });
+  // Safe feature initialization — wraps each in try-catch so one failure doesn't crash the app
+  function safeInit(name, fn) {
+    try { fn(); } catch (e) { console.error(`[SupaMsg] Failed to init ${name}:`, e.message); }
+  }
 
-  // Initialize all 30 new features
+  safeInit('automations', () => initAutomations({ app, ipcMain, getMainWindow, getViews, getAccounts }));
+  safeInit('broadcast', () => initBroadcast({ app, ipcMain, getMainWindow, getViews }));
+  safeInit('stealth-mode', () => initStealthMode({ app, ipcMain, getViews }));
+  safeInit('crm', () => initCrmIntegration({ app, ipcMain, getMainWindow }));
+  safeInit('licensing', () => initLicensing({ app, ipcMain, getMainWindow }));
+  safeInit('mobile-relay', () => initMobileRelay({ ipcMain, getMainWindow, getViews, getAccounts }));
+  safeInit('auto-updater', () => initAutoUpdater({ getMainWindow }));
+
+  // Initialize all 30 new features (each wrapped in error boundary)
   const featureCtx = { app, ipcMain, getMainWindow, getViews, getActiveAccountId, getAccounts };
-  initConversationKanban(featureCtx);
-  initSmartNotifications(featureCtx);
-  initQuickActions(featureCtx);
-  initVoiceTranscription(featureCtx);
-  initMessageRecall(featureCtx);
-  initCollaborativeNotes(featureCtx);
-  initTimezoneScheduler(featureCtx);
-  initSentimentAlerts(featureCtx);
-  initPaymentCollection(featureCtx);
-  initProductCatalog(featureCtx);
-  initAppointmentBooking(featureCtx);
-  initStatusManager(featureCtx);
-  initChatbotBuilder(featureCtx);
-  initChatBackup(featureCtx);
-  initWebhookApi(featureCtx);
-  initAiInsights(featureCtx);
-  initEcommerceTracking(featureCtx);
-  initAiAgent(featureCtx);
-  initZapierIntegration(featureCtx);
-  initWhiteLabel(featureCtx);
-  initCrossMessenger(featureCtx);
-  initScreenMirror(featureCtx);
-  initVirtualNumbers(featureCtx);
-  initSmsBridge(featureCtx);
-  initTeamInbox(featureCtx);
-  initAdvancedAnalytics(featureCtx);
-  initAutoTranslate(featureCtx);
-  initCustomDashboard(featureCtx);
-  initWhatsappBusinessApi(featureCtx);
-  initConversationSearch(featureCtx);
+  safeInit('kanban', () => initConversationKanban(featureCtx));
+  safeInit('smart-notifications', () => initSmartNotifications(featureCtx));
+  safeInit('quick-actions', () => initQuickActions(featureCtx));
+  safeInit('voice-transcription', () => initVoiceTranscription(featureCtx));
+  safeInit('message-recall', () => initMessageRecall(featureCtx));
+  safeInit('collaborative-notes', () => initCollaborativeNotes(featureCtx));
+  safeInit('timezone-scheduler', () => initTimezoneScheduler(featureCtx));
+  safeInit('sentiment-alerts', () => initSentimentAlerts(featureCtx));
+  safeInit('payment-collection', () => initPaymentCollection(featureCtx));
+  safeInit('product-catalog', () => initProductCatalog(featureCtx));
+  safeInit('appointment-booking', () => initAppointmentBooking(featureCtx));
+  safeInit('status-manager', () => initStatusManager(featureCtx));
+  safeInit('chatbot-builder', () => initChatbotBuilder(featureCtx));
+  safeInit('chat-backup', () => initChatBackup(featureCtx));
+  safeInit('webhook-api', () => initWebhookApi(featureCtx));
+  safeInit('ai-insights', () => initAiInsights(featureCtx));
+  safeInit('ecommerce-tracking', () => initEcommerceTracking(featureCtx));
+  safeInit('ai-agent', () => initAiAgent(featureCtx));
+  safeInit('zapier-integration', () => initZapierIntegration(featureCtx));
+  safeInit('white-label', () => initWhiteLabel(featureCtx));
+  safeInit('cross-messenger', () => initCrossMessenger(featureCtx));
+  safeInit('screen-mirror', () => initScreenMirror(featureCtx));
+  safeInit('virtual-numbers', () => initVirtualNumbers(featureCtx));
+  safeInit('sms-bridge', () => initSmsBridge(featureCtx));
+  safeInit('team-inbox', () => initTeamInbox(featureCtx));
+  safeInit('advanced-analytics', () => initAdvancedAnalytics(featureCtx));
+  safeInit('auto-translate', () => initAutoTranslate(featureCtx));
+  safeInit('custom-dashboard', () => initCustomDashboard(featureCtx));
+  safeInit('whatsapp-business-api', () => initWhatsappBusinessApi(featureCtx));
+  safeInit('conversation-search', () => initConversationSearch(featureCtx));
 
   // Global shortcut
   if (settings.globalShortcut) {

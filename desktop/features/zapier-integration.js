@@ -160,13 +160,26 @@ function initZapierIntegration({ app, ipcMain, getMainWindow, getViews, getActiv
 
   function startServer() {
     if (server) return;
+    let currentPort = PORT;
+    let retries = 0;
+    const maxRetries = 5;
+
     server = http.createServer(handleRequest);
-    server.listen(PORT, '127.0.0.1', () => {
-      console.log(`[zapier-integration] HTTP server listening on port ${PORT}`);
-    });
+
     server.on('error', (err) => {
-      console.error('[zapier-integration] Server error:', err);
-      server = null;
+      if (err.code === 'EADDRINUSE' && retries < maxRetries) {
+        retries++;
+        currentPort++;
+        console.log(`[zapier-integration] Port ${currentPort - 1} in use, trying ${currentPort}...`);
+        server.listen(currentPort, '127.0.0.1');
+      } else {
+        console.error(`[zapier-integration] Server failed to start: ${err.message}`);
+        server = null;
+      }
+    });
+
+    server.listen(currentPort, '127.0.0.1', () => {
+      console.log(`[zapier-integration] HTTP server listening on port ${currentPort}`);
     });
   }
 

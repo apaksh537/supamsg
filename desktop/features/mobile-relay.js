@@ -42,48 +42,68 @@ function initMobileRelay({ ipcMain, getMainWindow, getViews, getAccounts }) {
 // ─── WebSocket Server ─────────────────────────────────────────────────────────
 
 function startServer() {
-  wss = new WebSocket.Server({ port: RELAY_PORT }, () => {
-    console.log(`[MobileRelay] WebSocket server listening on port ${RELAY_PORT}`);
-  });
+  let currentPort = RELAY_PORT;
+  let retries = 0;
+  const maxRetries = 5;
 
-  wss.on('connection', (ws, req) => {
-    const clientIP = req.socket.remoteAddress;
-    console.log(`[MobileRelay] New connection from ${clientIP}`);
+  function tryListen(port) {
+    wss = new WebSocket.Server({ port }, () => {
+      console.log(`[MobileRelay] WebSocket server listening on port ${port}`);
+    });
 
-    ws.isAuthenticated = false;
-    ws.deviceId = null;
-    ws.deviceName = null;
-
-    // Timeout unauthenticated connections after 30s
-    const authTimeout = setTimeout(() => {
-      if (!ws.isAuthenticated) {
-        console.log(`[MobileRelay] Closing unauthenticated connection from ${clientIP}`);
-        ws.close(4001, 'Authentication timeout');
-      }
-    }, 30000);
-
-    ws.on('message', (data) => {
-      try {
-        const message = JSON.parse(data.toString());
-        handleClientMessage(ws, message, clientIP);
-      } catch (err) {
-        console.error('[MobileRelay] Failed to parse message:', err.message);
+    wss.on('error', (err) => {
+      if (err.code === 'EADDRINUSE' && retries < maxRetries) {
+        retries++;
+        currentPort++;
+        console.log(`[MobileRelay] Port ${currentPort - 1} in use, trying ${currentPort}...`);
+        wss = null;
+        tryListen(currentPort);
+      } else {
+        console.error(`[MobileRelay] Server failed to start: ${err.message}`);
       }
     });
 
-    ws.on('close', (code, reason) => {
-      clearTimeout(authTimeout);
-      console.log(`[MobileRelay] Client disconnected: ${ws.deviceName || clientIP} (${code})`);
-    });
+    setupWssHandlers();
+  }
 
-    ws.on('error', (err) => {
-      console.error(`[MobileRelay] WebSocket error for ${ws.deviceName || clientIP}:`, err.message);
-    });
-  });
+  function setupWssHandlers() {
+    wss.on('connection', (ws, req) => {
+      const clientIP = req.socket.remoteAddress;
+      console.log(`[MobileRelay] New connection from ${clientIP}`);
 
-  wss.on('error', (err) => {
-    console.error('[MobileRelay] Server error:', err.message);
-  });
+      ws.isAuthenticated = false;
+      ws.deviceId = null;
+      ws.deviceName = null;
+
+      // Timeout unauthenticated connections after 30s
+      const authTimeout = setTimeout(() => {
+        if (!ws.isAuthenticated) {
+          console.log(`[MobileRelay] Closing unauthenticated connection from ${clientIP}`);
+          ws.close(4001, 'Authentication timeout');
+        }
+      }, 30000);
+
+      ws.on('message', (data) => {
+        try {
+          const message = JSON.parse(data.toString());
+          handleClientMessage(ws, message, clientIP);
+        } catch (err) {
+          console.error('[MobileRelay] Failed to parse message:', err.message);
+        }
+      });
+
+      ws.on('close', (code, reason) => {
+        clearTimeout(authTimeout);
+        console.log(`[MobileRelay] Client disconnected: ${ws.deviceName || clientIP} (${code})`);
+      });
+
+      ws.on('error', (err) => {
+        console.error(`[MobileRelay] WebSocket error for ${ws.deviceName || clientIP}:`, err.message);
+      });
+    });
+  }
+
+  tryListen(currentPort);
 }
 
 // ─── Message Handling ─────────────────────────────────────────────────────────

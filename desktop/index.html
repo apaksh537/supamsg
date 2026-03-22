@@ -755,6 +755,10 @@
     let schedules = [];
     let labelsData = { labels: [], contactLabels: {} };
 
+    function escapeHtml(str) {
+      return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+    }
+
     // ── Panel management (hide BrowserViews so panels are visible) ──
     function openPanel(id) {
       hub.hideViews();
@@ -786,12 +790,12 @@
 
         item.innerHTML = `
           <div class="account-dot" style="background:${account.color}"></div>
-          <span class="account-name">${account.name}</span>
+          <span class="account-name">${escapeHtml(account.name)}</span>
           <span class="unread-badge ${unread > 0 ? 'has-unread' : ''}">${unread}</span>
           <div class="account-actions">
             <button title="Reload" onclick="event.stopPropagation();hub.reloadAccount('${account.id}')">&#8635;</button>
-            <button title="Rename" onclick="event.stopPropagation();renameAccount('${account.id}','${account.name.replace(/'/g,"\\'")}')">&#9998;</button>
-            <button class="remove" title="Remove" onclick="event.stopPropagation();removeAccount('${account.id}','${account.name.replace(/'/g,"\\'")}')">&#10005;</button>
+            <button title="Rename" onclick="event.stopPropagation();renameAccount('${account.id}','${escapeHtml(account.name.replace(/'/g,"\\'"))}')">&#9998;</button>
+            <button class="remove" title="Remove" onclick="event.stopPropagation();removeAccount('${account.id}','${escapeHtml(account.name.replace(/'/g,"\\'"))}')">&#10005;</button>
           </div>`;
 
         item.addEventListener('click', () => hub.switchAccount(account.id));

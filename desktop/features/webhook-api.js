@@ -113,6 +113,10 @@ function parseBody(req) {
 
 function startServer() {
   if (server) return;
+  let currentPort = apiConfig.port;
+  let retries = 0;
+  const maxRetries = 5;
+
   server = http.createServer(async (req, res) => {
     // CORS headers
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -125,7 +129,7 @@ function startServer() {
       return;
     }
 
-    const url = new URL(req.url, `http://localhost:${apiConfig.port}`);
+    const url = new URL(req.url, `http://localhost:${currentPort}`);
     const pathname = url.pathname;
 
     // Health check (no auth required)
@@ -146,12 +150,20 @@ function startServer() {
     }
   });
 
-  server.listen(apiConfig.port, () => {
-    console.log(`[webhook-api] API server running on port ${apiConfig.port}`);
+  server.on('error', (err) => {
+    if (err.code === 'EADDRINUSE' && retries < maxRetries) {
+      retries++;
+      currentPort++;
+      console.log(`[webhook-api] Port ${currentPort - 1} in use, trying ${currentPort}...`);
+      server.listen(currentPort);
+    } else {
+      console.error(`[webhook-api] Server failed to start: ${err.message}`);
+    }
   });
 
-  server.on('error', (err) => {
-    console.error('[webhook-api] Server error:', err.message);
+  server.listen(currentPort, () => {
+    apiConfig.port = currentPort;
+    console.log(`[webhook-api] API server running on port ${currentPort}`);
   });
 }
 
