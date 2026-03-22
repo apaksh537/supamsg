@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { v4: uuidv4 } = require('uuid') || { v4: () => `msg-${Date.now()}-${Math.random().toString(36).slice(2, 9)}` };
+const uuidv4 = () => require('crypto').randomUUID();
 const { BrowserView } = require('electron');
 
 function initCrossMessenger({ app, ipcMain, getMainWindow, getViews, getActiveAccountId, getAccounts }) {

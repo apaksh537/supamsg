@@ -1,6 +1,6 @@
 const path = require('path');
 const fs = require('fs');
-const { v4: uuidv4 } = require('uuid');
+const uuidv4 = () => require('crypto').randomUUID();
 
 function initCustomDashboard({ app, ipcMain, getMainWindow, getViews, getActiveAccountId, getAccounts }) {
   const userDataPath = app.getPath('userData');

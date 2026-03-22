@@ -668,27 +668,20 @@ app.whenReady().then(async () => {
   createWindow();
   createTray();
 
-  // Initialize feature modules
-  const featureCtx = {
-    app, ipcMain, getMainWindow, getViews, getAccounts,
-    getActiveAccountId, getSidebarWidth, accounts,
-  };
-
-  splitScreen = initSplitScreen({
-    ipcMain, getMainWindow, getViews, getAccounts, getSidebarWidth,
-  });
-
-  initScheduledMessages({ app, ipcMain, getMainWindow, getViews });
-  initTemplates({ app, ipcMain, getMainWindow, getViews, getActiveAccountId });
-  initChatExport({ ipcMain, getMainWindow, getViews, getActiveAccountId, accounts });
-  initContactLabels({ app, ipcMain, getMainWindow });
-  initAnalytics({ app, ipcMain, getMainWindow });
-  initAiReplies({ app, ipcMain, getMainWindow, getViews, getActiveAccountId });
   // Safe feature initialization — wraps each in try-catch so one failure doesn't crash the app
   function safeInit(name, fn) {
     try { fn(); } catch (e) { console.error(`[SupaMsg] Failed to init ${name}:`, e.message); }
   }
 
+  const featureCtx = { app, ipcMain, getMainWindow, getViews, getActiveAccountId, getAccounts, getSidebarWidth, accounts };
+
+  safeInit('split-screen', () => { splitScreen = initSplitScreen({ ipcMain, getMainWindow, getViews, getAccounts, getSidebarWidth }); });
+  safeInit('scheduled-messages', () => initScheduledMessages({ app, ipcMain, getMainWindow, getViews }));
+  safeInit('templates', () => initTemplates({ app, ipcMain, getMainWindow, getViews, getActiveAccountId }));
+  safeInit('chat-export', () => initChatExport({ ipcMain, getMainWindow, getViews, getActiveAccountId, accounts }));
+  safeInit('contact-labels', () => initContactLabels({ app, ipcMain, getMainWindow }));
+  safeInit('analytics', () => initAnalytics({ app, ipcMain, getMainWindow }));
+  safeInit('ai-replies', () => initAiReplies({ app, ipcMain, getMainWindow, getViews, getActiveAccountId }));
   safeInit('automations', () => initAutomations({ app, ipcMain, getMainWindow, getViews, getAccounts }));
   safeInit('broadcast', () => initBroadcast({ app, ipcMain, getMainWindow, getViews }));
   safeInit('stealth-mode', () => initStealthMode({ app, ipcMain, getViews }));
@@ -697,8 +690,7 @@ app.whenReady().then(async () => {
   safeInit('mobile-relay', () => initMobileRelay({ ipcMain, getMainWindow, getViews, getAccounts }));
   safeInit('auto-updater', () => initAutoUpdater({ getMainWindow }));
 
-  // Initialize all 30 new features (each wrapped in error boundary)
-  const featureCtx = { app, ipcMain, getMainWindow, getViews, getActiveAccountId, getAccounts };
+  // Initialize all 30 new features
   safeInit('kanban', () => initConversationKanban(featureCtx));
   safeInit('smart-notifications', () => initSmartNotifications(featureCtx));
   safeInit('quick-actions', () => initQuickActions(featureCtx));
