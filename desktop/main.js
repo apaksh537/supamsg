@@ -277,20 +277,25 @@ function switchToAccount(accountId) {
 
 function resizeView(view) {
   if (!mainWindow || !view) return;
-  const bounds = mainWindow.getBounds();
+  const contentBounds = mainWindow.getContentBounds();
+  const windowBounds = mainWindow.getBounds();
+  // Content bounds gives us the actual usable area (excludes title bar chrome)
+  const contentWidth = contentBounds.width;
+  const contentHeight = contentBounds.height;
   const tabBarHeight = 40; // Account tab bar at top
-  // In WhatsApp Mode: BrowserView takes full width, starts below tab bar
-  // In Simple/Pro Mode: BrowserView starts after sidebar
+
   const mode = settings.uiMode || 'whatsapp';
-  let x = 0, y = tabBarHeight, w = bounds.width, h = bounds.height - tabBarHeight;
+  let x = 0, y = tabBarHeight;
+  let w = contentWidth;
+  let h = contentHeight - tabBarHeight;
 
   if (mode === 'simple' || mode === 'pro') {
     const sidebarWidth = getSidebarWidth();
     x = sidebarWidth;
-    w = bounds.width - sidebarWidth;
+    w = contentWidth - sidebarWidth;
   }
 
-  view.setBounds({ x, y, width: w, height: h });
+  view.setBounds({ x, y, width: Math.max(w, 0), height: Math.max(h, 0) });
   view.setAutoResize({ width: true, height: true });
 }
 
