@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  background: #FFFFFF;
+  color: #111B21;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+.panel-header {
+  height: 48px;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  border-bottom: 1px solid #E8E8E8;
+  -webkit-app-region: drag;
+  flex-shrink: 0;
+}
+.panel-title { font-size: 16px; font-weight: 600; color: #111B21; flex: 1; }
+.panel-close {
+  width: 28px; height: 28px; border-radius: 6px; border: none;
+  background: none; color: #667781; font-size: 18px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  -webkit-app-region: no-drag;
+  transition: all 0.15s;
+}
+.panel-close:hover { background: #F0F2F5; color: #111B21; }
+.panel-body { flex: 1; overflow-y: auto; padding: 20px; }
+.stats-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+  margin-bottom: 20px;
+}
+.stat-card {
+  background: #F0F2F5; border-radius: 10px; padding: 16px;
+}
+.stat-value { font-size: 28px; font-weight: 700; color: #111B21; }
+.stat-label { font-size: 12px; color: #667781; margin-top: 2px; }
+.stat-change {
+  font-size: 11px; font-weight: 500; margin-top: 4px;
+}
+.stat-change.up { color: #25D366; }
+.stat-change.down { color: #E74C3C; }
+.section-label { font-size: 11px; font-weight: 600; color: #667781; text-transform: uppercase; letter-spacing: 1px; margin: 16px 0 8px; }
+.chart {
+  display: flex; align-items: flex-end; gap: 6px; height: 120px;
+  padding: 12px 0;
+}
+.chart-bar {
+  flex: 1; background: #25D366; border-radius: 4px 4px 0 0;
+  min-height: 8px; position: relative;
+  transition: height 0.3s;
+}
+.chart-bar:hover { background: #1FAA59; }
+.chart-bar .chart-tip {
+  position: absolute; top: -20px; left: 50%; transform: translateX(-50%);
+  font-size: 10px; color: #667781; white-space: nowrap;
+  display: none;
+}
+.chart-bar:hover .chart-tip { display: block; }
+.chart-labels {
+  display: flex; gap: 6px; margin-top: 4px;
+}
+.chart-labels span {
+  flex: 1; text-align: center; font-size: 10px; color: #667781;
+}
+</style>
+</head>
+<body>
+  <div class="panel-header">
+    <span class="panel-title">Dashboard</span>
+    <button class="panel-close" onclick="hub.closePanel('dashboard')">&times;</button>
+  </div>
+  <div class="panel-body">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-value" id="stat-sent">--</div>
+        <div class="stat-label">Messages Sent</div>
+        <div class="stat-change up">+12% this week</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="stat-received">--</div>
+        <div class="stat-label">Messages Received</div>
+        <div class="stat-change up">+8% this week</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="stat-contacts">--</div>
+        <div class="stat-label">Active Contacts</div>
+        <div class="stat-change up">+5 new</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="stat-response">--</div>
+        <div class="stat-label">Avg Response Time</div>
+        <div class="stat-change down">+2m slower</div>
+      </div>
+    </div>
+
+    <div class="section-label">Messages This Week</div>
+    <div class="chart" id="chart"></div>
+    <div class="chart-labels" id="chart-labels"></div>
+  </div>
+
+  <script>
+    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    const values = [42, 65, 38, 78, 56, 30, 12];
+    const maxVal = Math.max(...values);
+
+    const chartEl = document.getElementById('chart');
+    const labelsEl = document.getElementById('chart-labels');
+
+    days.forEach((day, i) => {
+      const pct = (values[i] / maxVal) * 100;
+      const bar = document.createElement('div');
+      bar.className = 'chart-bar';
+      bar.style.height = pct + '%';
+      bar.innerHTML = `<span class="chart-tip">${values[i]}</span>`;
+      chartEl.appendChild(bar);
+
+      const label = document.createElement('span');
+      label.textContent = day;
+      labelsEl.appendChild(label);
+    });
+
+    // Load real data
+    (async () => {
+      try {
+        const data = await hub.getAnalytics();
+        if (data) {
+          document.getElementById('stat-sent').textContent = data.sent || '0';
+          document.getElementById('stat-received').textContent = data.received || '0';
+          document.getElementById('stat-contacts').textContent = data.activeContacts || '0';
+          document.getElementById('stat-response').textContent = data.avgResponseTime || '--';
+        }
+      } catch (e) {
+        // keep placeholders
+      }
+    })();
+  </script>
+</body>
+</html>

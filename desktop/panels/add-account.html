@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Add Account</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  background: #FFFFFF;
+  color: #111B21;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+.panel-header {
+  height: 48px;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  border-bottom: 1px solid #E8E8E8;
+  -webkit-app-region: drag;
+  flex-shrink: 0;
+}
+.panel-title { font-size: 16px; font-weight: 600; color: #111B21; flex: 1; }
+.panel-close {
+  width: 28px; height: 28px; border-radius: 6px; border: none;
+  background: none; color: #667781; font-size: 18px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  -webkit-app-region: no-drag;
+  transition: all 0.15s;
+}
+.panel-close:hover { background: #F0F2F5; color: #111B21; }
+.panel-body { flex: 1; overflow-y: auto; padding: 20px; }
+.form-label { font-size: 12px; font-weight: 500; color: #667781; margin-bottom: 4px; display: block; }
+.form-input {
+  width: 100%; height: 40px; padding: 0 12px;
+  background: #F0F2F5; border: none; border-radius: 8px;
+  font-size: 14px; color: #111B21; outline: none;
+  margin-bottom: 12px;
+}
+.form-input:focus { box-shadow: 0 0 0 2px rgba(37,211,102,0.3); }
+.form-btn {
+  width: 100%; height: 40px; border: none; border-radius: 8px;
+  background: #25D366; color: #fff; font-size: 14px; font-weight: 500;
+  cursor: pointer; transition: background 0.15s;
+}
+.form-btn:hover { background: #1FAA59; }
+.progress {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 24px;
+}
+.progress-step {
+  width: 32px; height: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 600;
+  background: #F0F2F5; color: #667781;
+  transition: all 0.2s;
+}
+.progress-step.active { background: #25D366; color: #fff; }
+.progress-step.done { background: #E8F8EE; color: #25D366; }
+.progress-line {
+  flex: 1; height: 2px; background: #E8E8E8;
+}
+.progress-line.done { background: #25D366; }
+.chips {
+  display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px;
+}
+.chip {
+  padding: 6px 14px; border-radius: 16px;
+  background: #F0F2F5; border: 1px solid transparent;
+  font-size: 13px; color: #111B21; cursor: pointer;
+  transition: all 0.15s;
+}
+.chip:hover { border-color: #25D366; }
+.chip.selected { background: #E8F8EE; border-color: #25D366; color: #25D366; }
+.illustration {
+  text-align: center; padding: 24px 0 16px;
+}
+.illustration svg {
+  width: 80px; height: 80px; color: #25D366;
+}
+.subtitle {
+  text-align: center; font-size: 13px; color: #667781; margin-bottom: 20px;
+  line-height: 1.5;
+}
+</style>
+</head>
+<body>
+  <div class="panel-header">
+    <span class="panel-title">Add Account</span>
+    <button class="panel-close" onclick="hub.closePanel('add-account')">&times;</button>
+  </div>
+  <div class="panel-body">
+    <div class="progress">
+      <div class="progress-step active" id="step-1">1</div>
+      <div class="progress-line" id="line-1"></div>
+      <div class="progress-step" id="step-2">2</div>
+      <div class="progress-line" id="line-2"></div>
+      <div class="progress-step" id="step-3">3</div>
+    </div>
+
+    <div class="illustration">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+        <circle cx="12" cy="7" r="4"/>
+        <line x1="12" y1="11" x2="12" y2="17"/>
+        <line x1="9" y1="14" x2="15" y2="14"/>
+      </svg>
+    </div>
+
+    <p class="subtitle">Give this account a name so you can easily identify it in the sidebar.</p>
+
+    <label class="form-label">Account Name</label>
+    <input class="form-input" id="account-name" type="text" placeholder="e.g. Work, Personal, Shop..." />
+
+    <div class="chips">
+      <div class="chip" onclick="selectChip(this, 'Personal')">Personal</div>
+      <div class="chip" onclick="selectChip(this, 'Work')">Work</div>
+      <div class="chip" onclick="selectChip(this, 'Business')">Business</div>
+      <div class="chip" onclick="selectChip(this, 'Shop')">Shop</div>
+      <div class="chip" onclick="selectChip(this, 'Support')">Support</div>
+    </div>
+
+    <button class="form-btn" id="next-btn">Next</button>
+  </div>
+
+  <script>
+    function selectChip(el, name) {
+      document.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+      el.classList.add('selected');
+      document.getElementById('account-name').value = name;
+    }
+
+    document.getElementById('next-btn').addEventListener('click', () => {
+      const name = document.getElementById('account-name').value.trim();
+      if (!name) return;
+      hub.addAccount(name);
+      hub.closePanel('add-account');
+    });
+  </script>
+</body>
+</html>

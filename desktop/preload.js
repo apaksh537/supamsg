@@ -9,6 +9,10 @@ contextBridge.exposeInMainWorld('hub', {
   reloadAccount: (id) => ipcRenderer.send('reload-account', id),
   reorderAccounts: (ids) => ipcRenderer.send('reorder-accounts', ids),
 
+  // Panels (child BrowserWindows)
+  openPanel: (name) => ipcRenderer.send('open-panel', name),
+  closePanel: (name) => ipcRenderer.send('close-panel', name),
+
   // Settings
   updateSettings: (s) => ipcRenderer.send('update-settings', s),
   toggleSidebar: () => ipcRenderer.send('toggle-sidebar'),
@@ -76,6 +80,10 @@ contextBridge.exposeInMainWorld('hub', {
   crmSearchContact: (name, phone) => ipcRenderer.invoke('crm-search-contact', { name, phone }),
   crmLogConversation: (contactKey, messages, summary) => ipcRenderer.invoke('crm-log-conversation', { contactKey, messages, summary }),
   crmLinkContact: (contactKey, crmContact) => ipcRenderer.send('crm-link-contact', { contactKey, crmContact }),
+
+  // Panels
+  openPanel: (name) => ipcRenderer.send('open-panel', name),
+  closePanel: (name) => ipcRenderer.send('close-panel', name),
 
   // Dialogs (native)
   showInputDialog: (opts) => ipcRenderer.invoke('show-input-dialog', opts),

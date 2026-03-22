@@ -1,1717 +1,291 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>SupaMsg</title>
-  <style>
-    /* ── Reset ── */
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, sans-serif;
-      background: #ECE5DD;
-      color: #303030;
-      height: 100vh;
-      overflow: hidden;
-      display: flex;
-      flex-direction: row; /* Changed: horizontal layout with left strip */
-    }
-
-    /* ── WhatsApp Mode (default) ── */
-
-    /* ── Left Navigation Strip ── */
-    .account-strip {
-      width: 68px;
-      height: 100vh;
-      background: #2C3E50;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 48px 0 12px;
-      flex-shrink: 0;
-      z-index: 20;
-      -webkit-app-region: drag;
-      overflow-y: auto;
-      overflow-x: hidden;
-      border-right: 1px solid rgba(0,0,0,0.15);
-    }
-    .account-strip::-webkit-scrollbar { display: none; }
-
-    .strip-section-label { display: none; }
-
-    .strip-divider {
-      width: 36px;
-      height: 1px;
-      background: rgba(255,255,255,0.12);
-      margin: 8px 0;
-    }
-
-    .strip-tool-btn {
-      width: 52px;
-      height: 44px;
-      padding: 4px 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 2px;
-      cursor: pointer;
-      border-radius: 8px;
-      border: none;
-      background: none;
-      transition: all 0.15s;
-      -webkit-app-region: no-drag;
-      margin-bottom: 1px;
-    }
-    .strip-tool-btn:hover { background: rgba(255,255,255,0.1); }
-    .strip-tool-btn:active { background: rgba(255,255,255,0.18); }
-
-    .strip-tool-icon { font-size: 16px; line-height: 1; filter: grayscale(100%) brightness(2); }
-    .strip-tool-btn:hover .strip-tool-icon { filter: none; }
-
-    .strip-tool-text {
-      font-size: 9px;
-      font-weight: 500;
-      color: rgba(255,255,255,0.55);
-      text-align: center;
-      letter-spacing: 0.2px;
-    }
-    .strip-tool-btn:hover .strip-tool-text { color: rgba(255,255,255,0.95); }
-
-    .account-tab-bar { display: none; }
-
-    /* ── Account Items ── */
-    .account-strip-item {
-      width: 52px;
-      padding: 6px 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 3px;
-      cursor: pointer;
-      border-radius: 8px;
-      transition: all 0.15s;
-      -webkit-app-region: no-drag;
-      position: relative;
-      margin-bottom: 2px;
-    }
-    .account-strip-item:hover { background: rgba(255,255,255,0.08); }
-    .account-strip-item.active { background: rgba(255,255,255,0.13); }
-    .account-strip-item.active::before {
-      content: '';
-      position: absolute;
-      left: -2px; top: 10px; bottom: 10px;
-      width: 3px;
-      background: #fff;
-      border-radius: 0 3px 3px 0;
-    }
-
-    .account-strip-avatar {
-      width: 36px; height: 36px;
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 14px; font-weight: 600; color: #fff;
-      position: relative;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-    }
-    .account-strip-name {
-      font-size: 9px; color: rgba(255,255,255,0.6);
-      font-weight: 500;
-      text-align: center; white-space: nowrap;
-      overflow: hidden; text-overflow: ellipsis;
-      max-width: 52px;
-    }
-    .account-strip-item.active .account-strip-name { color: #fff; font-weight: 600; }
-
-    .account-strip-unread {
-      display: none;
-      position: absolute; top: 0; right: 0;
-      min-width: 16px; height: 16px;
-      background: #FF3B30; color: #fff;
-      font-size: 9px; font-weight: 700;
-      border-radius: 8px; text-align: center; line-height: 16px;
-      padding: 0 4px;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.3);
-    }
-    .account-strip-unread.has-unread { display: block; }
-
-    /* Edit/Delete icons on hover */
-    .account-strip-actions {
-      display: none;
-      position: absolute; top: -2px; right: -2px;
-      flex-direction: column; gap: 2px;
-    }
-    .account-strip-item:hover .account-strip-actions { display: flex; }
-    .account-strip-action {
-      width: 18px; height: 18px;
-      border-radius: 50%;
-      background: rgba(0,0,0,0.6);
-      color: #fff; font-size: 10px;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; border: none;
-    }
-    .account-strip-action:hover { background: rgba(0,0,0,0.8); }
-    .account-strip-action.delete:hover { background: #FF3B30; }
-
-    .strip-add-btn {
-      width: 36px; height: 36px;
-      border-radius: 50%;
-      border: 1.5px solid rgba(255,255,255,0.25);
-      background: rgba(255,255,255,0.05);
-      color: rgba(255,255,255,0.6);
-      font-size: 16px;
-      cursor: pointer;
-      -webkit-app-region: no-drag;
-      display: flex; align-items: center; justify-content: center;
-      margin: 4px 0;
-      transition: all 0.15s;
-    }
-    .strip-add-btn:hover { border-color: rgba(255,255,255,0.5); color: #fff; background: rgba(255,255,255,0.12); }
-
-    .strip-settings-btn {
-      margin-top: auto;
-      width: 36px; height: 36px;
-      border-radius: 50%;
-      background: none; border: none;
-      color: rgba(255,255,255,0.5);
-      font-size: 18px;
-      cursor: pointer;
-      -webkit-app-region: no-drag;
-      display: flex; align-items: center; justify-content: center;
-      margin-bottom: 8px;
-    }
-    .strip-settings-btn:hover { color: #fff; background: rgba(255,255,255,0.1); }
-
-    /* Hide old tab bar elements */
-    .tab-bar-right { display: none; }
-    .tab-bar-icon {
-      background: none; border: none;
-      color: rgba(255,255,255,0.6);
-      font-size: 16px;
-      width: 32px; height: 32px;
-      display: flex; align-items: center; justify-content: center;
-      border-radius: 50%;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-    .tab-bar-icon:hover { color: #fff; background: rgba(255,255,255,0.1); }
-
-    /* ── Main Layout ── */
-    .main-layout {
-      display: flex;
-      flex: 1;
-      overflow: hidden;
-    }
-
-    /* ── Sidebar — HIDDEN in WhatsApp Mode (WhatsApp Web has its own sidebar) ── */
-    .sidebar {
-      width: 350px;
-      min-width: 280px;
-      max-width: 30vw;
-      height: 100%;
-      background: #FFFFFF;
-      display: none; /* Hidden by default in WhatsApp Mode */
-      flex-direction: column;
-      border-right: 1px solid #E9EDEF;
-      position: relative;
-      z-index: 10;
-    }
-
-    /* Show sidebar only in Simple/Pro mode */
-    body.mode-simple .sidebar,
-    body.mode-pro .sidebar {
-      display: flex;
-    }
-
-    .sidebar-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 16px;
-      background: #F0F2F5;
-      height: 59px;
-      flex-shrink: 0;
-    }
-    .sidebar-header .user-avatar {
-      width: 40px; height: 40px;
-      border-radius: 50%;
-      background: #DFE5E7;
-      display: flex; align-items: center; justify-content: center;
-      color: #8696A0;
-      font-size: 20px;
-    }
-    .sidebar-header-icons {
-      display: flex; gap: 2px;
-    }
-    .sidebar-icon-btn {
-      background: none; border: none;
-      color: #54656F;
-      width: 40px; height: 40px;
-      display: flex; align-items: center; justify-content: center;
-      border-radius: 50%;
-      cursor: pointer;
-      font-size: 18px;
-      transition: background 0.15s;
-    }
-    .sidebar-icon-btn:hover { background: #E9EDEF; }
-
-    /* DND Banner */
-    .dnd-banner {
-      display: none; padding: 6px 12px; background: #FFF3CD;
-      border-bottom: 1px solid #FFE69C;
-      font-size: 12px; color: #856404; text-align: center; cursor: pointer;
-      -webkit-app-region: no-drag;
-    }
-    .dnd-banner.active { display: block; }
-
-    /* Update banner */
-    .update-banner {
-      display: none; padding: 6px 12px; background: #D4EDDA;
-      border-bottom: 1px solid #C3E6CB;
-      font-size: 12px; color: #155724; text-align: center; cursor: pointer;
-      -webkit-app-region: no-drag;
-    }
-    .update-banner.active { display: block; }
-
-    /* Search bar */
-    .search-bar {
-      padding: 7px 12px;
-      background: #F0F2F5;
-      border-bottom: 1px solid #E9EDEF;
-    }
-    .search-bar-inner {
-      display: flex;
-      align-items: center;
-      background: #FFFFFF;
-      border-radius: 8px;
-      padding: 0 12px;
-      height: 35px;
-      border: 1px solid #E9EDEF;
-    }
-    .search-bar-inner .search-icon {
-      color: #54656F;
-      font-size: 14px;
-      margin-right: 12px;
-      flex-shrink: 0;
-    }
-    .search-bar-inner input {
-      border: none;
-      outline: none;
-      flex: 1;
-      font-size: 13px;
-      color: #303030;
-      background: transparent;
-      font-family: inherit;
-    }
-    .search-bar-inner input::placeholder { color: #8696A0; }
-
-    /* Chat list */
-    .chat-list {
-      flex: 1;
-      overflow-y: auto;
-    }
-    .chat-list-empty {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100%;
-      color: #8696A0;
-      font-size: 14px;
-      text-align: center;
-      padding: 24px;
-    }
-
-    .chat-list-item {
-      display: flex;
-      align-items: center;
-      padding: 10px 16px;
-      cursor: pointer;
-      border-bottom: 1px solid #F0F2F5;
-      transition: background 0.1s;
-      position: relative;
-    }
-    .chat-list-item:hover { background: #F5F6F6; }
-    .chat-list-item.active { background: #F0F2F5; }
-    .chat-list-item.dragging { opacity: 0.5; }
-
-    .chat-list-item .chat-avatar {
-      width: 49px; height: 49px;
-      border-radius: 50%;
-      background: #DFE5E7;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 18px; color: #8696A0;
-      flex-shrink: 0;
-      margin-right: 13px;
-      position: relative;
-    }
-    .chat-list-item .chat-avatar .avatar-dot {
-      position: absolute;
-      bottom: 1px; right: 1px;
-      width: 10px; height: 10px;
-      border-radius: 50%;
-      border: 2px solid #fff;
-    }
-
-    .chat-list-item .chat-info {
-      flex: 1;
-      min-width: 0;
-    }
-    .chat-list-item .chat-info .chat-name-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .chat-list-item .chat-name {
-      font-size: 16px;
-      font-weight: 400;
-      color: #111B21;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .chat-list-item .chat-time {
-      font-size: 12px;
-      color: #667781;
-      flex-shrink: 0;
-      margin-left: 8px;
-    }
-    .chat-list-item .chat-preview-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-top: 2px;
-    }
-    .chat-list-item .chat-preview {
-      font-size: 14px;
-      color: #667781;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      flex: 1;
-    }
-    .chat-list-item .chat-unread-badge {
-      display: none;
-      min-width: 20px; height: 20px;
-      background: #25D366;
-      color: #fff;
-      font-size: 11px; font-weight: 600;
-      border-radius: 10px;
-      text-align: center; line-height: 20px;
-      padding: 0 5px;
-      margin-left: 8px;
-      flex-shrink: 0;
-    }
-    .chat-list-item .chat-unread-badge.has-unread { display: inline-block; }
-
-    .chat-list-item .chat-item-actions {
-      display: none;
-      position: absolute;
-      right: 8px; top: 50%;
-      transform: translateY(-50%);
-      gap: 2px;
-    }
-    .chat-list-item:hover .chat-item-actions { display: flex; }
-    .chat-item-actions button {
-      background: #F0F2F5; border: none;
-      color: #54656F;
-      width: 28px; height: 28px;
-      display: flex; align-items: center; justify-content: center;
-      border-radius: 50%;
-      cursor: pointer; font-size: 12px;
-    }
-    .chat-item-actions button:hover { background: #E0E2E5; }
-    .chat-item-actions button.remove:hover { color: #E53E3E; }
-
-    /* ── Chat Area ── */
-    .chat-area {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      background: #ECE5DD;
-      position: relative;
-    }
-
-    .chat-header {
-      display: flex;
-      align-items: center;
-      padding: 10px 16px;
-      background: #F0F2F5;
-      height: 59px;
-      border-bottom: 1px solid #E9EDEF;
-      border-left: 1px solid #E9EDEF;
-      flex-shrink: 0;
-    }
-    .chat-header .chat-header-avatar {
-      width: 40px; height: 40px;
-      border-radius: 50%;
-      background: #DFE5E7;
-      display: flex; align-items: center; justify-content: center;
-      color: #8696A0;
-      font-size: 18px;
-      margin-right: 13px;
-      flex-shrink: 0;
-    }
-    .chat-header .chat-header-info {
-      flex: 1;
-      min-width: 0;
-    }
-    .chat-header .chat-header-name {
-      font-size: 16px;
-      font-weight: 400;
-      color: #111B21;
-    }
-    .chat-header .chat-header-status {
-      font-size: 13px;
-      color: #667781;
-    }
-    .chat-header-icons {
-      display: flex; gap: 2px;
-    }
-    .chat-header-icon {
-      background: none; border: none;
-      color: #54656F;
-      width: 40px; height: 40px;
-      display: flex; align-items: center; justify-content: center;
-      border-radius: 50%;
-      cursor: pointer;
-      font-size: 18px;
-      transition: background 0.15s;
-    }
-    .chat-header-icon:hover { background: #E9EDEF; }
-
-    /* Upgrade Banner (below chat header) */
-    .upgrade-banner {
-      display: none;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      padding: 8px 16px;
-      background: #F0FFF4;
-      border-bottom: 2px solid #C6F6D5;
-      font-size: 13px;
-      color: #276749;
-      flex-shrink: 0;
-    }
-    .upgrade-banner.visible { display: flex; }
-    .upgrade-banner .upgrade-btn {
-      background: #25D366;
-      color: #fff;
-      border: none;
-      padding: 4px 14px;
-      border-radius: 4px;
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-    .upgrade-banner .upgrade-btn:hover { background: #20c45a; }
-    .upgrade-banner .upgrade-dismiss {
-      background: none; border: none;
-      color: #667781;
-      font-size: 18px;
-      cursor: pointer;
-      padding: 0 4px;
-    }
-
-    /* Chat body (placeholder) */
-    .chat-body {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #ECE5DD;
-    }
-    .chat-body-empty {
-      text-align: center;
-      color: #667781;
-    }
-    .chat-body-empty .logo-text {
-      font-size: 28px;
-      font-weight: 300;
-      color: #41525D;
-      margin-bottom: 8px;
-    }
-    .chat-body-empty .logo-sub {
-      font-size: 14px;
-      color: #8696A0;
-    }
-
-    /* ── Input Bar ── */
-    .input-bar {
-      display: flex;
-      align-items: center;
-      padding: 5px 10px;
-      background: #F0F2F5;
-      gap: 6px;
-      flex-shrink: 0;
-      border-top: 1px solid #E9EDEF;
-    }
-    .input-bar-icon {
-      background: none; border: none;
-      color: #54656F;
-      width: 36px; height: 36px;
-      display: flex; align-items: center; justify-content: center;
-      border-radius: 50%;
-      cursor: pointer;
-      font-size: 20px;
-      transition: background 0.15s;
-      flex-shrink: 0;
-    }
-    .input-bar-icon:hover { background: #E9EDEF; }
-    .input-bar-icon.supa-icon {
-      font-size: 16px;
-      width: 28px; height: 28px;
-      color: #54656F;
-      position: relative;
-    }
-    .input-bar-icon.supa-icon:hover { color: #075E54; background: #E9EDEF; }
-
-    .input-bar .supa-divider {
-      width: 1px;
-      height: 24px;
-      background: #CED0D1;
-      flex-shrink: 0;
-    }
-
-    .input-text-wrap {
-      flex: 1;
-      background: #FFFFFF;
-      border: 1px solid #CED0D1;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      padding: 0 12px;
-      min-height: 42px;
-    }
-    .input-text-wrap input {
-      border: none;
-      outline: none;
-      flex: 1;
-      font-size: 15px;
-      color: #303030;
-      background: transparent;
-      font-family: inherit;
-    }
-    .input-text-wrap input::placeholder { color: #8696A0; }
-
-    /* ── Inline Popups ── */
-    .inline-popup {
-      display: none;
-      position: absolute;
-      bottom: 60px;
-      right: 80px;
-      background: #FFFFFF;
-      border-radius: 12px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
-      max-width: 380px;
-      min-width: 300px;
-      z-index: 50;
-      padding: 16px;
-      animation: popup-in 0.15s ease;
-    }
-    .inline-popup.visible { display: block; }
-
-    @keyframes popup-in {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .popup-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 12px;
-    }
-    .popup-title {
-      font-size: 15px;
-      font-weight: 600;
-      color: #111B21;
-    }
-    .popup-close {
-      background: none; border: none;
-      color: #8696A0;
-      font-size: 20px;
-      cursor: pointer;
-      width: 28px; height: 28px;
-      display: flex; align-items: center; justify-content: center;
-      border-radius: 50%;
-    }
-    .popup-close:hover { background: #F0F2F5; }
-
-    .popup-form-group {
-      margin-bottom: 10px;
-    }
-    .popup-form-group label {
-      display: block;
-      font-size: 12px;
-      color: #667781;
-      margin-bottom: 4px;
-    }
-    .popup-input {
-      width: 100%;
-      padding: 8px 10px;
-      border: 1px solid #CED0D1;
-      border-radius: 6px;
-      font-size: 13px;
-      color: #303030;
-      font-family: inherit;
-      background: #fff;
-    }
-    .popup-input:focus { outline: none; border-color: #075E54; }
-    textarea.popup-input { min-height: 60px; resize: vertical; }
-    select.popup-input { appearance: none; cursor: pointer; }
-
-    .popup-btn {
-      padding: 7px 14px;
-      border-radius: 6px;
-      border: none;
-      font-size: 13px;
-      cursor: pointer;
-      font-weight: 500;
-      font-family: inherit;
-    }
-    .popup-btn-primary { background: #075E54; color: #fff; }
-    .popup-btn-primary:hover { background: #064E45; }
-    .popup-btn-secondary { background: #F0F2F5; color: #303030; }
-    .popup-btn-secondary:hover { background: #E9EDEF; }
-    .popup-btn-danger { background: #FFE5E5; color: #E53E3E; }
-    .popup-btn-danger:hover { background: #FED7D7; }
-    .popup-btn-row { display: flex; gap: 8px; margin-top: 10px; }
-
-    .popup-list-item {
-      display: flex;
-      align-items: center;
-      padding: 8px 10px;
-      border-radius: 6px;
-      margin-bottom: 4px;
-      cursor: pointer;
-      transition: background 0.1s;
-      border: 1px solid #F0F2F5;
-    }
-    .popup-list-item:hover { background: #F5F6F6; }
-    .popup-list-item .popup-item-info { flex: 1; min-width: 0; }
-    .popup-list-item .popup-item-title { font-size: 13px; font-weight: 500; color: #111B21; }
-    .popup-list-item .popup-item-sub { font-size: 11px; color: #667781; margin-top: 1px; }
-    .popup-list-item .popup-item-actions { display: flex; gap: 4px; }
-
-    .popup-empty { text-align: center; color: #8696A0; font-size: 13px; padding: 16px 0; }
-
-    /* AI popup preset buttons */
-    .ai-presets { display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
-    .ai-preset-btn {
-      padding: 6px 12px;
-      border-radius: 16px;
-      border: 1px solid #CED0D1;
-      background: #fff;
-      font-size: 12px;
-      color: #303030;
-      cursor: pointer;
-      font-family: inherit;
-      transition: all 0.15s;
-    }
-    .ai-preset-btn:hover { background: #F0F2F5; border-color: #075E54; color: #075E54; }
-
-    .ai-result-area {
-      max-height: 200px;
-      overflow-y: auto;
-      font-size: 13px;
-      color: #303030;
-    }
-
-    /* ── Settings Panel (slides over sidebar) ── */
-    .settings-panel {
-      display: none;
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: #FFFFFF;
-      z-index: 30;
-      flex-direction: column;
-      animation: slide-in-left 0.2s ease;
-    }
-    .settings-panel.visible { display: flex; }
-
-    @keyframes slide-in-left {
-      from { transform: translateX(-100%); }
-      to { transform: translateX(0); }
-    }
-
-    .settings-header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 10px 16px;
-      background: #075E54;
-      color: #fff;
-      height: 59px;
-      flex-shrink: 0;
-    }
-    .settings-header .back-btn {
-      background: none; border: none;
-      color: #fff;
-      font-size: 20px;
-      cursor: pointer;
-      width: 36px; height: 36px;
-      display: flex; align-items: center; justify-content: center;
-      border-radius: 50%;
-    }
-    .settings-header .back-btn:hover { background: rgba(255,255,255,0.15); }
-    .settings-header h2 {
-      font-size: 19px;
-      font-weight: 400;
-    }
-
-    .settings-body {
-      flex: 1;
-      overflow-y: auto;
-      padding: 16px;
-      background: #F0F2F5;
-    }
-
-    .settings-section {
-      padding: 16px 20px;
-      border-bottom: 8px solid #F0F2F5;
-    }
-    .settings-section-title {
-      font-size: 14px;
-      font-weight: 400;
-      color: #075E54;
-      margin-bottom: 12px;
-    }
-
-    /* New card-based settings */
-    .settings-card {
-      background: #fff;
-      border: 1px solid #E8E8E8;
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 12px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-    }
-    .settings-card-title {
-      font-size: 13px;
-      font-weight: 600;
-      color: #075E54;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 10px;
-    }
-
-    .settings-action-card {
-      background: #F5F6F6;
-      border-radius: 12px;
-      padding: 16px;
-      cursor: pointer;
-      transition: all 0.15s;
-      text-align: center;
-    }
-    .settings-action-card:hover {
-      background: #E9EDEF;
-      transform: translateY(-1px);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    }
-    .settings-action-card:active { transform: translateY(0); }
-    .settings-action-title {
-      font-size: 14px;
-      font-weight: 600;
-      color: #111B21;
-      margin-top: 6px;
-    }
-    .settings-action-desc {
-      font-size: 11px;
-      color: #667781;
-      margin-top: 2px;
-    }
-
-    .settings-input {
-      width: 100%;
-      padding: 10px 14px;
-      background: #F5F6F6;
-      border: 1px solid #E8E8E8;
-      border-radius: 8px;
-      font-size: 14px;
-      color: #111B21;
-      font-family: inherit;
-    }
-    .settings-input:focus { outline: none; border-color: #25D366; }
-
-    .settings-btn { padding: 10px 20px; border-radius: 8px; border: none; font-size: 14px; cursor: pointer; font-weight: 500; }
-    .settings-btn-primary { background: #25D366; color: #fff; }
-    .settings-btn-primary:hover { background: #20B954; }
-
-    .setting-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 14px 0;
-      border-bottom: 1px solid #F0F2F5;
-    }
-    .setting-row:last-child { border-bottom: none; }
-    .setting-label { font-size: 14px; color: #111B21; }
-    .setting-desc { font-size: 12px; color: #667781; margin-top: 2px; }
-
-    .toggle {
-      position: relative; width: 44px; height: 24px; background: #CED0D1;
-      border-radius: 12px; cursor: pointer; transition: background 0.2s; flex-shrink: 0;
-    }
-    .toggle.on { background: #25D366; }
-    .toggle::after {
-      content: ''; position: absolute; top: 2px; left: 2px;
-      width: 20px; height: 20px; border-radius: 50%; background: #fff; transition: transform 0.2s;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-    }
-    .toggle.on::after { transform: translateX(20px); }
-
-    /* Mode radio buttons */
-    .mode-option {
-      display: flex;
-      align-items: center;
-      padding: 10px 0;
-      cursor: pointer;
-      gap: 10px;
-    }
-    .mode-radio {
-      width: 20px; height: 20px;
-      border-radius: 50%;
-      border: 2px solid #CED0D1;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
-      transition: border-color 0.15s;
-    }
-    .mode-option.active .mode-radio { border-color: #075E54; }
-    .mode-radio::after {
-      content: '';
-      width: 10px; height: 10px;
-      border-radius: 50%;
-      background: #075E54;
-      display: none;
-    }
-    .mode-option.active .mode-radio::after { display: block; }
-    .mode-option-label { font-size: 14px; color: #111B21; }
-    .mode-option-desc { font-size: 12px; color: #667781; }
-
-    /* Settings form inputs */
-    .settings-input {
-      width: 100%;
-      padding: 8px 12px;
-      border: 1px solid #CED0D1;
-      border-radius: 6px;
-      font-size: 13px;
-      color: #303030;
-      font-family: inherit;
-      background: #fff;
-    }
-    .settings-input:focus { outline: none; border-color: #075E54; }
-    .settings-btn {
-      padding: 8px 16px;
-      border-radius: 6px;
-      border: none;
-      font-size: 13px;
-      cursor: pointer;
-      font-weight: 500;
-      font-family: inherit;
-    }
-    .settings-btn-primary { background: #075E54; color: #fff; }
-    .settings-btn-primary:hover { background: #064E45; }
-
-    /* ── Panel Overlays (for full feature panels) ── */
-    .panel-overlay {
-      display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.4); z-index: 100; -webkit-app-region: no-drag;
-      align-items: center; justify-content: center;
-    }
-    .panel-overlay.visible { display: flex; }
-
-    .panel {
-      background: #FFFFFF; border-radius: 12px; padding: 24px;
-      width: 520px; max-height: 80vh; overflow-y: auto;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.15);
-    }
-    .panel h2 { font-size: 18px; color: #075E54; margin-bottom: 16px; font-weight: 400; }
-    .panel h3 { font-size: 14px; color: #667781; margin: 16px 0 8px; font-weight: 500; }
-
-    .panel-close {
-      float: right; background: none; border: none; color: #8696A0;
-      font-size: 22px; cursor: pointer; padding: 0 4px;
-    }
-    .panel-close:hover { color: #303030; }
-
-    /* Form controls for panels */
-    .form-group { margin-bottom: 12px; }
-    .form-group label { display: block; font-size: 12px; color: #667781; margin-bottom: 4px; }
-    .form-input {
-      width: 100%; padding: 8px 12px; background: #FFFFFF;
-      border: 1px solid #CED0D1; border-radius: 6px;
-      color: #303030; font-size: 13px; font-family: inherit;
-    }
-    .form-input:focus { outline: none; border-color: #075E54; }
-    textarea.form-input { min-height: 80px; resize: vertical; }
-    select.form-input { appearance: none; cursor: pointer; }
-
-    .btn {
-      padding: 8px 16px; border-radius: 6px; border: none; font-size: 13px;
-      cursor: pointer; font-weight: 500; font-family: inherit;
-    }
-    .btn-primary { background: #075E54; color: #fff; }
-    .btn-primary:hover { background: #064E45; }
-    .btn-secondary { background: #F0F2F5; color: #303030; }
-    .btn-secondary:hover { background: #E9EDEF; }
-    .btn-danger { background: #FFE5E5; color: #E53E3E; }
-    .btn-danger:hover { background: #FED7D7; }
-    .btn-row { display: flex; gap: 8px; margin-top: 12px; }
-
-    /* List items in panels */
-    .list-item {
-      display: flex; align-items: center; padding: 10px 12px;
-      background: #F9FAFB; border-radius: 8px; margin-bottom: 6px;
-      border: 1px solid #F0F2F5;
-    }
-    .list-item:hover { background: #F0F2F5; }
-    .list-item .item-info { flex: 1; min-width: 0; }
-    .list-item .item-title { font-size: 13px; font-weight: 500; color: #111B21; }
-    .list-item .item-sub { font-size: 11px; color: #667781; margin-top: 2px; }
-    .list-item .item-actions { display: flex; gap: 4px; }
-
-    /* Status badges */
-    .status-badge {
-      font-size: 10px; padding: 2px 8px; border-radius: 10px; font-weight: 600;
-      text-transform: uppercase; letter-spacing: 0.5px;
-    }
-    .status-pending { background: #E3F2FD; color: #1565C0; }
-    .status-sent { background: #E8F5E9; color: #2E7D32; }
-    .status-failed { background: #FFE5E5; color: #E53E3E; }
-
-    /* Label chips */
-    .label-chip {
-      display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px;
-      border-radius: 12px; font-size: 11px; font-weight: 600; margin: 2px;
-      cursor: default;
-    }
-    .label-chip .chip-remove { cursor: pointer; opacity: 0.6; font-size: 10px; }
-    .label-chip .chip-remove:hover { opacity: 1; }
-
-    /* Analytics charts */
-    .chart-bar-container { display: flex; align-items: flex-end; gap: 3px; height: 100px; margin: 12px 0; }
-    .chart-bar {
-      flex: 1; background: rgba(7,94,84,0.2); border-radius: 3px 3px 0 0;
-      min-height: 2px; transition: height 0.3s; position: relative;
-    }
-    .chart-bar:hover { background: rgba(7,94,84,0.4); }
-    .chart-bar .bar-tooltip {
-      display: none; position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
-      background: #303030; color: #fff; font-size: 10px; padding: 2px 6px; border-radius: 4px;
-      white-space: nowrap; margin-bottom: 4px;
-    }
-    .chart-bar:hover .bar-tooltip { display: block; }
-
-    .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 12px 0; }
-    .stat-card {
-      padding: 12px; background: #F9FAFB; border-radius: 8px;
-      border: 1px solid #F0F2F5;
-    }
-    .stat-value { font-size: 24px; font-weight: 700; color: #075E54; }
-    .stat-label { font-size: 11px; color: #667781; margin-top: 2px; }
-
-    /* Empty state */
-    .empty-state { text-align: center; padding: 32px; color: #8696A0; font-size: 13px; }
-
-    /* ── Context Menu ── */
-    .context-menu {
-      display: none;
-      position: fixed;
-      background: #FFFFFF;
-      border-radius: 8px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
-      min-width: 180px;
-      z-index: 200;
-      padding: 6px 0;
-      animation: popup-in 0.1s ease;
-    }
-    .context-menu.visible { display: block; }
-    .context-menu-item {
-      padding: 8px 16px;
-      font-size: 13px;
-      color: #303030;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .context-menu-item:hover { background: #F0F2F5; }
-    .context-menu-item.disabled { color: #8696A0; cursor: default; }
-    .context-menu-item.disabled:hover { background: transparent; }
-    .context-menu-separator {
-      height: 1px;
-      background: #E9EDEF;
-      margin: 4px 0;
-    }
-    .context-menu-item .supa-label {
-      font-size: 10px;
-      color: #075E54;
-      font-weight: 600;
-      margin-left: auto;
-    }
-
-    /* ── Command Palette ── */
-    #commandPalette .panel {
-      padding: 12px;
-      width: 500px;
-    }
-    #commandPalette .form-input {
-      font-size: 15px;
-      padding: 12px 16px;
-      background: transparent;
-      border: none;
-      border-bottom: 1px solid #E9EDEF;
-    }
-
-    /* ── Simple Mode overrides ── */
-    body.mode-simple .account-tab-bar { height: 36px; }
-    body.mode-simple .sidebar { width: 260px; }
-    body.mode-simple .input-bar-icon.supa-icon { display: none; }
-    body.mode-simple .supa-divider { display: none; }
-
-    /* ── Pro Mode overrides ── */
-    body.mode-pro .sidebar { width: 400px; }
-    body.mode-pro .input-bar-icon.supa-icon { width: 32px; height: 32px; font-size: 18px; }
-  </style>
+<meta charset="UTF-8">
+<title>SupaMsg</title>
+<style>
+  /* ── Reset ── */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    width: 100%; height: 100vh; overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background: #fff;
+  }
+
+  body {
+    display: flex;
+    flex-direction: row;
+  }
+
+  /* ── Nav Panel (200px, Notion-style) ── */
+  .nav-panel {
+    width: 200px;
+    min-width: 200px;
+    background: #FAFAFA;
+    border-right: 1px solid #E8E8E8;
+    display: flex;
+    flex-direction: column;
+    padding-top: 44px;
+    z-index: 10;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-app-region: drag;
+    flex-shrink: 0;
+  }
+  .nav-panel::-webkit-scrollbar { width: 4px; }
+  .nav-panel::-webkit-scrollbar-thumb { background: #ccc; border-radius: 2px; }
+
+  .nav-title {
+    padding: 0 16px 16px;
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    -webkit-app-region: drag;
+  }
+  .nav-title-name { font-size: 14px; font-weight: 600; color: #111B21; }
+  .nav-title-version { font-size: 12px; font-weight: 400; color: #667781; }
+
+  .nav-section-label {
+    font-size: 11px; font-weight: 600; color: #667781;
+    text-transform: uppercase; letter-spacing: 1px;
+    padding: 0 16px; margin-bottom: 8px;
+  }
+
+  /* ── Account Items ── */
+  .nav-account-list { padding: 0 8px; margin-bottom: 8px; }
+
+  .nav-account-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px; border-radius: 6px;
+    cursor: pointer; transition: all 0.15s ease;
+    position: relative;
+    -webkit-app-region: no-drag;
+  }
+  .nav-account-item:hover { background: #F0F2F5; }
+  .nav-account-item.active { background: #F0FFF4; border-left: 2px solid #25D366; padding-left: 6px; }
+  .nav-account-item.dragging { opacity: 0.5; }
+
+  .nav-account-avatar {
+    width: 32px; height: 32px; min-width: 32px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 600; color: #fff;
+    position: relative;
+  }
+  .nav-account-avatar .status-dot {
+    position: absolute; bottom: 0; right: 0;
+    width: 8px; height: 8px; border-radius: 50%;
+    border: 1.5px solid #FAFAFA;
+    background: #25D366;
+  }
+
+  .nav-account-details { flex: 1; min-width: 0; }
+  .nav-account-name {
+    font-size: 14px; font-weight: 500; color: #111B21;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+
+  .nav-account-badge {
+    background: #EF4444; color: #fff;
+    font-size: 10px; font-weight: 700;
+    min-width: 18px; height: 18px; border-radius: 9px;
+    display: none; align-items: center; justify-content: center;
+    padding: 0 5px;
+  }
+  .nav-account-badge.has-unread { display: flex; }
+
+  .nav-add-account {
+    display: flex; align-items: center; gap: 6px;
+    padding: 8px 16px; cursor: pointer;
+    transition: all 0.15s ease; margin-bottom: 4px;
+    -webkit-app-region: no-drag;
+  }
+  .nav-add-account:hover { background: #F0F2F5; }
+  .nav-add-account span { font-size: 14px; color: #25D366; font-weight: 500; }
+
+  .nav-divider { height: 1px; background: #E8E8E8; margin: 8px 16px; }
+
+  /* ── Tool Items ── */
+  .nav-tool-list { padding: 0 8px; }
+
+  .nav-tool-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 0 8px; height: 36px; border-radius: 6px;
+    cursor: pointer; transition: all 0.15s ease;
+    -webkit-app-region: no-drag;
+  }
+  .nav-tool-item:hover { background: #F0F2F5; }
+  .nav-tool-item:hover svg { color: #111B21; }
+  .nav-tool-item svg {
+    width: 18px; height: 18px; min-width: 18px;
+    color: #667781; transition: color 0.15s ease;
+  }
+  .nav-tool-item span { font-size: 14px; color: #111B21; }
+
+  .nav-spacer { flex: 1; }
+
+  .nav-bottom-section { padding: 0 8px; }
+
+  .nav-footer {
+    padding: 12px 16px;
+    border-top: 1px solid #E8E8E8;
+    margin-top: 8px;
+    -webkit-app-region: no-drag;
+  }
+  .nav-footer span { font-size: 12px; color: #667781; }
+  .nav-footer a {
+    font-size: 12px; color: #25D366; text-decoration: none;
+    cursor: pointer; font-weight: 500;
+  }
+  .nav-footer a:hover { text-decoration: underline; }
+
+  /* ── BrowserView Area ── */
+  .view-area {
+    flex: 1;
+    background: #fff;
+    position: relative;
+  }
+
+  /* ── DND Banner ── */
+  .dnd-banner {
+    display: none; padding: 6px 12px; background: #FFF3CD;
+    border-bottom: 1px solid #FFE69C;
+    font-size: 12px; color: #856404; text-align: center; cursor: pointer;
+    -webkit-app-region: no-drag;
+  }
+  .dnd-banner.active { display: block; }
+
+  /* ── Update Banner ── */
+  .update-banner {
+    display: none; padding: 6px 12px; background: #D4EDDA;
+    border-bottom: 1px solid #C3E6CB;
+    font-size: 12px; color: #155724; text-align: center; cursor: pointer;
+    -webkit-app-region: no-drag;
+  }
+  .update-banner.active { display: block; }
+
+  /* ── Upgrade Banner (inline) ── */
+  .upgrade-banner {
+    display: none;
+    position: fixed; bottom: 0; left: 200px; right: 0;
+    padding: 10px 16px;
+    background: linear-gradient(135deg, #25D366, #128C7E);
+    color: #fff; font-size: 13px; font-weight: 500;
+    z-index: 100;
+    align-items: center; justify-content: center; gap: 12px;
+  }
+  .upgrade-banner.visible { display: flex; }
+  .upgrade-banner-text { flex: 1; text-align: center; }
+  .upgrade-banner-btn {
+    background: #fff; color: #128C7E; border: none; border-radius: 6px;
+    padding: 6px 16px; font-size: 13px; font-weight: 600; cursor: pointer;
+  }
+  .upgrade-banner-dismiss {
+    background: none; border: none; color: rgba(255,255,255,0.8);
+    font-size: 18px; cursor: pointer; padding: 0 4px;
+  }
+
+  /* ── Context menu (right-click on accounts) ── */
+  .context-menu {
+    position: fixed; background: #fff; border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    padding: 4px 0; z-index: 9999; min-width: 160px;
+    font-size: 14px; color: #303030; display: none;
+  }
+  .context-menu.visible { display: block; }
+  .context-menu-item {
+    padding: 8px 16px; cursor: pointer;
+  }
+  .context-menu-item:hover { background: #f5f5f5; }
+  .context-menu-item.danger { color: #FF3B30; }
+  .context-menu-item.danger:hover { background: #fff5f5; }
+  .context-menu-divider { height: 1px; background: #e8e8e8; margin: 4px 0; }
+</style>
 </head>
-<body class="mode-whatsapp">
+<body>
 
-  <!-- ═══════════════════════════ ACCOUNT TAB BAR ═══════════════════════════ -->
-  <!-- ═══════ LEFT NAVIGATION STRIP ═══════ -->
-  <div class="account-strip" id="accountStrip">
-    <!-- Accounts section -->
-    <div class="strip-section-label">Accounts</div>
-    <div id="accountTabs"></div>
-    <button class="strip-add-btn" id="addBtn" title="Add Account">+</button>
+  <!-- Nav Panel -->
+  <nav class="nav-panel">
+    <div class="nav-title">
+      <span class="nav-title-name">SupaMsg</span>
+      <span class="nav-title-version">v2</span>
+    </div>
 
-    <!-- Divider -->
-    <div class="strip-divider"></div>
+    <div class="nav-section-label">Accounts</div>
+    <div class="nav-account-list" id="accountTabs">
+      <!-- Rendered by JS -->
+    </div>
+    <div class="nav-add-account" id="addBtn">
+      <span>+ Add Account</span>
+    </div>
 
-    <!-- Quick access tools -->
-    <div class="strip-section-label">Tools</div>
-    <button class="strip-tool-btn" id="btnSchedule" title="Send Later">
-      <span class="strip-tool-icon">&#128339;</span>
-      <span class="strip-tool-text">Schedule</span>
-    </button>
-    <button class="strip-tool-btn" id="btnTemplates" title="Quick Replies">
-      <span class="strip-tool-icon">&#128203;</span>
-      <span class="strip-tool-text">Replies</span>
-    </button>
-    <button class="strip-tool-btn" id="btnAI" title="AI Helper">
-      <span class="strip-tool-icon">&#10024;</span>
-      <span class="strip-tool-text">AI</span>
-    </button>
-    <button class="strip-tool-btn" id="btnBroadcast" title="Broadcast">
-      <span class="strip-tool-icon">&#128226;</span>
-      <span class="strip-tool-text">Blast</span>
-    </button>
-    <button class="strip-tool-btn" id="btnExport" title="Save Chat">
-      <span class="strip-tool-icon">&#128190;</span>
-      <span class="strip-tool-text">Export</span>
-    </button>
-    <button class="strip-tool-btn" id="btnAnalytics" title="Analytics">
-      <span class="strip-tool-icon">&#128200;</span>
-      <span class="strip-tool-text">Stats</span>
-    </button>
+    <div class="nav-divider"></div>
 
-    <!-- Bottom section -->
-    <div style="margin-top:auto"></div>
-    <button class="strip-tool-btn" id="btnPairMobile" title="Connect Phone">
-      <span class="strip-tool-icon">&#128241;</span>
-      <span class="strip-tool-text">Mobile</span>
-    </button>
-    <button class="strip-tool-btn" id="btnSettings" title="Settings">
-      <span class="strip-tool-icon">&#9881;</span>
-      <span class="strip-tool-text">Settings</span>
-    </button>
-  </div>
-
-  <!-- Hidden old tab bar (keeping for JS compatibility) -->
-  <div class="account-tab-bar" id="accountTabBar" style="display:none"></div>
-
-  <!-- ═══════════════════════════ MAIN LAYOUT ═══════════════════════════ -->
-  <div class="main-layout" style="flex:1;flex-direction:column">
-
-    <!-- ── Sidebar ── -->
-    <div class="sidebar" id="sidebar">
-      <div class="sidebar-header">
-        <div class="user-avatar">&#128100;</div>
-        <div class="sidebar-header-icons">
-          <button class="sidebar-icon-btn" id="btnBroadcast" title="Broadcast">&#128226;</button>
-          <button class="sidebar-icon-btn" id="btnTemplates" title="Templates">&#9998;</button>
-          <button class="sidebar-icon-btn" id="btnSidebarMenu" title="Menu">&#8942;</button>
-        </div>
+    <div class="nav-section-label" style="margin-top: 4px;">Tools</div>
+    <div class="nav-tool-list">
+      <div class="nav-tool-item" id="btnSchedule">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg>
+        <span>Schedule</span>
       </div>
-
-      <div class="dnd-banner" id="dndBanner" title="Click to disable DND">
-        &#9790; Do Not Disturb is on
+      <div class="nav-tool-item" id="btnTemplates">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="13" x2="13" y2="13"/></svg>
+        <span>Quick Replies</span>
       </div>
-
-      <div class="update-banner" id="updateBanner" title="Click to restart and update">
-        Update ready &mdash; click to restart
+      <div class="nav-tool-item" id="btnAI">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 7.2H22l-6 4.8 2.4 7.2L12 16.4 5.6 21.2 8 14 2 9.2h7.6z"/></svg>
+        <span>AI Helper</span>
       </div>
-
-      <div class="search-bar">
-        <div class="search-bar-inner">
-          <span class="search-icon">&#128269;</span>
-          <input type="text" placeholder="Search or start new chat" id="searchInput">
-        </div>
+      <div class="nav-tool-item" id="btnBroadcast">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M2 8 L6 10 L2 14" transform="translate(-1,0)"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span>Broadcast</span>
       </div>
-
-      <div class="chat-list" id="accountsList">
-        <div class="chat-list-empty">
-          <div>
-            <div style="font-size:40px;margin-bottom:12px;opacity:0.3">&#128172;</div>
-            Chats will appear here
-          </div>
-        </div>
-      </div>
-
-      <!-- Settings Panel (slides over sidebar) -->
-      <div class="settings-panel" id="settingsPanel">
-        <div class="settings-header">
-          <button class="back-btn" id="settingsBack">&#8592; Back to Chats</button>
-          <h2>Settings</h2>
-        </div>
-        <div class="settings-body">
-
-          <!-- Plan Banner -->
-          <div class="settings-card" id="settingsLicenseInfo" style="background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;cursor:pointer" onclick="document.getElementById('settingsUpgradeBtn').click()">
-            <div style="display:flex;align-items:center;justify-content:space-between">
-              <div>
-                <div style="font-size:18px;font-weight:700" id="settingsTierBadge">Free Plan</div>
-                <div style="font-size:12px;opacity:0.8;margin-top:2px">Tap to upgrade for more features</div>
-                <span style="display:none" id="settingsLicenseEmail"></span>
-              </div>
-              <span style="font-size:28px">&#10148;</span>
-            </div>
-            <button id="settingsUpgradeBtn" style="display:none"></button>
-          </div>
-
-          <!-- Big Action Cards -->
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
-            <div class="settings-action-card" onclick="document.getElementById('settingsBack').click();document.getElementById('btnPairMobile').click()">
-              <span style="font-size:28px">&#128241;</span>
-              <div class="settings-action-title">Connect Phone</div>
-              <div class="settings-action-desc">Use SupaMsg on your iPhone</div>
-            </div>
-            <div class="settings-action-card" onclick="settingsAction('addAccount')">
-              <span style="font-size:28px">&#10133;</span>
-              <div class="settings-action-title">Add Account</div>
-              <div class="settings-action-desc">Connect another WhatsApp</div>
-            </div>
-            <div class="settings-action-card" onclick="settingsAction('apiKey')">
-              <span style="font-size:28px">&#10024;</span>
-              <div class="settings-action-title">Setup AI</div>
-              <div class="settings-action-desc">Enable smart replies & more</div>
-            </div>
-            <div class="settings-action-card" onclick="settingsAction('licenseKey')">
-              <span style="font-size:28px">&#128273;</span>
-              <div class="settings-action-title">Enter License Key</div>
-              <div class="settings-action-desc">Activate Pro or Business</div>
-            </div>
-          </div>
-
-          <!-- Simple toggles -->
-          <div class="settings-card">
-            <div class="settings-card-title">Notifications</div>
-            <div class="setting-row">
-              <div class="setting-label">Show notifications</div>
-              <div class="toggle" data-key="notifications"></div>
-            </div>
-            <div class="setting-row">
-              <div class="setting-label">Play sound</div>
-              <div class="toggle" data-key="notificationSound"></div>
-            </div>
-            <div class="setting-row">
-              <div class="setting-label">Do Not Disturb</div>
-              <div class="toggle" data-key="dnd"></div>
-            </div>
-          </div>
-
-          <div class="settings-card">
-            <div class="settings-card-title">General</div>
-            <div class="setting-row">
-              <div class="setting-label">Open at startup</div>
-              <div class="toggle" data-key="launchAtLogin"></div>
-            </div>
-          </div>
-
-          <!-- Accounts list -->
-          <div class="settings-card">
-            <div class="settings-card-title">My Accounts</div>
-            <div id="stealthAccountsList"></div>
-          </div>
-
-          <!-- Hidden inputs for API key and license (shown by settingsAction) -->
-          <div class="settings-card" id="apiKeyCard" style="display:none">
-            <div class="settings-card-title">AI Setup</div>
-            <div style="font-size:12px;color:#667781;margin-bottom:8px">Get your API key from <a href="#" style="color:#25D366" onclick="window.open('https://console.anthropic.com/settings/keys')">console.anthropic.com</a></div>
-            <input class="settings-input" id="anthropicKey" type="password" placeholder="Paste your API key here (sk-ant-...)">
-            <button class="settings-btn settings-btn-primary" id="saveApiKey" style="margin-top:8px;width:100%">Save & Enable AI</button>
-          </div>
-
-          <div class="settings-card" id="licenseKeyCard" style="display:none">
-            <div class="settings-card-title">Activate License</div>
-            <div style="font-size:12px;color:#667781;margin-bottom:8px">Paste the license key you received after purchase</div>
-            <input class="settings-input" id="licenseKeyInput" placeholder="WH-...">
-            <input class="settings-input" id="licenseEmailInput" placeholder="Your email" style="margin-top:6px">
-            <button class="settings-btn settings-btn-primary" id="activateLicenseBtn" style="margin-top:8px;width:100%">Activate</button>
-            <div id="licenseStatus" style="margin-top:6px;font-size:12px"></div>
-          </div>
-
-          <!-- CRM (hidden by default, shown for pro users) -->
-          <div class="settings-card" id="crmCard" style="display:none">
-            <div class="settings-card-title">CRM Integration</div>
-            <div class="setting-row">
-              <div class="setting-label">HubSpot</div>
-              <div class="toggle" id="toggleHubspot" data-crm="hubspot"></div>
-            </div>
-            <div id="hubspotKeyGroup" style="display:none;margin-top:4px">
-              <input class="settings-input" id="hubspotKey" type="password" placeholder="HubSpot API Key">
-            </div>
-            <div class="setting-row">
-              <div class="setting-label">Zoho CRM</div>
-              <div class="toggle" id="toggleZoho" data-crm="zoho"></div>
-            </div>
-            <div id="zohoKeyGroup" style="display:none;margin-top:4px">
-              <input class="settings-input" id="zohoKey" type="password" placeholder="Zoho OAuth Token">
-            </div>
-            <button class="settings-btn settings-btn-primary" id="saveCrmSettings" style="margin-top:8px;width:100%">Save</button>
-          </div>
-
-          <div style="text-align:center;padding:16px;font-size:11px;color:#667781">
-            SupaMsg v1.0.0 &mdash; All your WhatsApps, one window
-          </div>
-        </div>
+      <div class="nav-tool-item" id="btnAnalytics">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="14" width="4" height="6" rx="1"/><rect x="10" y="10" width="4" height="10" rx="1"/><rect x="16" y="6" width="4" height="14" rx="1"/></svg>
+        <span>Dashboard</span>
       </div>
     </div>
 
-    <!-- ── Chat Area ── -->
-    <div class="chat-area" id="chatArea">
-      <div class="chat-header" id="chatHeader">
-        <div class="chat-header-avatar">&#128100;</div>
-        <div class="chat-header-info">
-          <div class="chat-header-name" id="chatHeaderName">SupaMsg</div>
-          <div class="chat-header-status" id="chatHeaderStatus">Select an account to get started</div>
-        </div>
-        <div class="chat-header-icons">
-          <button class="chat-header-icon" id="btnSplit" title="Split Screen (Cmd+D)">&#9635;</button>
-          <button class="chat-header-icon" id="btnExport" title="Export Chat (Cmd+E)">&#8681;</button>
-          <button class="chat-header-icon" id="btnLabels" title="Contact Labels">&#9873;</button>
-          <button class="chat-header-icon" id="btnAnalytics" title="Analytics">&#9636;</button>
-        </div>
+    <div class="nav-spacer"></div>
+
+    <div class="nav-divider"></div>
+
+    <div class="nav-bottom-section">
+      <div class="nav-tool-item" id="btnPairMobile">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="3"/><line x1="12" y1="18" x2="12" y2="18.01" stroke-width="2.5"/></svg>
+        <span>Connect Phone</span>
       </div>
-
-      <!-- Upgrade Banner -->
-      <div class="upgrade-banner" id="upgradeBanner">
-        <span id="upgradeBannerText">Unlock this feature with Pro &mdash; $9/mo</span>
-        <button class="upgrade-btn" id="upgradeBannerBtn">Upgrade</button>
-        <button class="upgrade-dismiss" id="upgradeBannerDismiss">&times;</button>
-      </div>
-
-      <div class="chat-body">
-        <div class="chat-body-empty">
-          <div class="logo-text">SupaMsg</div>
-          <div class="logo-sub">Select an account and start chatting</div>
-          <div style="margin-top:16px;font-size:12px;color:#8696A0">
-            <span style="display:inline-block;padding:3px 8px;border:1px solid #E9EDEF;border-radius:4px;margin:2px">Cmd+1-9</span> switch accounts
-            &nbsp;&nbsp;
-            <span style="display:inline-block;padding:3px 8px;border:1px solid #E9EDEF;border-radius:4px;margin:2px">Cmd+K</span> command palette
-          </div>
-        </div>
-      </div>
-
-      <!-- Input Bar -->
-      <div class="input-bar">
-        <button class="input-bar-icon" title="Emoji">&#128522;</button>
-        <button class="input-bar-icon" title="Attach">&#128206;</button>
-
-        <div class="supa-divider"></div>
-
-        <!-- SupaMsg power icons -->
-        <button class="input-bar-icon supa-icon" id="btnScheduleInline" title="Send Later">&#9201;</button>
-        <button class="input-bar-icon supa-icon" id="btnAIInline" title="AI Helper">&#10024;</button>
-        <button class="input-bar-icon supa-icon" id="btnTemplatesInline" title="Quick Reply">&#128278;</button>
-
-        <div class="input-text-wrap">
-          <input type="text" placeholder="Type a message" disabled>
-        </div>
-        <button class="input-bar-icon" title="Voice">&#127908;</button>
-      </div>
-
-      <!-- ── Inline Popups ── -->
-
-      <!-- Schedule Popup -->
-      <div class="inline-popup" id="schedulePopup">
-        <div class="popup-header">
-          <span class="popup-title">Send Later</span>
-          <button class="popup-close" onclick="closePopup('schedulePopup')">&times;</button>
-        </div>
-        <div class="popup-form-group">
-          <label>Account</label>
-          <select class="popup-input" id="schedAccount"></select>
-        </div>
-        <div class="popup-form-group">
-          <label>Contact / Chat Name</label>
-          <input class="popup-input" id="schedContact" placeholder="e.g. John Doe">
-        </div>
-        <div class="popup-form-group">
-          <label>Message</label>
-          <textarea class="popup-input" id="schedMessage" placeholder="Your message..."></textarea>
-        </div>
-        <div style="display:flex;gap:8px">
-          <div class="popup-form-group" style="flex:1">
-            <label>Date</label>
-            <input class="popup-input" id="schedDate" type="date">
-          </div>
-          <div class="popup-form-group" style="flex:1">
-            <label>Time</label>
-            <input class="popup-input" id="schedTimeInput" type="time">
-          </div>
-        </div>
-        <div class="popup-btn-row">
-          <button class="popup-btn popup-btn-primary" id="schedSave">Schedule</button>
-        </div>
-        <div id="schedulesList" style="margin-top:12px;max-height:150px;overflow-y:auto"></div>
-      </div>
-
-      <!-- AI Popup -->
-      <div class="inline-popup" id="aiPopup">
-        <div class="popup-header">
-          <span class="popup-title">AI Helper</span>
-          <button class="popup-close" onclick="closePopup('aiPopup')">&times;</button>
-        </div>
-        <div class="ai-presets">
-          <button class="ai-preset-btn" id="aiSuggest">&#10024; Suggest Reply</button>
-          <button class="ai-preset-btn" id="aiSummarize">&#128220; Summarize</button>
-          <button class="ai-preset-btn" id="aiSentiment">&#128200; Sentiment</button>
-        </div>
-        <div class="popup-form-group">
-          <input class="popup-input" id="aiDraftInstruction" placeholder='e.g. "say I\'ll be 10 min late"'>
-        </div>
-        <div class="popup-btn-row" style="margin-top:0">
-          <button class="popup-btn popup-btn-primary" id="aiDraft">Draft Reply</button>
-        </div>
-        <div class="popup-form-group" style="margin-top:10px">
-          <div style="display:flex;gap:6px">
-            <input class="popup-input" id="aiTranslateText" placeholder="Text to translate" style="flex:1">
-            <select class="popup-input" id="aiTranslateLang" style="width:100px">
-              <option value="English">English</option>
-              <option value="Hindi">Hindi</option>
-              <option value="Spanish">Spanish</option>
-              <option value="French">French</option>
-              <option value="Arabic">Arabic</option>
-              <option value="Portuguese">Portuguese</option>
-              <option value="German">German</option>
-              <option value="Japanese">Japanese</option>
-              <option value="Chinese">Chinese</option>
-            </select>
-            <button class="popup-btn popup-btn-primary" id="aiTranslate">Go</button>
-          </div>
-        </div>
-        <div class="ai-result-area" id="aiResults">
-          <div class="popup-empty">Click a button to analyze the current chat.</div>
-        </div>
-        <div id="aiDraftResult"></div>
-        <div id="aiTranslateResult"></div>
-      </div>
-
-      <!-- Templates Popup (inline version) -->
-      <div class="inline-popup" id="templatesPopup">
-        <div class="popup-header">
-          <span class="popup-title">Quick Reply</span>
-          <button class="popup-close" onclick="closePopup('templatesPopup')">&times;</button>
-        </div>
-        <div class="popup-form-group">
-          <input class="popup-input" id="tplSearchInline" placeholder="Search templates...">
-        </div>
-        <div id="templatesInlineList" style="max-height:200px;overflow-y:auto"></div>
-        <div style="margin-top:8px;text-align:right">
-          <button class="popup-btn popup-btn-secondary" id="openFullTemplates">Manage Templates</button>
-        </div>
+      <div class="nav-tool-item" id="btnSettings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span>Settings</span>
       </div>
     </div>
-  </div>
 
-  <!-- ═══════════════════════════ CONTEXT MENU ═══════════════════════════ -->
-  <div class="context-menu" id="contextMenu">
-    <div class="context-menu-item disabled">Reply</div>
-    <div class="context-menu-item disabled">Forward</div>
-    <div class="context-menu-item disabled">Star Message</div>
-    <div class="context-menu-item disabled">Delete</div>
-    <div class="context-menu-separator"></div>
-    <div class="context-menu-item" id="ctxTranslate">&#127760; Translate <span class="supa-label">SupaMsg</span></div>
-    <div class="context-menu-item" id="ctxAddNote">&#128221; Add Note <span class="supa-label">SupaMsg</span></div>
-  </div>
-
-  <!-- ═══════════════════════════════════════════════════════ -->
-  <!-- TEMPLATES PANEL (full) -->
-  <!-- ═══════════════════════════════════════════════════════ -->
-  <div class="panel-overlay" id="templatesPanel">
-    <div class="panel" style="width:560px">
-      <button class="panel-close" onclick="closePanel('templatesPanel')">&times;</button>
-      <h2>Message Templates</h2>
-
-      <div id="templatesList"></div>
-
-      <h3>Create New Template</h3>
-      <div class="form-group">
-        <label>Template Name</label>
-        <input class="form-input" id="tplName" placeholder="e.g. Meeting Follow-up">
-      </div>
-      <div class="form-group">
-        <label>Category</label>
-        <input class="form-input" id="tplCategory" placeholder="e.g. Work, Personal">
-      </div>
-      <div class="form-group">
-        <label>Message Body <span style="color:#8696A0">(use {date}, {time} for auto-fill)</span></label>
-        <textarea class="form-input" id="tplBody" placeholder="Type your template message..."></textarea>
-      </div>
-      <div class="btn-row">
-        <button class="btn btn-primary" id="tplSave">Save Template</button>
-      </div>
+    <div class="nav-footer" id="navFooter">
+      <span>Free Plan &middot; </span><a href="#" id="footerUpgradeLink">Upgrade</a>
     </div>
+  </nav>
+
+  <!-- BrowserView area (managed by main.js) -->
+  <div class="view-area">
+    <div class="dnd-banner" id="dndBanner">Do Not Disturb is on — click to disable</div>
+    <div class="update-banner" id="updateBanner"></div>
   </div>
 
-  <!-- ═══════════════════════════════════════════════════════ -->
-  <!-- CONTACT LABELS PANEL -->
-  <!-- ═══════════════════════════════════════════════════════ -->
-  <div class="panel-overlay" id="labelsPanel">
-    <div class="panel">
-      <button class="panel-close" onclick="closePanel('labelsPanel')">&times;</button>
-      <h2>Contact Labels</h2>
-
-      <div id="labelsList"></div>
-
-      <h3>Create New Label</h3>
-      <div style="display:flex;gap:8px;align-items:flex-end">
-        <div class="form-group" style="flex:1;margin:0">
-          <label>Name</label>
-          <input class="form-input" id="labelName" placeholder="e.g. VIP Client">
-        </div>
-        <div class="form-group" style="width:60px;margin:0">
-          <label>Color</label>
-          <input type="color" id="labelColor" value="#25D366" style="width:100%;height:34px;border:none;border-radius:6px;cursor:pointer;">
-        </div>
-        <button class="btn btn-primary" id="labelSave" style="height:34px">Add</button>
-      </div>
-
-      <h3 style="margin-top:20px">Assign Labels to Contacts</h3>
-      <p style="font-size:12px;color:#8696A0;margin-bottom:8px">Type a contact name and select labels to assign.</p>
-      <div style="display:flex;gap:8px;margin-bottom:8px">
-        <input class="form-input" id="assignContact" placeholder="Contact name" style="flex:1">
-        <select class="form-input" id="assignAccount" style="width:140px"></select>
-      </div>
-      <div id="assignLabelChips" style="margin-bottom:8px"></div>
-      <div id="contactLabelsList"></div>
-    </div>
+  <!-- Upgrade banner (inline, bottom of screen) -->
+  <div class="upgrade-banner" id="upgradeBanner">
+    <span class="upgrade-banner-text" id="upgradeBannerText">Unlock Pro features — $9/mo</span>
+    <button class="upgrade-banner-btn" id="upgradeBannerBtn">Upgrade</button>
+    <button class="upgrade-banner-dismiss" id="upgradeBannerDismiss">&times;</button>
   </div>
 
-  <!-- ═══════════════════════════════════════════════════════ -->
-  <!-- ANALYTICS PANEL -->
-  <!-- ═══════════════════════════════════════════════════════ -->
-  <div class="panel-overlay" id="analyticsPanel">
-    <div class="panel" style="width:600px">
-      <button class="panel-close" onclick="closePanel('analyticsPanel')">&times;</button>
-      <h2>Analytics Dashboard</h2>
-      <div class="form-group">
-        <select class="form-input" id="analyticsAccount" style="width:200px">
-          <option value="">All Accounts</option>
-        </select>
-      </div>
-      <div id="analyticsContent">
-        <div class="empty-state">Analytics data will appear as you receive messages.</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ═══════════════════════════════════════════════════════ -->
-  <!-- UPGRADE PANEL -->
-  <!-- ═══════════════════════════════════════════════════════ -->
-  <div class="panel-overlay" id="upgradePanel">
-    <div class="panel" style="width:620px">
-      <button class="panel-close" onclick="closePanel('upgradePanel')">&times;</button>
-      <h2>Upgrade SupaMsg</h2>
-      <p style="font-size:13px;color:#667781;margin-bottom:16px">Unlock powerful features to manage WhatsApp like a pro.</p>
-
-      <div id="currentPlanBadge" style="margin-bottom:16px"></div>
-
-      <!-- Monthly / Annual toggle -->
-      <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:20px">
-        <span id="billingMonthlyLabel" style="font-size:13px;font-weight:600;color:#075E54">Monthly</span>
-        <div id="billingToggle" style="width:44px;height:24px;background:#CED0D1;border-radius:12px;cursor:pointer;position:relative;transition:background 0.2s" onclick="toggleBilling()">
-          <div id="billingDot" style="position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:white;transition:transform 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.2)"></div>
-        </div>
-        <span id="billingAnnualLabel" style="font-size:13px;color:#667781">Annual</span>
-        <span style="font-size:11px;background:#E8F5E9;color:#2E7D32;padding:2px 8px;border-radius:10px;font-weight:600">Save up to 35%</span>
-      </div>
-
-      <div style="display:flex;gap:12px">
-        <!-- Free -->
-        <div style="flex:1;padding:16px;background:#F9FAFB;border-radius:10px;border:1px solid #E9EDEF">
-          <div style="font-size:14px;font-weight:600;color:#111B21">Free</div>
-          <div style="font-size:28px;font-weight:700;color:#075E54;margin:8px 0">$0</div>
-          <div style="font-size:11px;color:#667781;margin-bottom:12px">Forever</div>
-          <ul style="list-style:none;font-size:12px;color:#667781;line-height:2">
-            <li>3 accounts</li>
-            <li>Notifications & DND</li>
-            <li>Templates</li>
-            <li>Contact labels</li>
-          </ul>
-        </div>
-        <!-- Pro -->
-        <div style="flex:1;padding:16px;background:#F0FFF4;border-radius:10px;border:2px solid #25D366;position:relative">
-          <div style="position:absolute;top:-8px;right:12px;background:#25D366;color:#fff;font-size:10px;font-weight:700;padding:2px 10px;border-radius:10px">POPULAR</div>
-          <div style="font-size:14px;font-weight:600;color:#111B21">Pro</div>
-          <div id="proPriceDisplay" style="font-size:28px;font-weight:700;color:#075E54;margin:8px 0">$9<span style="font-size:14px;color:#667781">/mo</span></div>
-          <div id="proSubtext" style="font-size:11px;color:#667781;margin-bottom:12px">or $79/year (save 27%)</div>
-          <ul style="list-style:none;font-size:12px;color:#667781;line-height:2">
-            <li>Unlimited accounts</li>
-            <li>AI smart replies (50/day)</li>
-            <li>Scheduled messages</li>
-            <li>Chat export</li>
-            <li>Split screen</li>
-            <li>Analytics</li>
-            <li>Stealth mode</li>
-          </ul>
-          <button class="btn btn-primary" style="width:100%;margin-top:12px" onclick="startUpgrade('pro')">Upgrade to Pro</button>
-        </div>
-        <!-- Business -->
-        <div style="flex:1;padding:16px;background:#F9FAFB;border-radius:10px;border:1px solid #E9EDEF">
-          <div style="font-size:14px;font-weight:600;color:#111B21">Business</div>
-          <div id="bizPriceDisplay" style="font-size:28px;font-weight:700;color:#075E54;margin:8px 0">$19<span style="font-size:14px;color:#667781">/mo</span></div>
-          <div id="bizSubtext" style="font-size:11px;color:#667781;margin-bottom:12px">or $149/year (save 35%)</div>
-          <ul style="list-style:none;font-size:12px;color:#667781;line-height:2">
-            <li>Everything in Pro, plus:</li>
-            <li>Automations & workflows</li>
-            <li>Broadcast campaigns</li>
-            <li>CRM integration</li>
-            <li>Unlimited AI</li>
-          </ul>
-          <button class="btn btn-secondary" style="width:100%;margin-top:12px" onclick="startUpgrade('business')">Upgrade to Business</button>
-        </div>
-      </div>
-
-      <h3 style="margin-top:20px">Already have a license key?</h3>
-      <div style="display:flex;gap:8px;margin-top:8px">
-        <input class="form-input" id="licenseKeyInput" placeholder="WH-..." style="flex:1">
-        <input class="form-input" id="licenseEmailInput" placeholder="your@email.com" style="width:180px">
-        <button class="btn btn-primary" id="activateLicenseBtn">Activate</button>
-      </div>
-      <div id="licenseStatus" style="margin-top:8px;font-size:12px"></div>
-    </div>
-  </div>
-
-  <!-- ═══════════════════════════════════════════════════════ -->
-  <!-- AUTOMATIONS PANEL -->
-  <!-- ═══════════════════════════════════════════════════════ -->
-  <div class="panel-overlay" id="automationsPanel">
-    <div class="panel" style="width:580px">
-      <button class="panel-close" onclick="closePanel('automationsPanel')">&times;</button>
-      <h2>Automations</h2>
-
-      <div id="automationsList"></div>
-
-      <h3>Create Automation</h3>
-      <div class="form-group">
-        <label>Name</label>
-        <input class="form-input" id="autoName" placeholder="e.g. Auto-reply to price inquiries">
-      </div>
-      <div style="display:flex;gap:8px">
-        <div class="form-group" style="flex:1">
-          <label>Account</label>
-          <select class="form-input" id="autoAccount">
-            <option value="*">All Accounts</option>
-          </select>
-        </div>
-      </div>
-      <div style="display:flex;gap:8px">
-        <div class="form-group" style="flex:1">
-          <label>When (Trigger)</label>
-          <select class="form-input" id="autoTriggerType">
-            <option value="message_contains">Message contains keyword</option>
-            <option value="message_from">Message from contact</option>
-            <option value="new_message">Any new message</option>
-            <option value="keyword_match">Regex keyword match</option>
-          </select>
-        </div>
-        <div class="form-group" style="flex:1">
-          <label>Value</label>
-          <input class="form-input" id="autoTriggerValue" placeholder="keyword or contact name">
-        </div>
-      </div>
-      <div style="display:flex;gap:8px">
-        <div class="form-group" style="flex:1">
-          <label>Then (Action)</label>
-          <select class="form-input" id="autoActionType">
-            <option value="auto_reply">Send auto-reply</option>
-            <option value="send_template">Send template</option>
-            <option value="assign_label">Assign label</option>
-            <option value="notify">Send notification</option>
-          </select>
-        </div>
-        <div class="form-group" style="flex:1">
-          <label>Value</label>
-          <input class="form-input" id="autoActionValue" placeholder="reply text or template ID">
-        </div>
-      </div>
-      <div class="btn-row">
-        <button class="btn btn-primary" id="autoSave">Create Automation</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ═══════════════════════════════════════════════════════ -->
-  <!-- BROADCAST PANEL -->
-  <!-- ═══════════════════════════════════════════════════════ -->
-  <div class="panel-overlay" id="broadcastPanel">
-    <div class="panel" style="width:580px">
-      <button class="panel-close" onclick="closePanel('broadcastPanel')">&times;</button>
-      <h2>Broadcast Campaign</h2>
-
-      <div id="campaignsList"></div>
-
-      <h3>Create Campaign</h3>
-      <div class="form-group">
-        <label>Campaign Name</label>
-        <input class="form-input" id="campName" placeholder="e.g. March Price Update">
-      </div>
-      <div class="form-group">
-        <label>Account</label>
-        <select class="form-input" id="campAccount"></select>
-      </div>
-      <div class="form-group">
-        <label>Message <span style="color:#8696A0">(use {name} for personalization)</span></label>
-        <textarea class="form-input" id="campMessage" placeholder="Hi {name}, we wanted to let you know..."></textarea>
-      </div>
-      <div class="form-group">
-        <label>Contacts <span style="color:#8696A0">(one name per line, must match WhatsApp chat names)</span></label>
-        <textarea class="form-input" id="campContacts" placeholder="John Doe&#10;Jane Smith&#10;Bob Wilson" style="min-height:100px"></textarea>
-      </div>
-      <div class="form-group">
-        <label>Delay between messages (seconds, min 3)</label>
-        <input class="form-input" id="campDelay" type="number" value="5" min="3" max="60">
-      </div>
-      <div class="btn-row">
-        <button class="btn btn-primary" id="campCreate">Create Campaign</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ═══════════════════════════════════════════════════════ -->
-  <!-- COMMAND PALETTE -->
-  <!-- ═══════════════════════════════════════════════════════ -->
-  <div class="panel-overlay" id="commandPalette" style="align-items:flex-start;padding-top:15vh">
-    <div class="panel" style="width:500px;padding:12px">
-      <input class="form-input" id="cmdInput" placeholder="Search accounts, actions, features..." style="font-size:15px;padding:12px 16px;background:transparent;border:none;border-bottom:1px solid #E9EDEF">
-      <div id="cmdResults" style="max-height:300px;overflow-y:auto;margin-top:4px"></div>
-    </div>
-  </div>
+  <!-- Context menu (right-click on accounts) -->
+  <div class="context-menu" id="tabContextMenu"></div>
 
   <script>
-    // ── Dialog helpers (use native Electron dialogs that render above BrowserViews) ──
+    // ── Dialog helpers (native Electron dialogs above BrowserViews) ──
     function showDialog({ title, message, placeholder, defaultValue, isConfirm }) {
       if (isConfirm) {
         return hub.showConfirmDialog({ title, message });
@@ -1725,54 +299,27 @@
     let unreadCounts = {};
     let currentSettings = {};
     let dragSrcId = null;
-    let templates = [];
-    let schedules = [];
-    let labelsData = { labels: [], contactLabels: {} };
-    let currentMode = 'whatsapp';
 
     function escapeHtml(str) {
       return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
     }
 
-    // ── Settings actions ──
-    function settingsAction(action) {
-      if (action === 'addAccount') {
-        document.getElementById('settingsBack').click();
-        setTimeout(() => document.getElementById('addBtn').click(), 300);
-      } else if (action === 'apiKey') {
-        const card = document.getElementById('apiKeyCard');
-        card.style.display = card.style.display === 'none' ? 'block' : 'none';
-        if (card.style.display === 'block') card.scrollIntoView({ behavior: 'smooth' });
-      } else if (action === 'licenseKey') {
-        const card = document.getElementById('licenseKeyCard');
-        card.style.display = card.style.display === 'none' ? 'block' : 'none';
-        if (card.style.display === 'block') card.scrollIntoView({ behavior: 'smooth' });
-      }
-    }
-
-    // ── Tab context menu ──
+    // ── Context menu (right-click on accounts) ──
     function showTabContextMenu(x, y, account) {
-      // Remove existing context menu if any
-      const existing = document.getElementById('tabContextMenu');
-      if (existing) existing.remove();
-
-      const menu = document.createElement('div');
-      menu.id = 'tabContextMenu';
-      menu.style.cssText = `position:fixed;top:${y}px;left:${x}px;background:#fff;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,0.15);padding:4px 0;z-index:9999;min-width:160px;font-size:14px;color:#303030;`;
-
+      const menu = document.getElementById('tabContextMenu');
       menu.innerHTML = `
-        <div style="padding:8px 16px;cursor:pointer;hover-bg:#f0f0f0" onmouseover="this.style.background='#f5f5f5'" onmouseout="this.style.background=''" onclick="tabMenuAction('rename','${account.id}','${escapeHtml(account.name)}')">Rename</div>
-        <div style="padding:8px 16px;cursor:pointer" onmouseover="this.style.background='#f5f5f5'" onmouseout="this.style.background=''" onclick="tabMenuAction('reload','${account.id}')">Reload</div>
-        <div style="height:1px;background:#e8e8e8;margin:4px 0"></div>
-        <div style="padding:8px 16px;cursor:pointer;color:#FF3B30" onmouseover="this.style.background='#fff5f5'" onmouseout="this.style.background=''" onclick="tabMenuAction('remove','${account.id}','${escapeHtml(account.name)}')">Remove</div>
+        <div class="context-menu-item" onclick="tabMenuAction('rename','${account.id}','${escapeHtml(account.name)}')">Rename</div>
+        <div class="context-menu-item" onclick="tabMenuAction('reload','${account.id}')">Reload</div>
+        <div class="context-menu-divider"></div>
+        <div class="context-menu-item danger" onclick="tabMenuAction('remove','${account.id}','${escapeHtml(account.name)}')">Remove</div>
       `;
+      menu.style.left = Math.min(x, window.innerWidth - 200) + 'px';
+      menu.style.top = Math.min(y, window.innerHeight - 150) + 'px';
+      menu.classList.add('visible');
 
-      document.body.appendChild(menu);
-
-      // Close on click outside
       setTimeout(() => {
         document.addEventListener('click', function closeMenu() {
-          menu.remove();
+          menu.classList.remove('visible');
           document.removeEventListener('click', closeMenu);
         });
       }, 10);
@@ -1780,7 +327,7 @@
 
     async function tabMenuAction(action, accountId, accountName) {
       const menu = document.getElementById('tabContextMenu');
-      if (menu) menu.remove();
+      menu.classList.remove('visible');
 
       if (action === 'rename') {
         const newName = await showDialog({
@@ -1801,528 +348,126 @@
       }
     }
 
-    // ── Mode switching ──
-    function switchMode(mode) {
-      currentMode = mode;
-      document.body.className = 'mode-' + mode;
-      document.querySelectorAll('.mode-option').forEach(el => {
-        el.classList.toggle('active', el.dataset.mode === mode);
-      });
-    }
-
-    // ── Popup management ──
-    function openPopup(id) {
-      closeAllPopups();
-      document.getElementById(id).classList.add('visible');
-    }
-    function closePopup(id) {
-      document.getElementById(id).classList.remove('visible');
-    }
-    function closeAllPopups() {
-      document.querySelectorAll('.inline-popup.visible').forEach(p => p.classList.remove('visible'));
-    }
-
-    // ── Panel management (hide BrowserViews so panels are visible) ──
-    function openPanel(id) {
-      hub.hideViews();
-      document.getElementById(id).classList.add('visible');
-    }
-    function closePanel(id) {
-      document.getElementById(id).classList.remove('visible');
-      // Only restore views if no other panels are open
-      const anyOpen = document.querySelectorAll('.panel-overlay.visible').length > 0;
-      if (!anyOpen) hub.showViews();
-    }
-
-    document.querySelectorAll('.panel-overlay').forEach(el => {
-      el.addEventListener('click', e => { if (e.target === el) closePanel(el.id); });
-    });
-
-    // Close popups when clicking outside
-    document.addEventListener('click', (e) => {
-      if (!e.target.closest('.inline-popup') && !e.target.closest('.supa-icon')) {
-        closeAllPopups();
-      }
-    });
-
-    // ── Context Menu ──
-    document.addEventListener('contextmenu', (e) => {
-      e.preventDefault();
-      const menu = document.getElementById('contextMenu');
-      menu.classList.add('visible');
-      menu.style.left = Math.min(e.clientX, window.innerWidth - 200) + 'px';
-      menu.style.top = Math.min(e.clientY, window.innerHeight - 250) + 'px';
-    });
-    document.addEventListener('click', () => {
-      document.getElementById('contextMenu').classList.remove('visible');
-    });
-    document.getElementById('ctxTranslate').addEventListener('click', async () => {
-      if (await requireFeature('aiReplies', 'AI Translate')) {
-        openPopup('aiPopup');
-      }
-    });
-    document.getElementById('ctxAddNote').addEventListener('click', async () => {
-      showDialog({ title: 'Add Note', message: 'Notes feature coming soon.', isConfirm: true });
-    });
-
-    // ── Render accounts (tab bar + chat list) ──
+    // ── Render accounts ──
     function renderAccounts(accounts) {
       currentAccounts = accounts;
 
-      // Render account strip (left sidebar)
-      const tabsContainer = document.getElementById('accountTabs');
-      tabsContainer.innerHTML = '';
+      const container = document.getElementById('accountTabs');
+      container.innerHTML = '';
+
       accounts.forEach((account) => {
         const item = document.createElement('div');
-        item.className = `account-strip-item ${account.id === activeId ? 'active' : ''}`;
+        item.className = `nav-account-item${account.id === activeId ? ' active' : ''}`;
         item.dataset.id = account.id;
-        const unread = unreadCounts[account.id] || 0;
-        const initials = escapeHtml(account.name).substring(0, 2).toUpperCase();
-        item.innerHTML = `
-          <div class="account-strip-avatar" style="background:${account.color}">
-            ${initials}
-            <span class="account-strip-unread ${unread > 0 ? 'has-unread' : ''}">${unread}</span>
-          </div>
-          <span class="account-strip-name">${escapeHtml(account.name)}</span>
-          <div class="account-strip-actions">
-            <button class="account-strip-action edit" title="Rename" onclick="event.stopPropagation();tabMenuAction('rename','${account.id}','${escapeHtml(account.name)}')">&#9998;</button>
-            <button class="account-strip-action delete" title="Remove" onclick="event.stopPropagation();tabMenuAction('remove','${account.id}','${escapeHtml(account.name)}')">&#10005;</button>
-          </div>
-        `;
-        item.addEventListener('click', () => hub.switchAccount(account.id));
-        tabsContainer.appendChild(item);
-      });
-
-      // Render chat list (sidebar)
-      const list = document.getElementById('accountsList');
-      if (!accounts.length) {
-        list.innerHTML = `<div class="chat-list-empty"><div><div style="font-size:40px;margin-bottom:12px;opacity:0.3">&#128172;</div>Chats will appear here</div></div>`;
-        return;
-      }
-      list.innerHTML = '';
-
-      accounts.forEach((account) => {
-        const item = document.createElement('div');
-        item.className = `chat-list-item ${account.id === activeId ? 'active' : ''}`;
         item.draggable = true;
-        item.dataset.id = account.id;
+
         const unread = unreadCounts[account.id] || 0;
+        const initials = escapeHtml(account.name).substring(0, 1).toUpperCase();
 
         item.innerHTML = `
-          <div class="chat-avatar">
-            <span>&#128100;</span>
-            <div class="avatar-dot" style="background:${account.color}"></div>
+          <div class="nav-account-avatar" style="background:${account.color}">
+            ${initials}
+            <div class="status-dot"></div>
           </div>
-          <div class="chat-info">
-            <div class="chat-name-row">
-              <span class="chat-name">${escapeHtml(account.name)}</span>
-              <span class="chat-time">WhatsApp</span>
-            </div>
-            <div class="chat-preview-row">
-              <span class="chat-preview">Click to open</span>
-              <span class="chat-unread-badge ${unread > 0 ? 'has-unread' : ''}">${unread}</span>
-            </div>
+          <div class="nav-account-details">
+            <div class="nav-account-name">${escapeHtml(account.name)}</div>
           </div>
-          <div class="chat-item-actions">
-            <button title="Reload" onclick="event.stopPropagation();hub.reloadAccount('${account.id}')">&#8635;</button>
-            <button title="Rename" onclick="event.stopPropagation();renameAccount('${account.id}','${escapeHtml(account.name.replace(/'/g,"\\'"))}')">&#9998;</button>
-            <button class="remove" title="Remove" onclick="event.stopPropagation();removeAccount('${account.id}','${escapeHtml(account.name.replace(/'/g,"\\'"))}')">&#10005;</button>
-          </div>`;
+          <div class="nav-account-badge${unread > 0 ? ' has-unread' : ''}">${unread}</div>
+        `;
 
+        // Click to switch
         item.addEventListener('click', () => hub.switchAccount(account.id));
+
+        // Right-click context menu
+        item.addEventListener('contextmenu', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          showTabContextMenu(e.clientX, e.clientY, account);
+        });
+
+        // Double-click to rename
+        item.addEventListener('dblclick', async (e) => {
+          e.preventDefault();
+          const newName = await showDialog({
+            title: 'Rename Account',
+            placeholder: 'Account name',
+            defaultValue: account.name,
+          });
+          if (newName?.trim()) hub.renameAccount(account.id, newName.trim());
+        });
 
         // Drag to reorder
-        item.addEventListener('dragstart', e => { dragSrcId = account.id; item.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; });
-        item.addEventListener('dragend', () => { item.classList.remove('dragging'); dragSrcId = null; });
-        item.addEventListener('dragover', e => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; });
-        item.addEventListener('drop', e => {
+        item.addEventListener('dragstart', (e) => {
+          dragSrcId = account.id;
+          item.classList.add('dragging');
+          e.dataTransfer.effectAllowed = 'move';
+        });
+        item.addEventListener('dragend', () => {
+          item.classList.remove('dragging');
+          dragSrcId = null;
+        });
+        item.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          e.dataTransfer.dropEffect = 'move';
+        });
+        item.addEventListener('drop', (e) => {
           e.preventDefault();
           if (dragSrcId && dragSrcId !== account.id) {
             const ids = currentAccounts.map(a => a.id);
-            const from = ids.indexOf(dragSrcId), to = ids.indexOf(account.id);
-            ids.splice(from, 1); ids.splice(to, 0, dragSrcId);
+            const from = ids.indexOf(dragSrcId);
+            const to = ids.indexOf(account.id);
+            ids.splice(from, 1);
+            ids.splice(to, 0, dragSrcId);
             hub.reorderAccounts(ids);
           }
         });
 
-        list.appendChild(item);
-      });
-
-      // Update account selects in panels
-      updateAccountSelects();
-    }
-
-    async function renameAccount(id, name) {
-      const n = await showDialog({ title: 'Rename Account', placeholder: 'Account name', defaultValue: name });
-      if (n?.trim()) hub.renameAccount(id, n.trim());
-    }
-    async function removeAccount(id, name) {
-      const ok = await showDialog({ title: 'Remove Account', message: `Remove "${name}"? This will log out of this WhatsApp session.`, isConfirm: true });
-      if (ok) hub.removeAccount(id);
-    }
-
-    function updateAccountSelects() {
-      ['schedAccount', 'assignAccount', 'analyticsAccount', 'campAccount'].forEach(selId => {
-        const sel = document.getElementById(selId);
-        if (!sel) return;
-        const val = sel.value;
-        const hasAllOption = selId === 'analyticsAccount' || selId === 'autoAccount';
-        sel.innerHTML = hasAllOption ? '<option value="*">All Accounts</option>' : '';
-        currentAccounts.forEach(a => {
-          sel.innerHTML += `<option value="${a.id}">${a.name}</option>`;
-        });
-        if (val) sel.value = val;
+        container.appendChild(item);
       });
     }
 
     // ── Settings ──
     function updateSettingsUI(s) {
       currentSettings = s;
-      document.querySelectorAll('.toggle').forEach(el => {
-        el.classList.toggle('on', !!s[el.dataset.key]);
-      });
       document.getElementById('dndBanner').classList.toggle('active', !!s.dnd);
       renderAccounts(currentAccounts);
     }
-
-    document.querySelectorAll('.toggle').forEach(el => {
-      el.addEventListener('click', () => {
-        currentSettings[el.dataset.key] = !currentSettings[el.dataset.key];
-        hub.updateSettings(currentSettings);
-      });
-    });
 
     document.getElementById('dndBanner').addEventListener('click', () => {
       currentSettings.dnd = false;
       hub.updateSettings(currentSettings);
     });
 
-    // Settings panel open/close
-    document.getElementById('btnSettings').addEventListener('click', async () => {
-      hub.hideViews();
-      const stealth = await hub.getStealthSettings();
-      renderStealthSettings(stealth);
-      const crm = await hub.getCrmSettings();
-      renderCrmSettings(crm);
-      document.getElementById('settingsPanel').classList.add('visible');
-    });
-    document.getElementById('settingsBack').addEventListener('click', () => {
-      document.getElementById('settingsPanel').classList.remove('visible');
-      hub.showViews();
+    // ── Tool button handlers (IPC to open child BrowserWindows) ──
+    document.getElementById('btnSchedule').addEventListener('click', () => {
+      hub.openPanel('schedule');
     });
 
-    // ── Strip tool buttons ──
-    document.getElementById('btnSchedule').addEventListener('click', async () => {
-      if (!(await requireFeature('scheduling', 'Send Later'))) return;
-      hub.hideViews();
-      const scheds = await hub.getSchedules();
-      renderSchedules(scheds);
-      openPanel('schedulePanel');
+    document.getElementById('btnTemplates').addEventListener('click', () => {
+      hub.openPanel('templates');
     });
 
-    document.getElementById('btnTemplates').addEventListener('click', async () => {
-      hub.hideViews();
-      const tpls = await hub.getTemplates();
-      renderTemplates(tpls);
-      openPanel('templatesPanel');
+    document.getElementById('btnAI').addEventListener('click', () => {
+      hub.openPanel('ai');
     });
 
-    document.getElementById('btnAI').addEventListener('click', async () => {
-      if (!(await requireFeature('aiReplies', 'AI Helper'))) return;
-      hub.hideViews();
-      openPanel('aiPanel');
+    document.getElementById('btnBroadcast').addEventListener('click', () => {
+      hub.openPanel('broadcast');
     });
 
-    document.getElementById('btnBroadcast').addEventListener('click', async () => {
-      if (!(await requireFeature('broadcast', 'Broadcast'))) return;
-      hub.hideViews();
-      const camps = await hub.getCampaigns();
-      renderCampaigns(camps);
-      openPanel('broadcastPanel');
-    });
-
-    document.getElementById('btnExport').addEventListener('click', async () => {
-      if (!(await requireFeature('chatExport', 'Save Chat'))) return;
-      const result = await hub.exportChat({ format: 'text' });
-      if (result.success) showDialog({ title: 'Saved', message: `Exported ${result.messageCount} messages.`, isConfirm: true });
-      else if (result.error !== 'Cancelled') showDialog({ title: 'Export Failed', message: result.error, isConfirm: true });
-    });
-
-    document.getElementById('btnAnalytics').addEventListener('click', async () => {
-      if (!(await requireFeature('analytics', 'Analytics'))) return;
-      hub.hideViews();
-      openPanel('analyticsPanel');
-      renderAnalytics();
+    document.getElementById('btnAnalytics').addEventListener('click', () => {
+      hub.openPanel('dashboard');
     });
 
     document.getElementById('btnPairMobile').addEventListener('click', () => {
-      hub.hideViews();
-      openPanel('settingsPanel');
-      // TODO: scroll to mobile pairing section
+      hub.openPanel('connect-phone');
     });
 
-    // Sidebar menu button (opens automations as a secondary action)
-    document.getElementById('btnSidebarMenu').addEventListener('click', async () => {
-      if (!(await requireFeature('automations', 'Automations'))) return;
-      const autos = await hub.getAutomations();
-      renderAutomations(autos);
-      openPanel('automationsPanel');
+    document.getElementById('btnSettings').addEventListener('click', () => {
+      hub.openPanel('settings');
     });
 
-    // ── Templates ──
-    function renderTemplates(tpls) {
-      templates = tpls;
-      const list = document.getElementById('templatesList');
-      if (!tpls.length) { list.innerHTML = '<div class="empty-state">No templates yet. Create one below.</div>'; return; }
-      list.innerHTML = tpls.map(t => `
-        <div class="list-item">
-          <div class="item-info">
-            <div class="item-title">${t.name} <span style="color:#8696A0;font-size:11px">${t.category || ''}</span></div>
-            <div class="item-sub">${t.body.substring(0, 80)}${t.body.length > 80 ? '...' : ''}</div>
-          </div>
-          <div class="item-actions">
-            <button class="btn btn-secondary" style="font-size:11px;padding:4px 10px" onclick="hub.insertTemplate('${t.id}')">Insert</button>
-            <button class="btn btn-danger" style="font-size:11px;padding:4px 8px" onclick="hub.deleteTemplate('${t.id}')">&#10005;</button>
-          </div>
-        </div>
-      `).join('');
-
-      // Also render inline templates list
-      renderInlineTemplates(tpls);
-    }
-
-    function renderInlineTemplates(tpls) {
-      const list = document.getElementById('templatesInlineList');
-      if (!tpls.length) {
-        list.innerHTML = '<div class="popup-empty">No templates yet.</div>';
-        return;
-      }
-      list.innerHTML = tpls.map(t => `
-        <div class="popup-list-item" onclick="hub.insertTemplate('${t.id}');closePopup('templatesPopup')">
-          <div class="popup-item-info">
-            <div class="popup-item-title">${t.name}</div>
-            <div class="popup-item-sub">${t.body.substring(0, 50)}${t.body.length > 50 ? '...' : ''}</div>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    document.getElementById('tplSave').addEventListener('click', () => {
-      const name = document.getElementById('tplName').value.trim();
-      const body = document.getElementById('tplBody').value.trim();
-      const category = document.getElementById('tplCategory').value.trim();
-      if (!name || !body) return showDialog({ title: 'Missing Fields', message: 'Name and body are required.', isConfirm: true });
-      hub.saveTemplate({ name, body, category });
-      document.getElementById('tplName').value = '';
-      document.getElementById('tplBody').value = '';
-      document.getElementById('tplCategory').value = '';
-    });
-
-    // Inline template search
-    document.getElementById('tplSearchInline').addEventListener('input', (e) => {
-      const q = e.target.value.toLowerCase();
-      const filtered = templates.filter(t => t.name.toLowerCase().includes(q) || t.body.toLowerCase().includes(q));
-      renderInlineTemplates(filtered);
-    });
-
-    // Open full templates panel from inline popup
-    document.getElementById('openFullTemplates').addEventListener('click', async () => {
-      closePopup('templatesPopup');
-      templates = await hub.getTemplates();
-      renderTemplates(templates);
-      openPanel('templatesPanel');
-    });
-
-    // ── Scheduled messages ──
-    function renderSchedules(scheds) {
-      schedules = scheds;
-      const list = document.getElementById('schedulesList');
-      if (!scheds.length) { list.innerHTML = '<div class="popup-empty">No scheduled messages.</div>'; return; }
-      list.innerHTML = scheds.map(s => {
-        const statusClass = s.status === 'sent' ? 'status-sent' : s.status === 'failed' ? 'status-failed' : 'status-pending';
-        const acct = currentAccounts.find(a => a.id === s.accountId);
-        return `
-          <div class="popup-list-item" style="cursor:default">
-            <div class="popup-item-info">
-              <div class="popup-item-title">${s.contactName} <span style="color:#8696A0;font-size:10px">via ${acct?.name || '?'}</span></div>
-              <div class="popup-item-sub">${s.message.substring(0, 40)}${s.message.length > 40 ? '...' : ''}</div>
-              <div class="popup-item-sub">${new Date(s.sendAt).toLocaleString()} <span class="status-badge ${statusClass}">${s.status}</span></div>
-              ${s.error ? `<div class="popup-item-sub" style="color:#E53E3E">${s.error}</div>` : ''}
-            </div>
-            ${s.status === 'pending' ? `<div class="popup-item-actions"><button class="popup-btn popup-btn-danger" style="font-size:11px;padding:2px 8px" onclick="hub.cancelSchedule('${s.id}')">Cancel</button></div>` : ''}
-          </div>`;
-      }).join('');
-    }
-
-    document.getElementById('schedSave').addEventListener('click', () => {
-      const accountId = document.getElementById('schedAccount').value;
-      const contactName = document.getElementById('schedContact').value.trim();
-      const message = document.getElementById('schedMessage').value.trim();
-      const dateVal = document.getElementById('schedDate').value;
-      const timeVal = document.getElementById('schedTimeInput').value;
-      if (!accountId || !contactName || !message || !dateVal || !timeVal) return showDialog({ title: 'Missing Fields', message: 'All fields are required.', isConfirm: true });
-      const sendAt = new Date(`${dateVal}T${timeVal}`).toISOString();
-      hub.addSchedule({ accountId, contactName, message, sendAt });
-      document.getElementById('schedContact').value = '';
-      document.getElementById('schedMessage').value = '';
-      document.getElementById('schedDate').value = '';
-      document.getElementById('schedTimeInput').value = '';
-    });
-
-    // ── Contact labels ──
-    function renderLabels(data) {
-      labelsData = data;
-      const list = document.getElementById('labelsList');
-      list.innerHTML = data.labels.map(l => `
-        <div class="list-item">
-          <div class="label-chip" style="background:${l.color}22;color:${l.color};border:1px solid ${l.color}44">
-            ${l.name}
-          </div>
-          <div style="flex:1"></div>
-          <button class="btn btn-danger" style="font-size:11px;padding:4px 8px" onclick="hub.deleteLabel('${l.id}')">&#10005;</button>
-        </div>
-      `).join('');
-
-      // Render assign chips
-      const chips = document.getElementById('assignLabelChips');
-      chips.innerHTML = data.labels.map(l =>
-        `<span class="label-chip" style="background:${l.color}22;color:${l.color};border:1px solid ${l.color}44;cursor:pointer" onclick="assignLabelToContact('${l.id}')">${l.name}</span>`
-      ).join('');
-
-      // Render assigned contacts
-      const clList = document.getElementById('contactLabelsList');
-      const entries = Object.entries(data.contactLabels);
-      if (!entries.length) { clList.innerHTML = '<div class="empty-state">No contacts labeled yet.</div>'; return; }
-      clList.innerHTML = entries.map(([key, labelIds]) => {
-        const chips = labelIds.map(lid => {
-          const l = data.labels.find(x => x.id === lid);
-          return l ? `<span class="label-chip" style="background:${l.color}22;color:${l.color};border:1px solid ${l.color}44">${l.name} <span class="chip-remove" onclick="hub.removeLabelFromContact('${key}','${lid}')">&times;</span></span>` : '';
-        }).join('');
-        return `<div class="list-item"><div class="item-info"><div class="item-title">${key}</div><div>${chips}</div></div></div>`;
-      }).join('');
-    }
-
-    document.getElementById('labelSave').addEventListener('click', () => {
-      const name = document.getElementById('labelName').value.trim();
-      const color = document.getElementById('labelColor').value;
-      if (!name) return;
-      hub.createLabel(name, color);
-      document.getElementById('labelName').value = '';
-    });
-
-    function assignLabelToContact(labelId) {
-      const contact = document.getElementById('assignContact').value.trim();
-      const account = document.getElementById('assignAccount').value;
-      if (!contact || !account) return showDialog({ title: 'Missing Fields', message: 'Enter a contact name and select an account.', isConfirm: true });
-      hub.assignLabel(`${contact}:${account}`, labelId);
-    }
-
-    // ── Analytics ──
-    async function renderAnalytics() {
-      const accountId = document.getElementById('analyticsAccount').value || undefined;
-      const summary = await hub.getAnalyticsSummary(accountId);
-      const content = document.getElementById('analyticsContent');
-
-      const entries = Object.entries(summary);
-      if (!entries.length) {
-        content.innerHTML = '<div class="empty-state">No analytics data yet. Data is collected as messages arrive.</div>';
-        return;
-      }
-
-      let html = '';
-      for (const [accId, s] of entries) {
-        const acct = currentAccounts.find(a => a.id === accId);
-        const name = acct?.name || accId;
-
-        html += `<h3 style="color:#075E54">${name}</h3>`;
-        html += `<div class="stat-grid">
-          <div class="stat-card"><div class="stat-value">${s.messagesThisWeek}</div><div class="stat-label">This Week</div></div>
-          <div class="stat-card"><div class="stat-value">${s.messagesThisMonth}</div><div class="stat-label">This Month</div></div>
-          <div class="stat-card"><div class="stat-value">${s.avgDailyMessages}</div><div class="stat-label">Avg Daily</div></div>
-          <div class="stat-card"><div class="stat-value">${s.peakHour}</div><div class="stat-label">Peak Hour</div></div>
-        </div>`;
-
-        // Hourly distribution bar chart
-        const hourly = s.hourlyDistribution || {};
-        const maxH = Math.max(...Object.values(hourly), 1);
-        html += `<p style="font-size:12px;color:#667781;margin-top:12px">Hourly Distribution</p>`;
-        html += `<div class="chart-bar-container">`;
-        for (let h = 0; h < 24; h++) {
-          const val = hourly[h] || 0;
-          const pct = (val / maxH) * 100;
-          html += `<div class="chart-bar" style="height:${Math.max(pct, 2)}%"><div class="bar-tooltip">${h}:00 — ${val} msgs</div></div>`;
-        }
-        html += `</div>`;
-
-        // Last 7 days
-        if (s.last7Days?.length) {
-          const maxD = Math.max(...s.last7Days.map(d => d.received), 1);
-          html += `<p style="font-size:12px;color:#667781;margin-top:12px">Last 7 Days</p>`;
-          html += `<div class="chart-bar-container">`;
-          for (const day of s.last7Days.reverse()) {
-            const pct = (day.received / maxD) * 100;
-            const label = day.date.split('-').slice(1).join('/');
-            html += `<div class="chart-bar" style="height:${Math.max(pct, 2)}%"><div class="bar-tooltip">${label}: ${day.received} msgs</div></div>`;
-          }
-          html += `</div>`;
-        }
-      }
-
-      content.innerHTML = html;
-    }
-
-    document.getElementById('analyticsAccount').addEventListener('change', renderAnalytics);
-
-    // ── Toolbar buttons (with feature gates) ──
-    document.getElementById('btnSplit').addEventListener('click', async () => {
-      if (await requireFeature('splitScreen', 'Split Screen')) hub.toggleSplitScreen();
-    });
-    document.getElementById('btnTemplates').addEventListener('click', async () => {
-      templates = await hub.getTemplates();
-      renderTemplates(templates);
-      openPanel('templatesPanel');
-    });
-
-    // Inline schedule button
-    document.getElementById('btnScheduleInline').addEventListener('click', async (e) => {
-      e.stopPropagation();
-      if (!(await requireFeature('scheduling', 'Scheduled Messages'))) return;
-      schedules = await hub.getSchedules();
-      renderSchedules(schedules);
-      openPopup('schedulePopup');
-    });
-
-    // Inline AI button
-    document.getElementById('btnAIInline').addEventListener('click', async (e) => {
-      e.stopPropagation();
-      if (await requireFeature('aiReplies', 'AI Assistant')) openPopup('aiPopup');
-    });
-
-    // Inline templates button
-    document.getElementById('btnTemplatesInline').addEventListener('click', async (e) => {
-      e.stopPropagation();
-      templates = await hub.getTemplates();
-      renderInlineTemplates(templates);
-      openPopup('templatesPopup');
-    });
-
-    document.getElementById('btnExport').addEventListener('click', async () => {
-      if (!(await requireFeature('chatExport', 'Chat Export'))) return;
-      const result = await hub.exportChat({ format: 'text' });
-      if (result.success) showDialog({ title: 'Export Complete', message: `Exported ${result.messageCount} messages.`, isConfirm: true });
-      else if (result.error !== 'Cancelled') showDialog({ title: 'Export Failed', message: result.error, isConfirm: true });
-    });
-    document.getElementById('btnLabels').addEventListener('click', async () => {
-      labelsData = await hub.getLabels();
-      renderLabels(labelsData);
-      openPanel('labelsPanel');
-    });
-    document.getElementById('btnAnalytics').addEventListener('click', async () => {
-      if (!(await requireFeature('analytics', 'Analytics Dashboard'))) return;
-      openPanel('analyticsPanel');
-      renderAnalytics();
-    });
-
+    // ── Add account ──
     document.getElementById('addBtn').addEventListener('click', async () => {
       const name = await showDialog({
         title: 'Add WhatsApp Account',
@@ -2330,216 +475,6 @@
         placeholder: 'e.g. Work, Personal, Client Phone',
       });
       if (name?.trim()) hub.addAccount(name.trim());
-    });
-
-    // ── Split screen indicator ──
-    hub.onSplitScreenChanged((data) => {
-      document.getElementById('btnSplit').classList.toggle('active', data.active);
-    });
-
-    // ── AI Assistant ──
-    async function aiAction(action) {
-      const results = document.getElementById('aiResults');
-      results.innerHTML = '<div class="popup-empty">Thinking...</div>';
-      try {
-        const messages = await hub.aiGetChatMessages();
-        if (messages.error) { results.innerHTML = `<div class="popup-empty" style="color:#E53E3E">${messages.error}</div>`; return; }
-        if (!messages.length) { results.innerHTML = '<div class="popup-empty">No messages found in current chat.</div>'; return; }
-
-        let result;
-        if (action === 'suggest') result = await hub.aiSuggestReplies(messages);
-        else if (action === 'summarize') result = await hub.aiSummarize(messages);
-        else if (action === 'sentiment') result = await hub.aiAnalyzeSentiment(messages);
-
-        if (result.error) { results.innerHTML = `<div class="popup-empty" style="color:#E53E3E">${result.error}</div>`; return; }
-
-        if (action === 'suggest' && result.replies) {
-          results.innerHTML = result.replies.map(r =>
-            `<div class="popup-list-item" onclick="navigator.clipboard.writeText(this.dataset.text)" data-text="${r.replace(/"/g,'&quot;')}">
-              <div class="popup-item-info"><div class="popup-item-title">${r}</div><div class="popup-item-sub">Click to copy</div></div>
-            </div>`
-          ).join('');
-        } else if (action === 'summarize') {
-          results.innerHTML = `<div class="popup-list-item" style="cursor:default"><div class="popup-item-info"><div class="popup-item-sub" style="white-space:pre-wrap;color:#303030">${result.summary}</div></div></div>`;
-        } else if (action === 'sentiment') {
-          const colors = { positive: '#2E7D32', negative: '#E53E3E', neutral: '#667781', urgent: '#F59E0B' };
-          results.innerHTML = `<div class="popup-list-item" style="cursor:default">
-            <div class="popup-item-info">
-              <div class="popup-item-title"><span class="status-badge" style="background:${colors[result.sentiment] || '#667781'}22;color:${colors[result.sentiment] || '#667781'}">${result.sentiment}</span></div>
-              <div class="popup-item-sub" style="margin-top:6px">${result.summary}</div>
-            </div></div>`;
-        }
-      } catch (e) {
-        results.innerHTML = `<div class="popup-empty" style="color:#E53E3E">${e.message}</div>`;
-      }
-    }
-
-    document.getElementById('aiSuggest').addEventListener('click', () => aiAction('suggest'));
-    document.getElementById('aiSummarize').addEventListener('click', () => aiAction('summarize'));
-    document.getElementById('aiSentiment').addEventListener('click', () => aiAction('sentiment'));
-
-    document.getElementById('aiDraft').addEventListener('click', async () => {
-      const instruction = document.getElementById('aiDraftInstruction').value.trim();
-      if (!instruction) return;
-      const el = document.getElementById('aiDraftResult');
-      el.innerHTML = '<div class="popup-empty">Drafting...</div>';
-      const messages = await hub.aiGetChatMessages();
-      const result = await hub.aiDraftReply(messages.error ? [] : messages, instruction);
-      if (result.error) el.innerHTML = `<div class="popup-empty" style="color:#E53E3E">${result.error}</div>`;
-      else el.innerHTML = `<div class="popup-list-item" onclick="navigator.clipboard.writeText(this.dataset.text)" data-text="${(result.draft||'').replace(/"/g,'&quot;')}"><div class="popup-item-info"><div class="popup-item-title">${result.draft}</div><div class="popup-item-sub">Click to copy</div></div></div>`;
-    });
-
-    document.getElementById('aiTranslate').addEventListener('click', async () => {
-      const text = document.getElementById('aiTranslateText').value.trim();
-      const lang = document.getElementById('aiTranslateLang').value;
-      if (!text) return;
-      const el = document.getElementById('aiTranslateResult');
-      el.innerHTML = '<div class="popup-empty">Translating...</div>';
-      const result = await hub.aiTranslate(text, lang);
-      if (result.error) el.innerHTML = `<div class="popup-empty" style="color:#E53E3E">${result.error}</div>`;
-      else el.innerHTML = `<div class="popup-list-item" style="margin-top:6px" onclick="navigator.clipboard.writeText(this.dataset.text)" data-text="${(result.translated||'').replace(/"/g,'&quot;')}"><div class="popup-item-info"><div class="popup-item-title">${result.translated}</div><div class="popup-item-sub">Click to copy</div></div></div>`;
-    });
-
-    // ── Automations ──
-    function renderAutomations(rules) {
-      const list = document.getElementById('automationsList');
-      if (!rules.length) { list.innerHTML = '<div class="empty-state">No automations yet.</div>'; return; }
-      list.innerHTML = rules.map(r => `
-        <div class="list-item">
-          <div class="item-info">
-            <div class="item-title">${r.name} <span class="status-badge ${r.enabled ? 'status-sent' : 'status-failed'}">${r.enabled ? 'ON' : 'OFF'}</span></div>
-            <div class="item-sub">When: ${r.trigger.type} "${r.trigger.value || 'any'}" → ${r.action.type}</div>
-            <div class="item-sub">Triggered ${r.triggerCount || 0} times</div>
-          </div>
-          <div class="item-actions">
-            <button class="btn btn-secondary" style="font-size:11px;padding:4px 8px" onclick="hub.toggleAutomation('${r.id}')">${r.enabled ? 'Disable' : 'Enable'}</button>
-            <button class="btn btn-danger" style="font-size:11px;padding:4px 8px" onclick="hub.deleteAutomation('${r.id}')">&#10005;</button>
-          </div>
-        </div>`).join('');
-    }
-
-    document.getElementById('autoSave').addEventListener('click', () => {
-      const name = document.getElementById('autoName').value.trim();
-      if (!name) return;
-      hub.saveAutomation({
-        name,
-        accountId: document.getElementById('autoAccount').value,
-        trigger: { type: document.getElementById('autoTriggerType').value, value: document.getElementById('autoTriggerValue').value.trim() },
-        action: { type: document.getElementById('autoActionType').value, value: document.getElementById('autoActionValue').value.trim() },
-      });
-      document.getElementById('autoName').value = '';
-      document.getElementById('autoTriggerValue').value = '';
-      document.getElementById('autoActionValue').value = '';
-    });
-
-    hub.onAutomationsUpdated(renderAutomations);
-
-    // ── Broadcast ──
-    document.getElementById('btnBroadcast').addEventListener('click', async () => {
-      if (!(await requireFeature('broadcast', 'Broadcast Campaigns'))) return;
-      const camps = await hub.getCampaigns();
-      renderCampaigns(camps);
-      openPanel('broadcastPanel');
-    });
-
-    function renderCampaigns(campaigns) {
-      const list = document.getElementById('campaignsList');
-      if (!campaigns.length) { list.innerHTML = '<div class="empty-state">No campaigns yet.</div>'; return; }
-      list.innerHTML = campaigns.map(c => {
-        const statusClass = c.status === 'completed' ? 'status-sent' : c.status === 'running' ? 'status-pending' : 'status-failed';
-        return `
-          <div class="list-item">
-            <div class="item-info">
-              <div class="item-title">${c.name} <span class="status-badge ${statusClass}">${c.status}</span></div>
-              <div class="item-sub">${c.stats.sent}/${c.stats.total} sent${c.stats.failed ? `, ${c.stats.failed} failed` : ''}</div>
-            </div>
-            <div class="item-actions">
-              ${c.status === 'draft' ? `<button class="btn btn-primary" style="font-size:11px;padding:4px 10px" onclick="hub.startCampaign('${c.id}')">Start</button>` : ''}
-              ${c.status === 'running' ? `<button class="btn btn-secondary" style="font-size:11px;padding:4px 10px" onclick="hub.pauseCampaign('${c.id}')">Pause</button>` : ''}
-              ${c.status === 'paused' ? `<button class="btn btn-primary" style="font-size:11px;padding:4px 10px" onclick="hub.resumeCampaign('${c.id}')">Resume</button>` : ''}
-              <button class="btn btn-danger" style="font-size:11px;padding:4px 8px" onclick="hub.deleteCampaign('${c.id}')">&#10005;</button>
-            </div>
-          </div>`;
-      }).join('');
-    }
-
-    document.getElementById('campCreate').addEventListener('click', () => {
-      const name = document.getElementById('campName').value.trim();
-      const accountId = document.getElementById('campAccount').value;
-      const message = document.getElementById('campMessage').value.trim();
-      const contactsText = document.getElementById('campContacts').value.trim();
-      const delay = parseInt(document.getElementById('campDelay').value) || 5;
-      if (!name || !accountId || !message || !contactsText) return showDialog({ title: 'Missing Fields', message: 'All fields are required.', isConfirm: true });
-      const contacts = contactsText.split('\n').map(c => c.trim()).filter(Boolean).map(name => ({ name, status: 'pending' }));
-      hub.saveCampaign({ name, accountId, message, contacts, delayBetween: Math.max(delay, 3) });
-      document.getElementById('campName').value = '';
-      document.getElementById('campMessage').value = '';
-      document.getElementById('campContacts').value = '';
-    });
-
-    hub.onCampaignProgress(renderCampaigns);
-
-    // ── Stealth Mode (in Settings) ──
-    function renderStealthSettings(stealthData) {
-      const container = document.getElementById('stealthAccountsList');
-      container.innerHTML = currentAccounts.map(acc => {
-        const s = stealthData[acc.id] || {};
-        return `
-          <div style="padding:10px 0;border-bottom:1px solid #F0F2F5">
-            <div style="font-size:14px;font-weight:500;margin-bottom:6px;color:#111B21">${acc.name}</div>
-            <div style="display:flex;gap:12px;font-size:12px">
-              <label style="display:flex;align-items:center;gap:4px;cursor:pointer;color:#667781">
-                <input type="checkbox" ${s.readReceipts === false ? 'checked' : ''} onchange="updateStealthFor('${acc.id}','readReceipts',!this.checked)"> Hide read receipts
-              </label>
-              <label style="display:flex;align-items:center;gap:4px;cursor:pointer;color:#667781">
-                <input type="checkbox" ${s.typing === false ? 'checked' : ''} onchange="updateStealthFor('${acc.id}','typing',!this.checked)"> Hide typing
-              </label>
-              <label style="display:flex;align-items:center;gap:4px;cursor:pointer;color:#667781">
-                <input type="checkbox" ${s.online === false ? 'checked' : ''} onchange="updateStealthFor('${acc.id}','online',!this.checked)"> Hide online
-              </label>
-            </div>
-          </div>`;
-      }).join('');
-    }
-
-    window.updateStealthFor = function(accountId, key, value) {
-      hub.updateStealth(accountId, { [key]: value });
-    };
-
-    // ── CRM (in Settings) ──
-    function renderCrmSettings(crm) {
-      document.getElementById('toggleHubspot').classList.toggle('on', crm.hubspot?.enabled);
-      document.getElementById('toggleZoho').classList.toggle('on', crm.zoho?.enabled);
-      document.getElementById('hubspotKeyGroup').style.display = crm.hubspot?.enabled ? 'block' : 'none';
-      document.getElementById('zohoKeyGroup').style.display = crm.zoho?.enabled ? 'block' : 'none';
-      if (crm.hubspot?.apiKey) document.getElementById('hubspotKey').value = crm.hubspot.apiKey;
-      if (crm.zoho?.apiKey) document.getElementById('zohoKey').value = crm.zoho.apiKey;
-    }
-
-    document.getElementById('toggleHubspot').addEventListener('click', function() {
-      this.classList.toggle('on');
-      document.getElementById('hubspotKeyGroup').style.display = this.classList.contains('on') ? 'block' : 'none';
-    });
-    document.getElementById('toggleZoho').addEventListener('click', function() {
-      this.classList.toggle('on');
-      document.getElementById('zohoKeyGroup').style.display = this.classList.contains('on') ? 'block' : 'none';
-    });
-
-    document.getElementById('saveCrmSettings').addEventListener('click', () => {
-      hub.updateCrmSettings({
-        hubspot: { enabled: document.getElementById('toggleHubspot').classList.contains('on'), apiKey: document.getElementById('hubspotKey').value.trim() },
-        zoho: { enabled: document.getElementById('toggleZoho').classList.contains('on'), apiKey: document.getElementById('zohoKey').value.trim() },
-      });
-      showDialog({ title: 'Saved', message: 'CRM settings saved.', isConfirm: true });
-    });
-
-    // API Key save
-    document.getElementById('saveApiKey').addEventListener('click', () => {
-      const key = document.getElementById('anthropicKey').value.trim();
-      if (!key) return;
-      currentSettings.anthropicApiKey = key;
-      hub.updateSettings(currentSettings);
-      showDialog({ title: 'Saved', message: 'API key saved. AI features are now active.', isConfirm: true });
     });
 
     // ── Licensing & Upgrade ──
@@ -2552,104 +487,29 @@
 
     function updateLicenseUI() {
       const tier = currentLicense.tier || 'free';
-      const tierColors = { free: '#667781', pro: '#075E54', business: '#F59E0B' };
       const tierNames = { free: 'Free Plan', pro: 'Pro Plan', business: 'Business Plan' };
+      const footer = document.getElementById('navFooter');
+      const upgradeLink = document.getElementById('footerUpgradeLink');
 
-      // Settings panel
-      const badge = document.getElementById('settingsTierBadge');
-      if (badge) {
-        badge.textContent = tierNames[tier];
-        badge.style.color = tierColors[tier];
-      }
-      const emailEl = document.getElementById('settingsLicenseEmail');
-      if (emailEl) emailEl.textContent = currentLicense.email ? ` (${currentLicense.email})` : '';
-
-      const upgradeBtn = document.getElementById('settingsUpgradeBtn');
-      if (upgradeBtn) {
-        upgradeBtn.textContent = tier === 'free' ? 'Upgrade' : 'Manage Plan';
-      }
-
-      // Upgrade panel current plan badge
-      const planBadge = document.getElementById('currentPlanBadge');
-      if (planBadge) {
-        planBadge.innerHTML = `<span class="status-badge" style="background:${tierColors[tier]}22;color:${tierColors[tier]}">Current: ${tierNames[tier]}</span>`;
+      if (tier === 'free') {
+        footer.querySelector('span').textContent = 'Free Plan \u00b7 ';
+        upgradeLink.textContent = 'Upgrade';
+        upgradeLink.style.display = '';
+      } else {
+        footer.querySelector('span').textContent = tierNames[tier];
+        upgradeLink.style.display = 'none';
       }
     }
 
-    let isAnnualBilling = false;
-
-    function toggleBilling() {
-      isAnnualBilling = !isAnnualBilling;
-      document.getElementById('billingDot').style.transform = isAnnualBilling ? 'translateX(20px)' : 'translateX(0)';
-      document.getElementById('billingToggle').style.background = isAnnualBilling ? '#25D366' : '#CED0D1';
-      document.getElementById('billingMonthlyLabel').style.color = isAnnualBilling ? '#667781' : '#075E54';
-      document.getElementById('billingAnnualLabel').style.color = isAnnualBilling ? '#075E54' : '#667781';
-
-      if (isAnnualBilling) {
-        document.getElementById('proPriceDisplay').innerHTML = '$79<span style="font-size:14px;color:#667781">/year</span>';
-        document.getElementById('proSubtext').textContent = '$6.58/mo — save 27% vs monthly';
-        document.getElementById('bizPriceDisplay').innerHTML = '$149<span style="font-size:14px;color:#667781">/year</span>';
-        document.getElementById('bizSubtext').textContent = '$12.42/mo — save 35% vs monthly';
-      } else {
-        document.getElementById('proPriceDisplay').innerHTML = '$9<span style="font-size:14px;color:#667781">/mo</span>';
-        document.getElementById('proSubtext').textContent = 'or $79/year (save 27%)';
-        document.getElementById('bizPriceDisplay').innerHTML = '$19<span style="font-size:14px;color:#667781">/mo</span>';
-        document.getElementById('bizSubtext').textContent = 'or $149/year (save 35%)';
-      }
-    }
-
-    async function startUpgrade(tier) {
-      const url = await hub.getCheckoutUrl(tier, isAnnualBilling);
-      if (url) {
-        window.open(url, '_blank');
-        showDialog({
-          title: 'Checkout Opened',
-          message: 'Complete the payment in your browser.\n\nAfter payment, Lemon Squeezy will email you a license key.\n\nPaste it below to activate your plan.',
-          isConfirm: true,
-        });
-      } else {
-        showDialog({
-          title: 'Payment',
-          message: `Visit supamsg.com to subscribe to ${tier}. After payment, enter your license key below.`,
-          isConfirm: true,
-        });
-      }
-    }
-
-    document.getElementById('activateLicenseBtn').addEventListener('click', async () => {
-      const key = document.getElementById('licenseKeyInput').value.trim();
-      const email = document.getElementById('licenseEmailInput').value.trim();
-      const status = document.getElementById('licenseStatus');
-
-      if (!key) { status.innerHTML = '<span style="color:#E53E3E">Enter a license key.</span>'; return; }
-
-      status.innerHTML = '<span style="color:#667781">Activating...</span>';
-      const result = await hub.activateLicense(key, email);
-
-      if (result.success) {
-        status.innerHTML = `<span style="color:#2E7D32">Activated! You're now on the ${result.tier} plan.</span>`;
-        loadLicense();
-        closePanel('upgradePanel');
-      } else {
-        status.innerHTML = `<span style="color:#E53E3E">${result.error}</span>`;
-      }
+    document.getElementById('footerUpgradeLink').addEventListener('click', (e) => {
+      e.preventDefault();
+      hub.openPanel('upgrade');
     });
 
-    document.getElementById('settingsUpgradeBtn').addEventListener('click', async () => {
-      if (currentLicense.tier === 'free') {
-        document.getElementById('settingsPanel').classList.remove('visible');
-        openPanel('upgradePanel');
-      } else {
-        // Open customer portal for managing subscription
-        const portalUrl = await hub.getCustomerPortalUrl();
-        window.open(portalUrl, '_blank');
-      }
-    });
-
-    // Upgrade banner
     document.getElementById('upgradeBannerBtn').addEventListener('click', () => {
-      openPanel('upgradePanel');
+      hub.openPanel('upgrade');
     });
+
     document.getElementById('upgradeBannerDismiss').addEventListener('click', () => {
       document.getElementById('upgradeBanner').classList.remove('visible');
     });
@@ -2658,9 +518,8 @@
     async function requireFeature(featureName, friendlyName) {
       const allowed = await hub.checkFeature(featureName);
       if (!allowed) {
-        // Show inline upgrade banner instead of modal
         const banner = document.getElementById('upgradeBanner');
-        document.getElementById('upgradeBannerText').textContent = `Unlock ${friendlyName} with Pro — $9/mo`;
+        document.getElementById('upgradeBannerText').textContent = `Unlock ${friendlyName} with Pro \u2014 $9/mo`;
         banner.classList.add('visible');
         return false;
       }
@@ -2678,7 +537,7 @@
     // ── Auto-updater ──
     hub.onUpdateReady((data) => {
       const banner = document.getElementById('updateBanner');
-      banner.textContent = `Update v${data.version} ready — click to restart`;
+      banner.textContent = `Update v${data.version} ready \u2014 click to restart`;
       banner.classList.add('active');
     });
 
@@ -2686,100 +545,37 @@
       hub.installUpdate();
     });
 
-    // ── Command Palette (Cmd+K) ──
-    const cmdActions = [
-      { name: 'Switch to Split Screen', action: () => { closePanel('commandPalette'); hub.toggleSplitScreen(); }, keywords: 'split dual' },
-      { name: 'Open Templates', action: () => { closePanel('commandPalette'); document.getElementById('btnTemplates').click(); }, keywords: 'template quick reply' },
-      { name: 'Schedule a Message', action: () => { closePanel('commandPalette'); document.getElementById('btnScheduleInline').click(); }, keywords: 'schedule later timer' },
-      { name: 'Export Current Chat', action: () => { closePanel('commandPalette'); document.getElementById('btnExport').click(); }, keywords: 'export save download' },
-      { name: 'Open Contact Labels', action: () => { closePanel('commandPalette'); document.getElementById('btnLabels').click(); }, keywords: 'label tag contact' },
-      { name: 'View Analytics', action: () => { closePanel('commandPalette'); document.getElementById('btnAnalytics').click(); }, keywords: 'analytics stats chart' },
-      { name: 'AI Suggest Replies', action: () => { closePanel('commandPalette'); openPopup('aiPopup'); aiAction('suggest'); }, keywords: 'ai smart reply suggest' },
-      { name: 'AI Summarize Chat', action: () => { closePanel('commandPalette'); openPopup('aiPopup'); aiAction('summarize'); }, keywords: 'ai summarize tldr' },
-      { name: 'Open Automations', action: () => { closePanel('commandPalette'); document.getElementById('btnSidebarMenu').click(); }, keywords: 'automation rule workflow' },
-      { name: 'Open Broadcast', action: () => { closePanel('commandPalette'); document.getElementById('btnBroadcast').click(); }, keywords: 'broadcast campaign bulk' },
-      { name: 'Open Settings', action: () => { closePanel('commandPalette'); document.getElementById('btnSettings').click(); }, keywords: 'settings preferences config' },
-      { name: 'Add New Account', action: () => { closePanel('commandPalette'); document.getElementById('addBtn').click(); }, keywords: 'add new account whatsapp' },
-    ];
-
-    function renderCommandResults(query) {
-      const el = document.getElementById('cmdResults');
-      const q = query.toLowerCase();
-
-      // Dynamic: add account switching
-      const allActions = [
-        ...currentAccounts.map(a => ({
-          name: `Switch to ${a.name}`,
-          action: () => { closePanel('commandPalette'); hub.switchAccount(a.id); },
-          keywords: `switch ${a.name.toLowerCase()}`,
-        })),
-        ...cmdActions,
-      ];
-
-      const filtered = q ? allActions.filter(a =>
-        a.name.toLowerCase().includes(q) || a.keywords.includes(q)
-      ) : allActions;
-
-      el.innerHTML = filtered.slice(0, 10).map((a, i) =>
-        `<div class="list-item" style="cursor:pointer;padding:8px 12px;${i === 0 ? 'background:#F0F2F5' : ''}" onclick="cmdActions_exec(${allActions.indexOf(a)})" data-idx="${allActions.indexOf(a)}">
-          <div class="item-info"><div class="item-title" style="font-size:13px">${a.name}</div></div>
-        </div>`
-      ).join('');
-
-      // Store for keyboard nav
-      window._cmdFiltered = filtered.slice(0, 10);
-      window._cmdAllActions = allActions;
-    }
-
-    window.cmdActions_exec = function(idx) {
-      if (window._cmdAllActions && window._cmdAllActions[idx]) window._cmdAllActions[idx].action();
-    };
-
-    document.getElementById('cmdInput').addEventListener('input', (e) => renderCommandResults(e.target.value));
-    document.getElementById('cmdInput').addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && window._cmdFiltered?.length) {
-        e.preventDefault();
-        window._cmdFiltered[0].action();
-      }
-    });
-
     // ── Keyboard shortcuts ──
     document.addEventListener('keydown', (e) => {
+      // Cmd+1-9: switch accounts
       if (e.metaKey && e.key >= '1' && e.key <= '9') {
         const idx = parseInt(e.key) - 1;
-        if (idx < currentAccounts.length) { e.preventDefault(); hub.switchAccount(currentAccounts[idx].id); }
+        if (idx < currentAccounts.length) {
+          e.preventDefault();
+          hub.switchAccount(currentAccounts[idx].id);
+        }
       }
-      if (e.metaKey && e.key === '\\') { e.preventDefault(); hub.toggleSidebar(); }
-      if (e.metaKey && e.key === 'd') { e.preventDefault(); hub.toggleSplitScreen(); }
-      if (e.metaKey && e.key === 't') {
-        e.preventDefault();
-        hub.getTemplates().then(t => { renderTemplates(t); openPanel('templatesPanel'); });
-      }
-      if (e.metaKey && e.key === 'e') { e.preventDefault(); document.getElementById('btnExport').click(); }
-      if (e.metaKey && e.key === 'j') { e.preventDefault(); openPopup('aiPopup'); }
+      // Cmd+K: command palette (opens as child window)
       if (e.metaKey && e.key === 'k') {
         e.preventDefault();
-        openPanel('commandPalette');
-        document.getElementById('cmdInput').value = '';
-        renderCommandResults('');
-        setTimeout(() => document.getElementById('cmdInput').focus(), 100);
+        hub.openPanel('command-palette');
       }
+      // Cmd+,: settings
+      if (e.metaKey && e.key === ',') {
+        e.preventDefault();
+        hub.openPanel('settings');
+      }
+      // Escape: close upgrade banner
       if (e.key === 'Escape') {
-        closeAllPopups();
-        document.querySelectorAll('.panel-overlay.visible').forEach(p => closePanel(p.id));
-        document.getElementById('settingsPanel').classList.remove('visible');
-        document.getElementById('contextMenu').classList.remove('visible');
+        document.getElementById('upgradeBanner').classList.remove('visible');
       }
     });
 
     // ── IPC listeners ──
     hub.onLoadAccounts(renderAccounts);
-    hub.onAccountSwitched(id => { activeId = id; renderAccounts(currentAccounts); });
+    hub.onAccountSwitched((id) => { activeId = id; renderAccounts(currentAccounts); });
     hub.onSettingsUpdated(updateSettingsUI);
-    hub.onUnreadCounts(c => { unreadCounts = c; renderAccounts(currentAccounts); });
-    hub.onSchedulesUpdated(renderSchedules);
-    hub.onTemplatesUpdated(renderTemplates);
-    hub.onLabelsUpdated(renderLabels);
+    hub.onUnreadCounts((c) => { unreadCounts = c; renderAccounts(currentAccounts); });
   </script>
 </body>
 </html>

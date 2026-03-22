@@ -63,6 +63,7 @@ const { initCustomDashboard } = require('./features/custom-dashboard');
 const { initWhatsappBusinessApi } = require('./features/whatsapp-business-api');
 const { initConversationSearch } = require('./features/conversation-search');
 const { initPosthogAnalytics, trackEvent } = require('./features/posthog-analytics');
+const { initPanelManager } = require('./features/panel-manager');
 
 const DATA_PATH = path.join(app.getPath('userData'), 'accounts.json');
 const SETTINGS_PATH = path.join(app.getPath('userData'), 'settings.json');
@@ -264,7 +265,7 @@ function createViewForAccount(account) {
 // ── View Management (Bulletproof) ────────────────────────────
 // Single function calculates bounds. Used everywhere. No drift possible.
 
-const ACCOUNT_STRIP_WIDTH = 68;
+const ACCOUNT_STRIP_WIDTH = 200;
 
 function getViewBounds() {
   if (!mainWindow) return { x: 0, y: 0, width: 800, height: 600 };
@@ -773,6 +774,7 @@ app.whenReady().then(async () => {
   safeInit('whatsapp-business-api', () => initWhatsappBusinessApi(featureCtx));
   safeInit('conversation-search', () => initConversationSearch(featureCtx));
   safeInit('posthog-analytics', () => initPosthogAnalytics({ app, ipcMain }));
+  safeInit('panel-manager', () => initPanelManager({ getMainWindow }));
 
   // Global shortcut
   if (settings.globalShortcut) {

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Settings</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  background: #FFFFFF;
+  color: #111B21;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+.panel-header {
+  height: 48px;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  border-bottom: 1px solid #E8E8E8;
+  -webkit-app-region: drag;
+  flex-shrink: 0;
+}
+.panel-title { font-size: 16px; font-weight: 600; color: #111B21; flex: 1; }
+.panel-close {
+  width: 28px; height: 28px; border-radius: 6px; border: none;
+  background: none; color: #667781; font-size: 18px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  -webkit-app-region: no-drag;
+  transition: all 0.15s;
+}
+.panel-close:hover { background: #F0F2F5; color: #111B21; }
+.panel-body { flex: 1; overflow-y: auto; padding: 20px; }
+.form-label { font-size: 12px; font-weight: 500; color: #667781; margin-bottom: 4px; display: block; }
+.form-input {
+  width: 100%; height: 40px; padding: 0 12px;
+  background: #F0F2F5; border: none; border-radius: 8px;
+  font-size: 14px; color: #111B21; outline: none;
+  margin-bottom: 12px;
+}
+.form-input:focus { box-shadow: 0 0 0 2px rgba(37,211,102,0.3); }
+.form-btn {
+  width: 100%; height: 40px; border: none; border-radius: 8px;
+  background: #25D366; color: #fff; font-size: 14px; font-weight: 500;
+  cursor: pointer; transition: background 0.15s;
+}
+.form-btn:hover { background: #1FAA59; }
+.form-btn-outline {
+  width: 100%; height: 40px; border: 1px solid #25D366; border-radius: 8px;
+  background: none; color: #25D366; font-size: 14px; font-weight: 500;
+  cursor: pointer; transition: all 0.15s;
+}
+.form-btn-outline:hover { background: #F0FFF4; }
+.section-label { font-size: 11px; font-weight: 600; color: #667781; text-transform: uppercase; letter-spacing: 1px; margin: 16px 0 8px; }
+.divider { height: 1px; background: #E8E8E8; margin: 12px 0; }
+.list-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px; height: 36px; border-radius: 6px;
+  cursor: pointer; transition: background 0.15s;
+}
+.list-item:hover { background: #F0F2F5; }
+.list-item svg { width: 18px; height: 18px; color: #667781; flex-shrink: 0; }
+.list-item span { font-size: 14px; color: #111B21; }
+.toggle-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 0; border-bottom: 1px solid #F0F2F5;
+}
+.toggle-label { font-size: 14px; color: #111B21; }
+.toggle {
+  width: 44px; height: 24px; border-radius: 12px;
+  background: #CED0D1; cursor: pointer; position: relative;
+  transition: background 0.2s; flex-shrink: 0;
+}
+.toggle.on { background: #25D366; }
+.toggle::after {
+  content: ''; position: absolute; top: 2px; left: 2px;
+  width: 20px; height: 20px; border-radius: 50%; background: #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2); transition: transform 0.2s;
+}
+.toggle.on::after { transform: translateX(20px); }
+.plan-card {
+  border-radius: 10px; overflow: hidden; margin-bottom: 16px;
+  border: 1px solid #E8E8E8;
+}
+.plan-card-top {
+  background: linear-gradient(135deg, #25D366, #128C7E);
+  padding: 16px; color: #fff;
+}
+.plan-name { font-size: 14px; font-weight: 600; }
+.plan-tier { font-size: 22px; font-weight: 700; margin-top: 4px; }
+.plan-card-bottom { padding: 12px 16px; }
+.plan-card-bottom .plan-meta { font-size: 12px; color: #667781; }
+.pairing-code {
+  font-size: 32px; font-weight: 700; letter-spacing: 6px;
+  text-align: center; color: #25D366; padding: 16px;
+  background: #F0FFF4; border-radius: 8px; margin: 8px 0;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+}
+.footer {
+  text-align: center; padding: 16px; font-size: 11px; color: #CED0D1;
+}
+.row { display: flex; gap: 8px; }
+.row > * { flex: 1; }
+</style>
+</head>
+<body>
+  <div class="panel-header">
+    <span class="panel-title">Settings</span>
+    <button class="panel-close" onclick="hub.closePanel('settings')">&times;</button>
+  </div>
+  <div class="panel-body">
+    <!-- Plan Card -->
+    <div class="plan-card">
+      <div class="plan-card-top">
+        <div class="plan-name">Current Plan</div>
+        <div class="plan-tier" id="plan-name">Free</div>
+      </div>
+      <div class="plan-card-bottom">
+        <div class="plan-meta" id="plan-meta">2 accounts &middot; Basic features</div>
+        <div style="margin-top:8px;">
+          <button class="form-btn" onclick="hub.openPanel('upgrade')" style="height:32px;font-size:13px;">Upgrade</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- My Accounts -->
+    <div class="section-label">My Accounts</div>
+    <div id="accounts-list">
+      <div class="list-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>
+        <span>Personal</span>
+      </div>
+      <div class="list-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>
+        <span>Business</span>
+      </div>
+    </div>
+    <button class="form-btn-outline" onclick="hub.openPanel('add-account')" style="height:32px;font-size:13px;margin-top:8px;">+ Add Account</button>
+
+    <div class="divider"></div>
+
+    <!-- Connect Phone -->
+    <div class="section-label">Connect Phone</div>
+    <p style="font-size:12px;color:#667781;margin-bottom:8px;">Enter this code in WhatsApp &gt; Linked Devices &gt; Link with phone number</p>
+    <div class="pairing-code" id="pairing-code">----</div>
+
+    <div class="divider"></div>
+
+    <!-- Notifications -->
+    <div class="section-label">Notifications</div>
+    <div class="toggle-row">
+      <span class="toggle-label">Desktop Notifications</span>
+      <div class="toggle on" id="toggle-notif" onclick="toggleSwitch(this)"></div>
+    </div>
+    <div class="toggle-row">
+      <span class="toggle-label">Sound</span>
+      <div class="toggle on" id="toggle-sound" onclick="toggleSwitch(this)"></div>
+    </div>
+    <div class="toggle-row">
+      <span class="toggle-label">Badge Count</span>
+      <div class="toggle on" id="toggle-badge" onclick="toggleSwitch(this)"></div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- AI Setup -->
+    <div class="section-label">AI Setup</div>
+    <label class="form-label">OpenAI API Key</label>
+    <input class="form-input" id="ai-key" type="password" placeholder="sk-..." />
+    <button class="form-btn" id="save-ai-btn" style="height:34px;font-size:13px;">Save</button>
+
+    <div class="footer">SupaMsg v1.0.0</div>
+  </div>
+
+  <script>
+    function toggleSwitch(el) {
+      el.classList.toggle('on');
+    }
+
+    document.getElementById('save-ai-btn').addEventListener('click', () => {
+      const key = document.getElementById('ai-key').value;
+      if (key) {
+        hub.updateSettings({ openaiApiKey: key });
+      }
+    });
+
+    // Load license info
+    (async () => {
+      try {
+        const license = await hub.getLicense();
+        if (license && license.tier) {
+          document.getElementById('plan-name').textContent = license.tier;
+          document.getElementById('plan-meta').textContent = license.description || '';
+        }
+      } catch (e) {}
+    })();
+  </script>
+</body>
+</html>

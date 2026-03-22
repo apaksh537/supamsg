@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Helper</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  background: #FFFFFF;
+  color: #111B21;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+.panel-header {
+  height: 48px;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  border-bottom: 1px solid #E8E8E8;
+  -webkit-app-region: drag;
+  flex-shrink: 0;
+}
+.panel-title { font-size: 16px; font-weight: 600; color: #111B21; flex: 1; }
+.panel-close {
+  width: 28px; height: 28px; border-radius: 6px; border: none;
+  background: none; color: #667781; font-size: 18px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  -webkit-app-region: no-drag;
+  transition: all 0.15s;
+}
+.panel-close:hover { background: #F0F2F5; color: #111B21; }
+.panel-body { flex: 1; overflow-y: auto; padding: 20px; }
+.list-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px; border-radius: 8px;
+  cursor: pointer; transition: background 0.15s;
+}
+.list-item:hover { background: #F0F2F5; }
+.list-item svg { width: 20px; height: 20px; color: #667781; flex-shrink: 0; }
+.list-item .item-text { flex: 1; }
+.list-item .item-label { font-size: 14px; color: #111B21; font-weight: 500; }
+.list-item .item-desc { font-size: 12px; color: #667781; margin-top: 2px; }
+.chevron { color: #CED0D1; font-size: 16px; flex-shrink: 0; }
+.divider { height: 1px; background: #E8E8E8; margin: 4px 0; }
+.results-area {
+  margin-top: 16px;
+  padding: 16px;
+  background: #F0F2F5;
+  border-radius: 8px;
+  display: none;
+}
+.results-area.visible { display: block; }
+.results-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 10px;
+}
+.results-title { font-size: 13px; font-weight: 600; color: #111B21; }
+.results-close {
+  font-size: 12px; color: #667781; background: none; border: none;
+  cursor: pointer;
+}
+.results-close:hover { color: #111B21; }
+.results-content { font-size: 13px; color: #111B21; line-height: 1.5; }
+.loading { font-size: 13px; color: #667781; font-style: italic; }
+.suggestion-chip {
+  display: inline-block; padding: 6px 12px; background: #fff;
+  border: 1px solid #E8E8E8; border-radius: 16px; font-size: 13px;
+  color: #111B21; cursor: pointer; margin: 4px 4px 4px 0;
+  transition: all 0.15s;
+}
+.suggestion-chip:hover { border-color: #25D366; color: #25D366; }
+</style>
+</head>
+<body>
+  <div class="panel-header">
+    <span class="panel-title">AI Helper</span>
+    <button class="panel-close" onclick="hub.closePanel('ai')">&times;</button>
+  </div>
+  <div class="panel-body">
+    <div class="list-item" id="action-suggest">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+      </svg>
+      <div class="item-text">
+        <div class="item-label">Suggest Replies</div>
+        <div class="item-desc">Get AI-generated reply suggestions</div>
+      </div>
+      <span class="chevron">&#8250;</span>
+    </div>
+    <div class="divider"></div>
+    <div class="list-item" id="action-summarize">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="17" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="17" y1="18" x2="3" y2="18"/>
+      </svg>
+      <div class="item-text">
+        <div class="item-label">Summarize Chat</div>
+        <div class="item-desc">Get a quick summary of the conversation</div>
+      </div>
+      <span class="chevron">&#8250;</span>
+    </div>
+    <div class="divider"></div>
+    <div class="list-item" id="action-translate">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+      </svg>
+      <div class="item-text">
+        <div class="item-label">Translate</div>
+        <div class="item-desc">Translate messages to another language</div>
+      </div>
+      <span class="chevron">&#8250;</span>
+    </div>
+
+    <div class="results-area" id="results">
+      <div class="results-header">
+        <span class="results-title" id="results-title">Results</span>
+        <button class="results-close" onclick="hideResults()">Clear</button>
+      </div>
+      <div class="results-content" id="results-content"></div>
+    </div>
+  </div>
+
+  <script>
+    const resultsEl = document.getElementById('results');
+    const resultsTitleEl = document.getElementById('results-title');
+    const resultsContentEl = document.getElementById('results-content');
+
+    function showLoading(title) {
+      resultsTitleEl.textContent = title;
+      resultsContentEl.innerHTML = '<span class="loading">Thinking...</span>';
+      resultsEl.classList.add('visible');
+    }
+
+    function showResults(title, html) {
+      resultsTitleEl.textContent = title;
+      resultsContentEl.innerHTML = html;
+      resultsEl.classList.add('visible');
+    }
+
+    function hideResults() {
+      resultsEl.classList.remove('visible');
+    }
+
+    document.getElementById('action-suggest').addEventListener('click', async () => {
+      showLoading('Suggested Replies');
+      try {
+        const messages = await hub.aiGetChatMessages();
+        const result = await hub.aiSuggestReplies(messages);
+        if (result && result.suggestions) {
+          const chips = result.suggestions.map(s =>
+            `<span class="suggestion-chip">${s}</span>`
+          ).join('');
+          showResults('Suggested Replies', chips);
+        } else {
+          showResults('Suggested Replies', '<span class="loading">No suggestions available. Open a chat first.</span>');
+        }
+      } catch (e) {
+        showResults('Suggested Replies', '<span class="loading">Could not generate suggestions.</span>');
+      }
+    });
+
+    document.getElementById('action-summarize').addEventListener('click', async () => {
+      showLoading('Summary');
+      try {
+        const messages = await hub.aiGetChatMessages();
+        const result = await hub.aiSummarize(messages);
+        showResults('Summary', result.summary || 'No summary available.');
+      } catch (e) {
+        showResults('Summary', '<span class="loading">Could not generate summary.</span>');
+      }
+    });
+
+    document.getElementById('action-translate').addEventListener('click', async () => {
+      showLoading('Translate');
+      showResults('Translate', `
+        <div style="margin-bottom:8px;font-size:12px;color:#667781;">Select target language:</div>
+        <span class="suggestion-chip" onclick="doTranslate('English')">English</span>
+        <span class="suggestion-chip" onclick="doTranslate('Hindi')">Hindi</span>
+        <span class="suggestion-chip" onclick="doTranslate('Spanish')">Spanish</span>
+        <span class="suggestion-chip" onclick="doTranslate('French')">French</span>
+        <span class="suggestion-chip" onclick="doTranslate('Arabic')">Arabic</span>
+      `);
+    });
+
+    async function doTranslate(lang) {
+      showLoading('Translating...');
+      try {
+        const messages = await hub.aiGetChatMessages();
+        const lastMsg = messages && messages.length ? messages[messages.length - 1].body : '';
+        const result = await hub.aiTranslate(lastMsg, lang);
+        showResults('Translation (' + lang + ')', result.translation || 'No translation available.');
+      } catch (e) {
+        showResults('Translation', '<span class="loading">Could not translate.</span>');
+      }
+    }
+  </script>
+</body>
+</html>
