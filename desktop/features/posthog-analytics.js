@@ -12,7 +12,7 @@ let analyticsPath;
 let sessionStart;
 let config = {
   enabled: true,
-  posthogKey: '', // Set via settings or hardcode your key here
+  posthogKey: 'phc_PCJIJhtUnUozcI32pQYbjRF79n8xHSaPj5TyeQ0kVD5',
   distinctId: '',
 };
 
