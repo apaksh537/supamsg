@@ -31,6 +31,38 @@ const { initLicensing } = require('./features/licensing');
 const { initMobileRelay, broadcastNotification } = require('./features/mobile-relay');
 const { initAutoUpdater } = require('./features/auto-updater');
 
+// New feature modules (30 features)
+const { initConversationKanban } = require('./features/conversation-kanban');
+const { initSmartNotifications } = require('./features/smart-notifications');
+const { initQuickActions } = require('./features/quick-actions');
+const { initVoiceTranscription } = require('./features/voice-transcription');
+const { initMessageRecall } = require('./features/message-recall');
+const { initCollaborativeNotes } = require('./features/collaborative-notes');
+const { initTimezoneScheduler } = require('./features/timezone-scheduler');
+const { initSentimentAlerts, analyzeSentiment } = require('./features/sentiment-alerts');
+const { initPaymentCollection } = require('./features/payment-collection');
+const { initProductCatalog } = require('./features/product-catalog');
+const { initAppointmentBooking } = require('./features/appointment-booking');
+const { initStatusManager } = require('./features/status-manager');
+const { initChatbotBuilder, processBotMessage } = require('./features/chatbot-builder');
+const { initChatBackup } = require('./features/chat-backup');
+const { initWebhookApi } = require('./features/webhook-api');
+const { initAiInsights } = require('./features/ai-insights');
+const { initEcommerceTracking } = require('./features/ecommerce-tracking');
+const { initAiAgent, processAgentMessage } = require('./features/ai-agent');
+const { initZapierIntegration } = require('./features/zapier-integration');
+const { initWhiteLabel } = require('./features/white-label');
+const { initCrossMessenger } = require('./features/cross-messenger');
+const { initScreenMirror } = require('./features/screen-mirror');
+const { initVirtualNumbers } = require('./features/virtual-numbers');
+const { initSmsBridge } = require('./features/sms-bridge');
+const { initTeamInbox } = require('./features/team-inbox');
+const { initAdvancedAnalytics } = require('./features/advanced-analytics');
+const { initAutoTranslate } = require('./features/auto-translate');
+const { initCustomDashboard } = require('./features/custom-dashboard');
+const { initWhatsappBusinessApi } = require('./features/whatsapp-business-api');
+const { initConversationSearch } = require('./features/conversation-search');
+
 const DATA_PATH = path.join(app.getPath('userData'), 'accounts.json');
 const SETTINGS_PATH = path.join(app.getPath('userData'), 'settings.json');
 const ONBOARDING_PATH = path.join(app.getPath('userData'), 'onboarded.flag');
@@ -632,6 +664,39 @@ app.whenReady().then(async () => {
   initLicensing({ app, ipcMain, getMainWindow });
   initMobileRelay({ ipcMain, getMainWindow, getViews, getAccounts });
   initAutoUpdater({ getMainWindow });
+
+  // Initialize all 30 new features
+  const featureCtx = { app, ipcMain, getMainWindow, getViews, getActiveAccountId, getAccounts };
+  initConversationKanban(featureCtx);
+  initSmartNotifications(featureCtx);
+  initQuickActions(featureCtx);
+  initVoiceTranscription(featureCtx);
+  initMessageRecall(featureCtx);
+  initCollaborativeNotes(featureCtx);
+  initTimezoneScheduler(featureCtx);
+  initSentimentAlerts(featureCtx);
+  initPaymentCollection(featureCtx);
+  initProductCatalog(featureCtx);
+  initAppointmentBooking(featureCtx);
+  initStatusManager(featureCtx);
+  initChatbotBuilder(featureCtx);
+  initChatBackup(featureCtx);
+  initWebhookApi(featureCtx);
+  initAiInsights(featureCtx);
+  initEcommerceTracking(featureCtx);
+  initAiAgent(featureCtx);
+  initZapierIntegration(featureCtx);
+  initWhiteLabel(featureCtx);
+  initCrossMessenger(featureCtx);
+  initScreenMirror(featureCtx);
+  initVirtualNumbers(featureCtx);
+  initSmsBridge(featureCtx);
+  initTeamInbox(featureCtx);
+  initAdvancedAnalytics(featureCtx);
+  initAutoTranslate(featureCtx);
+  initCustomDashboard(featureCtx);
+  initWhatsappBusinessApi(featureCtx);
+  initConversationSearch(featureCtx);
 
   // Global shortcut
   if (settings.globalShortcut) {
