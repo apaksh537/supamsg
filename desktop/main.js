@@ -303,7 +303,17 @@ function switchToAccount(accountId) {
   const view = views[accountId];
   if (view) {
     mainWindow.addBrowserView(view);
-    applyBoundsToView(view);
+
+    // Set bounds TWICE with a delay — forces Electron to apply correctly
+    const bounds = getViewBounds();
+    view.setBounds(bounds);
+
+    // Force WhatsApp Web to recalculate its layout to match current viewport
+    setTimeout(() => {
+      view.setBounds(bounds);
+      view.webContents.executeJavaScript('window.dispatchEvent(new Event("resize"))').catch(() => {});
+    }, 50);
+
     activeAccountId = accountId;
     mainWindow.webContents.send('account-switched', accountId);
   }
@@ -475,7 +485,12 @@ ipcMain.on('show-views', () => {
     splitScreen.resizeSplit(mainWindow, views, getSidebarWidth());
   } else if (activeAccountId && views[activeAccountId]) {
     mainWindow.addBrowserView(views[activeAccountId]);
-    resizeView(views[activeAccountId]);
+    const bounds = getViewBounds();
+    views[activeAccountId].setBounds(bounds);
+    setTimeout(() => {
+      views[activeAccountId]?.setBounds(bounds);
+      views[activeAccountId]?.webContents.executeJavaScript('window.dispatchEvent(new Event("resize"))').catch(() => {});
+    }, 50);
   }
 });
 
@@ -506,7 +521,12 @@ ipcMain.handle('show-prompt', async (_event, { title, message, defaultValue }) =
     splitScreen.resizeSplit(mainWindow, views, getSidebarWidth());
   } else if (activeAccountId && views[activeAccountId]) {
     mainWindow.addBrowserView(views[activeAccountId]);
-    resizeView(views[activeAccountId]);
+    const bounds = getViewBounds();
+    views[activeAccountId].setBounds(bounds);
+    setTimeout(() => {
+      views[activeAccountId]?.setBounds(bounds);
+      views[activeAccountId]?.webContents.executeJavaScript('window.dispatchEvent(new Event("resize"))').catch(() => {});
+    }, 50);
   }
 
   return response === 1; // true if OK
