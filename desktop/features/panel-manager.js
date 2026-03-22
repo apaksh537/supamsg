@@ -50,6 +50,7 @@ function openPanel(name) {
     minimizable: false,
     maximizable: false,
     titleBarStyle: 'hidden',
+    trafficLightPosition: { x: -20, y: -20 }, // Hide native traffic lights (moved offscreen)
     backgroundColor: '#FFFFFF',
     webPreferences: {
       preload: path.join(__dirname, '..', 'preload.js'),
