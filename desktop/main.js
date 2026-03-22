@@ -692,6 +692,34 @@ ipcMain.on('set-ui-mode', (_event, mode) => {
   resizeAllViews();
 });
 
+// Generate QR code for phone pairing
+ipcMain.handle('generate-pairing-qr', async () => {
+  const os = require('os');
+  const QRCode = require('qrcode');
+
+  // Get local IP
+  let localIp = '';
+  const nets = os.networkInterfaces();
+  for (const name of Object.keys(nets)) {
+    for (const net of nets[name]) {
+      if (net.family === 'IPv4' && !net.internal) {
+        localIp = net.address;
+        break;
+      }
+    }
+    if (localIp) break;
+  }
+
+  // Generate pairing code
+  const code = String(Math.floor(100000 + Math.random() * 900000));
+
+  // Create QR code data URL
+  const qrData = JSON.stringify({ ip: localIp, port: 8765, code });
+  const qrDataUrl = await QRCode.toDataURL(qrData, { width: 200, margin: 2, color: { dark: '#111B21', light: '#FFFFFF' } });
+
+  return { qrDataUrl, code, ip: localIp };
+});
+
 ipcMain.on('wa-notification', (_event, { accountId, title, body }) => {
   showNotification(accountId, title, body);
 });

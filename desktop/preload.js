@@ -85,6 +85,9 @@ contextBridge.exposeInMainWorld('hub', {
   openPanel: (name) => ipcRenderer.send('open-panel', name),
   closePanel: (name) => ipcRenderer.send('close-panel', name),
 
+  // Pairing
+  generatePairingQR: () => ipcRenderer.invoke('generate-pairing-qr'),
+
   // Dialogs (native)
   showInputDialog: (opts) => ipcRenderer.invoke('show-input-dialog', opts),
   showConfirmDialog: (opts) => ipcRenderer.invoke('show-confirm-dialog', opts),
