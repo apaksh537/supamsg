@@ -250,6 +250,38 @@ function createViewForAccount(account) {
 
 // ── View management ──────────────────────────────────────────
 
+// ── View Management (Bulletproof) ────────────────────────────
+// Single function calculates bounds. Used everywhere. No drift possible.
+
+const ACCOUNT_STRIP_WIDTH = 72;
+
+function getViewBounds() {
+  if (!mainWindow) return { x: 0, y: 0, width: 800, height: 600 };
+  // Use contentSize (returns [width, height] of the content area, NOT screen coordinates)
+  const [cw, ch] = mainWindow.getContentSize();
+  return {
+    x: ACCOUNT_STRIP_WIDTH,
+    y: 0,
+    width: Math.max(cw - ACCOUNT_STRIP_WIDTH, 100),
+    height: Math.max(ch, 100),
+  };
+}
+
+function applyBoundsToView(view) {
+  if (!view) return;
+  const bounds = getViewBounds();
+  view.setAutoResize({ width: false, height: false, horizontal: false, vertical: false });
+  view.setBounds(bounds);
+}
+
+function applyBoundsToAllViews() {
+  const bounds = getViewBounds();
+  for (const view of Object.values(views)) {
+    view.setAutoResize({ width: false, height: false, horizontal: false, vertical: false });
+    view.setBounds(bounds);
+  }
+}
+
 function switchToAccount(accountId) {
   if (!mainWindow) return;
 
@@ -262,60 +294,28 @@ function switchToAccount(accountId) {
     mainWindow.webContents.send('split-screen-changed', { active: false });
   }
 
+  // Remove current view
   if (activeAccountId && views[activeAccountId]) {
     mainWindow.removeBrowserView(views[activeAccountId]);
   }
 
+  // Add new view with exact same bounds
   const view = views[accountId];
   if (view) {
     mainWindow.addBrowserView(view);
-    resizeView(view);
+    applyBoundsToView(view);
     activeAccountId = accountId;
     mainWindow.webContents.send('account-switched', accountId);
   }
 }
 
-function resizeView(view) {
-  if (!mainWindow || !view) return;
-  const contentBounds = mainWindow.getContentBounds();
-  const contentWidth = contentBounds.width;
-  const contentHeight = contentBounds.height;
-
-  // Left account strip (narrow sidebar with account icons)
-  const accountStripWidth = 72;
-
-  const x = accountStripWidth;
-  const y = 0;
-  const w = Math.max(contentWidth - accountStripWidth, 0);
-  const h = Math.max(contentHeight, 0);
-
-  // Disable auto-resize first, then set exact bounds
-  // This prevents accumulated offset drift between views
-  view.setAutoResize({ width: false, height: false, horizontal: false, vertical: false });
-  view.setBounds({ x, y, width: w, height: h });
-}
-
-// Resize ALL views to same bounds (fixes dimension mismatch between accounts)
-function resizeAllViewsToSameBounds() {
-  if (!mainWindow) return;
-  const contentBounds = mainWindow.getContentBounds();
-  const accountStripWidth = 72;
-  const x = accountStripWidth;
-  const w = Math.max(contentBounds.width - accountStripWidth, 0);
-  const h = Math.max(contentBounds.height, 0);
-
-  for (const view of Object.values(views)) {
-    view.setAutoResize({ width: false, height: false, horizontal: false, vertical: false });
-    view.setBounds({ x, y: 0, width: w, height: h });
-  }
-}
-
+// Legacy wrappers (other modules may call these)
+function resizeView(view) { applyBoundsToView(view); }
 function resizeAllViews() {
   if (splitScreen && splitScreen.isSplit()) {
     splitScreen.resizeSplit(mainWindow, views, getSidebarWidth());
   } else {
-    // Resize ALL views to identical bounds (prevents dimension mismatch)
-    resizeAllViewsToSameBounds();
+    applyBoundsToAllViews();
   }
 }
 
