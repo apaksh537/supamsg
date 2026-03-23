@@ -1,43 +1,78 @@
 # SupaMsg Launch Marketing Copy
 
+*Updated: March 2026 — reflects 48 features, AI, Razorpay subscriptions*
+
 ---
 
 ## 1. ProductHunt Launch
 
-### Tagline (56 chars)
+### Tagline (60 chars max)
 
-**Manage all your WhatsApp accounts from one Mac window.**
+**All your WhatsApp accounts in one window — with AI superpowers**
+
+### Topics
+
+`Productivity`, `Messaging`, `Artificial Intelligence`, `Mac`, `SaaS`
 
 ### Description
 
-Ever tried juggling three WhatsApp accounts across multiple phones? You end up with a desk that looks like a phone repair shop, constantly picking up the wrong device, missing messages, and losing track of conversations.
+If you have more than one WhatsApp number, you know the pain. Multiple phones, missed messages, wrong-account replies, and zero way to automate anything.
 
-SupaMsg is a native macOS desktop app that lets you run multiple WhatsApp Web sessions side by side in one window. No hacks, no workarounds — just clean, tabbed access to every WhatsApp account you have.
+SupaMsg puts all your WhatsApp accounts in one desktop window — and adds 48 features on top that WhatsApp will probably never build.
 
-**Here's what it does:**
+**The basics:**
+- Run unlimited WhatsApp accounts in isolated tabs
+- Split screen — view two conversations side by side
+- Unified notifications with per-account badges
+- Keyboard shortcuts to switch instantly (Cmd+1, Cmd+2...)
 
-- Run 2, 3, 5+ WhatsApp accounts simultaneously in separate tabs
-- Native macOS app — not a browser extension, not an Electron wrapper pretending to be native
-- Each session is fully isolated (separate cookies, storage, no cross-contamination)
-- Switch between accounts with keyboard shortcuts (Cmd+1, Cmd+2, etc.)
-- Desktop notifications per account so you know exactly which number got a message
-- Minimal, distraction-free UI — it stays out of your way
+**AI features (powered by Claude):**
+- Smart reply suggestions that match your tone
+- Chat summarization — catch up on 200 messages in 10 seconds
+- Real-time translation across 25 languages
+- Voice message transcription
+- AI Agent mode — auto-replies to common questions
 
-**Who is this for?**
+**Business tools:**
+- Scheduled messages across time zones
+- Broadcast campaigns (bulk messaging)
+- No-code chatbot builder
+- CRM integration (HubSpot, Zoho)
+- Conversation Kanban pipeline
+- Payment collection via UPI/Stripe
+- Webhook API + Zapier integration
 
-Freelancers with a personal and work number. Agency owners managing client accounts. Real estate agents with regional numbers. Recruiters juggling candidate pipelines. Small business owners who have a storefront number, a personal number, and maybe a third for that side hustle.
+**Privacy first:**
+- Zero access to your messages — everything runs locally
+- WhatsApp's end-to-end encryption stays fully intact
+- No cloud, no servers, no data leaves your Mac
 
-Basically, if you've ever wished WhatsApp Desktop let you log into more than one account, this is it.
+**Who it's for:**
+Freelancers, agency owners, real estate agents, sales teams, recruiters, small business owners — anyone who juggles multiple WhatsApp numbers daily.
 
-Free to try. One-time purchase. No subscriptions.
+**Pricing:**
+Free forever (3 accounts). Pro starts at ₹499/mo ($6). Business at ₹999/mo ($12).
+
+Try it free at supamsg.com
 
 ### First Comment (Maker's Comment)
 
-Hey everyone! I built SupaMsg because I have 3 phones — personal, work, and one for a side business — and I was losing my mind switching between them. I'd miss messages on one phone while replying on another. I tried browser profiles, separate Chrome windows, even running WhatsApp Web in incognito. All of it was clunky.
+Hey PH! I'm Apaksh, and I built SupaMsg because I was carrying 3 phones everywhere — personal, work, and a side business. I'd miss client messages while replying to friends. I'd accidentally send a casual voice note to a business contact. It was chaos.
 
-So I built the tool I wanted: one Mac app, multiple WhatsApp accounts, clean tabs. No sign-ups, no cloud sync, no middleman — your messages stay between you and WhatsApp.
+I looked for a solution and found nothing that wasn't a browser hack or a janky Chrome extension. So I built what I wanted.
 
-Would love your feedback. What features would make this more useful for you?
+SupaMsg started as a simple multi-account WhatsApp manager, but it evolved into something much bigger. Once you have all your conversations in one window, you start thinking — what if I could schedule that follow-up? What if AI could draft that reply? What if I could see all my leads in a pipeline? So I kept building.
+
+48 features later, here we are.
+
+A few things I'm proud of:
+- **Privacy**: We literally cannot read your messages. Everything runs locally on your Mac. No servers, no cloud sync for messages.
+- **AI replies**: Powered by Claude — the suggestions actually sound like you, not a robot.
+- **It just works**: Scan QR codes, and you're in. No account linking, no API keys, no setup wizard.
+
+The free tier gives you 3 accounts with all basic features. Pro and Business unlock AI, automations, and business tools.
+
+I'd love your feedback — what's missing? What would make this a must-have for your workflow? I'm here all day to answer questions.
 
 ---
 
@@ -45,55 +80,80 @@ Would love your feedback. What features would make this more useful for you?
 
 ### r/SideProject
 
-**Title:** I built a macOS app to manage multiple WhatsApp accounts — here's the journey
+**Title:** I built a desktop app with 48 features for managing multiple WhatsApp accounts — here's what I learned
 
 **Body:**
 
-I've been running a small agency and a freelance practice on the side. Three phone numbers, three WhatsApp accounts. I was drowning in notifications and constantly picking up the wrong phone.
+Six months ago, I had 3 phones on my desk and was losing my mind. Personal WhatsApp, work WhatsApp, side business WhatsApp. I'd miss messages, reply from the wrong account, and couldn't automate anything.
 
-Looked for a desktop solution and found nothing that wasn't janky. Browser profile tricks work but they're fragile. So I decided to build it myself.
+So I built SupaMsg — a Mac desktop app that puts all your WhatsApp accounts in one window.
 
-SupaMsg is a native macOS app that lets you run multiple WhatsApp Web sessions in isolated tabs. Built with Electron (I know, I know) but heavily optimized — separate BrowserView instances with isolated storage, custom session management, native macOS notifications with account identification.
+But here's where it got interesting. Once I had multi-account working, I realized the real opportunity wasn't just tabs — it was everything WhatsApp doesn't let you do:
 
-The hard parts were getting session isolation right without memory bloat and handling WhatsApp's aggressive logout behavior. Each tab runs in its own partition so nothing leaks between accounts.
+- **AI smart replies** — context-aware suggestions that match your tone (powered by Claude)
+- **Scheduled messages** — send later, across time zones
+- **Broadcast campaigns** — personalized bulk messaging
+- **Chatbot builder** — no-code auto-replies
+- **CRM integration** — HubSpot + Zoho, conversation pipeline
+- **Payment collection** — send UPI/Stripe payment links in chat
 
-It's live at supamsg.com. Free to try, one-time purchase after that.
+48 features total. All running locally on your Mac. Zero cloud, zero access to your messages.
 
-Genuinely looking for feedback — what's missing? What would make this worth paying for to you?
+**Business model:** Free for 3 accounts. Pro at ₹499/mo ($6) for unlimited accounts + AI. Business at ₹999/mo ($12) for automations, CRM, broadcasting.
+
+I chose Razorpay for payments because my core market (India, SE Asia) lives on UPI, and nobody wants to enter a credit card for a $6/mo tool.
+
+Live at supamsg.com — genuinely want feedback on what's missing.
 
 ---
 
 ### r/macapps
 
-**Title:** SupaMsg — run multiple WhatsApp accounts from one Mac app
+**Title:** SupaMsg — manage multiple WhatsApp accounts from one Mac app, now with AI and 48 features
 
 **Body:**
 
-Built a macOS app for anyone who needs more than one WhatsApp account on their desktop. You get isolated tabs, each running its own WhatsApp Web session. Switch between accounts with Cmd+1/2/3, get per-account notifications, and never mix up your conversations.
+Built a macOS app for anyone running more than one WhatsApp account. Each account runs in an isolated BrowserView with its own session — no cross-contamination.
 
-No browser extensions. No account linking. Each session is sandboxed with its own storage.
+What started as a multi-account manager now has 48 features:
 
-Lightweight, clean UI, sits in your menubar if you want it to.
+- Split screen (2 chats side by side)
+- AI replies, summarization, translation (25 languages)
+- Scheduled messages + auto-reply rules
+- Broadcast campaigns, chatbot builder
+- CRM integration, analytics, stealth mode
+- iPhone companion app for notifications
 
-Free trial available at supamsg.com. One-time purchase, no subscription.
+Privacy-first: everything runs locally, we never touch your messages.
+
+Free for 3 accounts. Pro from ₹499/mo ($6).
+
+supamsg.com
 
 ---
 
 ### r/Entrepreneur
 
-**Title:** If you run a business and have multiple WhatsApp numbers, I built something for you
+**Title:** WhatsApp is the #1 business tool in India/SE Asia/LATAM. I built a power-user app for it.
 
 **Body:**
 
-Quick context: in markets like India, SE Asia, the Middle East, and Latin America, WhatsApp IS the business communication tool. Most small business owners, agents, and freelancers have 2-4 numbers — one personal, one for the business, sometimes more for different regions or verticals.
+If you're in a market where WhatsApp = business communication, you know the pain of multiple numbers. Personal, business, regional — and WhatsApp Desktop only supports one account.
 
-The problem is WhatsApp Desktop only supports one account. So you're stuck switching between phones, using hacky browser setups, or just missing messages entirely.
+I built SupaMsg — a Mac desktop app that runs unlimited WhatsApp accounts in one window, plus 48 features that turn WhatsApp into a proper business tool:
 
-I built SupaMsg — a Mac desktop app that lets you run multiple WhatsApp Web sessions in one window with clean tabs. Each account is isolated. You get separate notifications for each. Keyboard shortcuts to jump between them.
+**For sales:** CRM integration (HubSpot/Zoho), conversation Kanban, AI-powered follow-ups
+**For support:** Team inbox, chatbot builder, canned replies, sentiment alerts
+**For marketing:** Broadcast campaigns, contact labels, analytics dashboard
+**For everyone:** AI smart replies, scheduled messages, split screen, stealth mode
 
-It's a one-time purchase, no recurring fees. Targeting it at freelancers, agency owners, recruiters, real estate agents — anyone whose workday involves multiple WhatsApp numbers.
+It runs locally — we never read your messages. WhatsApp's encryption stays intact.
 
-Live at supamsg.com. Would love to hear if this resonates with your workflow.
+**Pricing designed for emerging markets:** Free (3 accounts), Pro ₹499/mo ($6), Business ₹999/mo ($12). Razorpay for payments — UPI, cards, netbanking.
+
+The TAM here is massive. 500M+ WhatsApp users in India alone, and most business owners have 2-4 numbers. Yet there's no proper power tool for multi-account WhatsApp on desktop.
+
+Live at supamsg.com. Would love to hear from people in WhatsApp-heavy markets.
 
 ---
 
@@ -102,87 +162,156 @@ Live at supamsg.com. Would love to hear if this resonates with your workflow.
 **Tweet 1:**
 You have 3 phones on your desk right now.
 
-One for personal. One for work. One for that side project.
+Personal. Work. Side hustle.
 
-And you're constantly picking up the wrong one when WhatsApp buzzes. 😩
+And every time WhatsApp buzzes, you pick up the wrong one.
+
+I built a fix. Here's what it does (thread):
 
 **Tweet 2:**
-I built SupaMsg — a Mac app that lets you run ALL your WhatsApp accounts from one window.
+SupaMsg puts ALL your WhatsApp accounts in one Mac window.
 
-Separate tabs. Separate sessions. One app.
+Switch between them instantly. Split screen to view two side by side.
 
-No more phone juggling. No more browser hacks. No more missed messages. 🧘
+Each account is fully isolated. Nothing leaks between them.
+
+That alone saves hours. But we didn't stop there...
 
 **Tweet 3:**
-What you get:
+We added 48 features that WhatsApp will never build:
 
-📌 Multiple WhatsApp accounts in isolated tabs
-⌨️ Cmd+1, Cmd+2 to switch instantly
-🔔 Per-account desktop notifications
-🔒 Fully sandboxed sessions (nothing leaks)
-💻 Native macOS app, not a browser extension
-💰 One-time purchase, no subscription
+- AI smart replies (powered by Claude)
+- Chat summarization
+- Scheduled messages
+- Broadcast campaigns
+- CRM integration
+- Chatbot builder
+- Payment collection
+- Voice transcription
+
+All running locally. We never touch your messages.
 
 **Tweet 4:**
-Built this for:
+Who this is for:
 
-→ Freelancers with personal + work numbers
-→ Agency owners managing client lines
+→ Freelancers juggling personal + work
+→ Agency owners managing 10 client accounts
 → Real estate agents with regional numbers
-→ Recruiters juggling candidate pipelines
-→ Anyone in India/SE Asia/LATAM/Middle East where WhatsApp = business
+→ Sales teams tracking leads on WhatsApp
+→ Small businesses in India/SE Asia/LATAM
 
-If you have 2+ phones, this is for you.
+If WhatsApp is your office, SupaMsg is your OS.
 
 **Tweet 5:**
-SupaMsg is live and free to try. 🚀
+Pricing is dead simple:
 
-No sign-ups. No cloud middleman. Your messages stay yours.
+Free — 3 accounts, forever
+Pro — ₹499/mo ($6) — unlimited accounts + AI
+Business — ₹999/mo ($12) — automations, CRM, broadcasting
 
-One-time purchase. No subscriptions. Ever.
+No contracts. Cancel anytime. 30-day money back.
 
-Try it → supamsg.com
+Try it free → supamsg.com
 
-If this solves a problem for you, a RT would mean the world. 🙏
+**Tweet 6:**
+We launched on @ProductHunt today.
+
+If managing multiple WhatsApps has ever been painful for you, check it out and let me know what you think.
+
+Every upvote and comment helps us reach more people who need this.
+
+→ [ProductHunt link]
 
 ---
 
 ## 4. IndieHackers Post
 
-**Title:** I launched SupaMsg — a macOS app for managing multiple WhatsApp accounts. Here's everything.
+**Title:** I launched SupaMsg — 48 features for multi-account WhatsApp. Here's the full breakdown.
 
 **Body:**
 
-Hey IH. Wanted to share what I've been working on and be transparent about the whole thing.
+Hey IH. Sharing what I've been building and being fully transparent.
 
-**The problem:** I have three WhatsApp numbers. Personal, work, side business. WhatsApp Desktop only supports one account. I was using separate browser profiles, but it was messy — tabs everywhere, couldn't tell which notification was from which account, sessions would randomly log out. I figured if I have this problem, millions of people in WhatsApp-heavy markets (India, SE Asia, LATAM, Middle East) do too.
+**The problem:** I have 3 WhatsApp numbers. WhatsApp Desktop supports one. I tried browser profiles, separate Chrome windows, incognito tabs. All painful. And there's zero automation — no scheduling, no AI, no CRM, nothing.
 
-**The product:** SupaMsg is a macOS desktop app. You open it, scan QR codes for each WhatsApp account, and they live in separate tabs. Each session is fully isolated — separate storage, separate cookies. You get per-account notifications and keyboard shortcuts to switch between them. That's it. It does one thing and does it well.
+**The insight:** 500M+ WhatsApp users in India alone. Most business owners have 2-4 numbers. Yet there's no desktop power tool for multi-account WhatsApp. The market is massive and completely underserved.
 
-**Tech stack:** Electron with custom BrowserView management. Each WhatsApp session runs in an isolated partition. The tricky part was keeping memory usage reasonable while running multiple WebView instances and handling WhatsApp's session persistence quirks.
+**The product:** SupaMsg is a macOS desktop app. You scan QR codes, and all your WhatsApp accounts live in one window. But the real value is the 48 features on top:
 
-**Revenue model:** Free trial, then a one-time purchase. No subscriptions. I'm allergic to SaaS fatigue and I think for a utility app like this, one-time pricing feels right. It also makes the pitch dead simple: pay once, use forever.
+- AI smart replies + summarization + translation (powered by Claude)
+- Scheduled messages, auto-reply rules, chatbot builder
+- Broadcast campaigns, CRM integration (HubSpot/Zoho)
+- Conversation Kanban, team inbox, analytics
+- Payment collection, product catalog, appointment booking
+- Webhook API, Zapier integration, white-label branding
 
-**Where I am now:** Just launched. Focusing on macOS first because that's what I use and the market is underserved here. Windows version is on the roadmap if there's demand.
+Everything runs locally. Zero access to messages. WhatsApp's encryption stays intact.
 
-**What I'd love from you:** Honest feedback on positioning and pricing. Is one-time purchase the right call, or should I do annual? How would you approach marketing this in non-English markets?
+**Revenue model:** Freemium with subscriptions.
+- Free: 3 accounts, basic features
+- Pro: ₹499/mo ($6) — unlimited accounts, AI, scheduling
+- Business: ₹999/mo ($12) — automations, CRM, broadcasting, API
 
-Check it out at supamsg.com. Happy to answer any questions about the build or the business.
+Using Razorpay for payments because my core market is India/SE Asia and UPI is king.
+
+**Tech stack:** Electron + isolated BrowserViews per account. Backend on DigitalOcean (Node.js + Express) for payment verification. Cloudflare for DNS/CDN. GitHub for distribution.
+
+**What I'd love from you:**
+1. Is ₹499 ($6) the right price point, or should I go lower for the Indian market?
+2. Should I build a Windows version before or after validating on Mac?
+3. How would you approach SEO for "multiple whatsapp accounts on pc" — it gets 50K+ searches/month?
+
+supamsg.com — try it free, tear it apart, tell me what's wrong.
 
 ---
 
 ## 5. Hacker News (Show HN)
 
-**Title:** Show HN: SupaMsg -- Manage multiple WhatsApp accounts from one macOS app
+**Title:** Show HN: SupaMsg — Manage multiple WhatsApp accounts with AI, automations, and 48 features
 
 **Body:**
 
-SupaMsg is a macOS desktop app that runs multiple WhatsApp Web sessions in isolated tabs. Each tab has its own BrowserView with a separate Electron session partition, so cookies, localStorage, and IndexedDB are fully sandboxed between accounts.
+SupaMsg is a macOS desktop app that runs multiple WhatsApp Web sessions in isolated tabs, plus 48 features on top.
 
-The core challenge was keeping memory reasonable with multiple WebView instances while maintaining session persistence across app restarts. WhatsApp Web aggressively invalidates sessions if it detects anything unusual about the environment, so getting the user-agent and fingerprint handling right per session took some iteration.
+Technical details: Each WhatsApp account runs in its own Electron BrowserView with a separate session partition (persist:account-N). This gives full cookie/localStorage/IndexedDB isolation between accounts without the memory overhead of separate windows. WhatsApp Web's aggressive session invalidation was the hardest part — getting user-agent and fingerprint handling right per partition took significant iteration.
 
-Features: keyboard shortcuts for tab switching, per-account native notifications, and a minimal UI that stays out of the way. No proxy, no message relay, no cloud component -- it connects directly to WhatsApp Web.
+AI features use the Anthropic Claude API for reply suggestions, summarization, translation, and sentiment analysis. Everything runs as a request from the desktop app — no messages are stored or sent to our servers. The AI sees only the conversation context you explicitly ask it to analyze.
 
-One-time purchase, no subscription. macOS only for now.
+Other features: scheduled messages, auto-reply rules, chatbot builder, broadcast campaigns, CRM integration (HubSpot/Zoho API), conversation Kanban, split screen, voice transcription, and more.
+
+Privacy model: all data stays on your device. The only server component is payment verification (Razorpay subscriptions via a Node.js API). Messages never leave the local Electron process.
+
+Free for 3 accounts. Pro $6/mo, Business $12/mo.
 
 supamsg.com
+
+---
+
+## 6. LinkedIn Post
+
+I just launched SupaMsg, and I want to tell you why.
+
+In India, WhatsApp isn't just a messaging app. It's how we do business. Sales calls happen on WhatsApp. Customer support happens on WhatsApp. Invoices get sent on WhatsApp.
+
+But here's the thing — most business owners have 2-4 WhatsApp numbers. And WhatsApp Desktop only supports one account. So they carry multiple phones, miss messages, and have zero way to automate anything.
+
+I built SupaMsg to fix this.
+
+It's a desktop app that puts all your WhatsApp accounts in one window — and adds 48 features that turn WhatsApp into a real business platform:
+
+→ AI-powered smart replies and chat summarization
+→ Scheduled messages across time zones
+→ CRM integration with HubSpot and Zoho
+→ Broadcast campaigns and chatbot builder
+→ Payment collection via UPI
+→ Analytics and conversation pipeline
+
+Everything runs locally on your computer. We never read your messages. Privacy isn't a feature — it's the foundation.
+
+Pricing is designed for the Indian market: Free for 3 accounts. Pro at ₹499/month. Business at ₹999/month.
+
+If you manage multiple WhatsApp accounts for work, give it a try: supamsg.com
+
+And if you know someone drowning in multiple phones — share this with them. They'll thank you.
+
+#WhatsApp #Productivity #SaaS #IndianStartup #Launch
