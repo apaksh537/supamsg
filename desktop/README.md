@@ -42,7 +42,7 @@ All your WhatsApps. One window. Manage multiple WhatsApp accounts, schedule mess
 ## Quick Start
 
 ```bash
-git clone https://github.com/apaksh-gupta/supamsg.git
+git clone https://github.com/apaksh537/supamsg.git
 cd supamsg
 npm install
 npm start

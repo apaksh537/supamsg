@@ -48,8 +48,8 @@
     ],
     "publish": {
       "provider": "github",
-      "owner": "apaksh-gupta",
-      "repo": "supamsg-desktop"
+      "owner": "apaksh537",
+      "repo": "supamsg"
     }
   },
   "devDependencies": {
@@ -58,7 +58,6 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.80.0",
-    "@lemonsqueezy/lemonsqueezy.js": "^4.0.0",
     "electron-updater": "^6.8.3",
     "puppeteer-core": "^24.40.0",
     "qrcode": "^1.5.4",

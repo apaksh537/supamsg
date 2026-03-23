@@ -97,15 +97,17 @@ contextBridge.exposeInMainWorld('hub', {
   hideViews: () => ipcRenderer.send('hide-views'),
   showViews: () => ipcRenderer.send('show-views'),
 
-  // Licensing (Lemon Squeezy)
+  // Licensing (Razorpay)
   getLicense: () => ipcRenderer.invoke('get-license'),
   checkFeature: (name) => ipcRenderer.invoke('check-feature', name),
   getTiers: () => ipcRenderer.invoke('get-tiers'),
-  activateLicense: (licenseKey, email) => ipcRenderer.invoke('activate-license', { licenseKey, email }),
+  getPricing: () => ipcRenderer.invoke('get-pricing'),
+  activateLicense: (email) => ipcRenderer.invoke('activate-license', { email }),
   deactivateLicense: () => ipcRenderer.invoke('deactivate-license'),
   validateLicense: () => ipcRenderer.invoke('validate-license'),
-  getCheckoutUrl: (tier, annual) => ipcRenderer.invoke('get-checkout-url', { tier, annual }),
-  getCustomerPortalUrl: () => ipcRenderer.invoke('get-customer-portal-url'),
+  getRazorpayKey: () => ipcRenderer.invoke('get-razorpay-key'),
+  createSubscription: (email, tier, annual) => ipcRenderer.invoke('create-subscription', { email, tier, annual }),
+  verifyPayment: (data) => ipcRenderer.invoke('verify-payment', data),
 
   // Event listeners
   onLoadAccounts: (cb) => ipcRenderer.on('load-accounts', (_e, d) => cb(d)),

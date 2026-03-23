@@ -59,7 +59,7 @@ body {
 .plan-price { font-size: 32px; font-weight: 800; color: #111B21; line-height: 1; }
 .plan-price .period { font-size: 14px; font-weight: 400; color: #667781; }
 
-/* Annual breakdown — the key motivator */
+/* Annual breakdown */
 .plan-annual-info {
   margin-top: 8px; padding: 8px 12px; background: #F0FFF4; border-radius: 8px;
   border: 1px solid #D1FAE5;
@@ -96,7 +96,7 @@ body {
 .plan-btn-outline { background: none; border: 1.5px solid #25D366; color: #25D366; }
 .plan-btn-outline:hover { background: #F0FFF4; }
 
-/* License key section */
+/* Email activation section */
 .license-section {
   margin-top: 16px; padding-top: 16px; border-top: 1px solid #E8E8E8;
 }
@@ -129,6 +129,7 @@ body {
 .guarantee-text { font-size: 12px; color: #667781; }
 .guarantee-text strong { color: #111B21; }
 </style>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </head>
 <body>
   <div class="panel-header">
@@ -142,7 +143,7 @@ body {
       <div class="billing-opt active" id="opt-monthly" onclick="setBilling(false)">Monthly</div>
       <div class="billing-opt" id="opt-annual" onclick="setBilling(true)">
         Annual
-        <span class="save-tag">SAVE 27%</span>
+        <span class="save-tag">SAVE 33%</span>
       </div>
     </div>
 
@@ -151,15 +152,15 @@ body {
       <!-- Pro -->
       <div class="plan-card" id="card-pro">
         <div class="plan-name">Pro</div>
-        <div class="plan-price" id="price-pro">$9 <span class="period">/month</span></div>
+        <div class="plan-price" id="price-pro"></div>
 
         <div class="plan-annual-info" id="annual-info-pro" style="display:none">
-          <div class="plan-annual-total" id="annual-total-pro">$79/year</div>
+          <div class="plan-annual-total" id="annual-total-pro"></div>
           <div class="plan-annual-save">
             <span>&#10003;</span>
-            <span id="annual-save-pro">You save $29/year</span>
+            <span id="annual-save-pro"></span>
           </div>
-          <div class="plan-monthly-compare" id="annual-compare-pro">$108/year if billed monthly</div>
+          <div class="plan-monthly-compare" id="annual-compare-pro"></div>
         </div>
 
         <ul class="plan-features">
@@ -185,15 +186,15 @@ body {
       <div class="plan-card popular" id="card-business">
         <div class="popular-badge">Most Popular</div>
         <div class="plan-name">Business</div>
-        <div class="plan-price" id="price-business">$19 <span class="period">/month</span></div>
+        <div class="plan-price" id="price-business"></div>
 
         <div class="plan-annual-info" id="annual-info-business" style="display:none">
-          <div class="plan-annual-total" id="annual-total-business">$149/year</div>
+          <div class="plan-annual-total" id="annual-total-business"></div>
           <div class="plan-annual-save">
             <span>&#10003;</span>
-            <span id="annual-save-business">You save $79/year</span>
+            <span id="annual-save-business"></span>
           </div>
-          <div class="plan-monthly-compare" id="annual-compare-business">$228/year if billed monthly</div>
+          <div class="plan-monthly-compare" id="annual-compare-business"></div>
         </div>
 
         <ul class="plan-features">
@@ -222,20 +223,47 @@ body {
       <div class="guarantee-text"><strong>30-day money-back guarantee.</strong> Try risk-free — full refund if not satisfied.</div>
     </div>
 
-    <!-- License key -->
+    <!-- Email activation -->
     <div class="license-section">
-      <div class="license-toggle" onclick="toggleLicense()">Already have a license key? &#8594;</div>
-      <div class="license-form" id="licenseForm">
-        <input class="license-input" id="licenseKey" placeholder="Paste your license key (WH-...)">
-        <input class="license-input" id="licenseEmail" placeholder="Email used at purchase">
-        <button class="license-btn" onclick="activateLicense()">Activate License</button>
-        <div class="license-status" id="licenseStatus"></div>
+      <div class="license-toggle" onclick="toggleActivation()">Already subscribed? Activate with email &#8594;</div>
+      <div class="license-form" id="activationForm">
+        <input class="license-input" id="activationEmail" placeholder="Email used at purchase">
+        <button class="license-btn" onclick="activateByEmail()">Activate</button>
+        <div class="license-status" id="activationStatus"></div>
       </div>
     </div>
   </div>
 
   <script>
     let isAnnual = false;
+    let isIndia = true; // default to INR, detect below
+
+    // Detect locale for currency display
+    try {
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+      const locale = navigator.language || '';
+      isIndia = tz.includes('Calcutta') || tz.includes('Kolkata') || locale.startsWith('hi') || locale.includes('IN');
+    } catch (e) {}
+
+    const pricing = {
+      pro: { inr: 499, usd: 6, inrAnnual: 3999, usdAnnual: 48 },
+      business: { inr: 999, usd: 12, inrAnnual: 7999, usdAnnual: 96 },
+    };
+
+    function fmt(amount, currency) {
+      if (currency === 'INR') return '\u20B9' + amount.toLocaleString('en-IN');
+      return '$' + amount;
+    }
+
+    function cur() { return isIndia ? 'INR' : 'USD'; }
+
+    function monthlyPrice(tier) {
+      return isIndia ? pricing[tier].inr : pricing[tier].usd;
+    }
+
+    function annualPrice(tier) {
+      return isIndia ? pricing[tier].inrAnnual : pricing[tier].usdAnnual;
+    }
 
     function setBilling(annual) {
       isAnnual = annual;
@@ -245,79 +273,118 @@ body {
     }
 
     function updatePrices() {
-      if (isAnnual) {
-        // Show annual pricing with savings
-        document.getElementById('price-pro').innerHTML = '$6.58 <span class="period">/month</span>';
-        document.getElementById('price-business').innerHTML = '$12.42 <span class="period">/month</span>';
-        document.getElementById('annual-info-pro').style.display = 'block';
-        document.getElementById('annual-info-business').style.display = 'block';
-        document.getElementById('btn-pro').textContent = 'Get Pro — $79/year';
-        document.getElementById('btn-business').textContent = 'Get Business — $149/year';
-      } else {
-        // Show monthly pricing
-        document.getElementById('price-pro').innerHTML = '$9 <span class="period">/month</span>';
-        document.getElementById('price-business').innerHTML = '$19 <span class="period">/month</span>';
-        document.getElementById('annual-info-pro').style.display = 'none';
-        document.getElementById('annual-info-business').style.display = 'none';
-        document.getElementById('btn-pro').textContent = 'Get Pro';
-        document.getElementById('btn-business').textContent = 'Get Business';
+      const c = cur();
+      ['pro', 'business'].forEach(tier => {
+        const mp = monthlyPrice(tier);
+        const ap = annualPrice(tier);
+        const monthlyEquiv = Math.round(ap / 12);
+
+        if (isAnnual) {
+          document.getElementById('price-' + tier).innerHTML = fmt(monthlyEquiv, c) + ' <span class="period">/month</span>';
+          document.getElementById('annual-info-' + tier).style.display = 'block';
+          document.getElementById('annual-total-' + tier).textContent = fmt(ap, c) + '/year';
+          document.getElementById('annual-save-' + tier).textContent = 'You save ' + fmt(mp * 12 - ap, c) + '/year';
+          document.getElementById('annual-compare-' + tier).textContent = fmt(mp * 12, c) + '/year if billed monthly';
+          document.getElementById('btn-' + tier).textContent = 'Get ' + tier.charAt(0).toUpperCase() + tier.slice(1) + ' \u2014 ' + fmt(ap, c) + '/yr';
+        } else {
+          document.getElementById('price-' + tier).innerHTML = fmt(mp, c) + ' <span class="period">/month</span>';
+          document.getElementById('annual-info-' + tier).style.display = 'none';
+          document.getElementById('btn-' + tier).textContent = 'Get ' + tier.charAt(0).toUpperCase() + tier.slice(1);
+        }
+      });
+    }
+
+    // Initialize prices
+    updatePrices();
+
+    async function selectPlan(tier) {
+      // Prompt for email
+      const email = await hub.showInputDialog({
+        title: 'Enter your email',
+        message: 'We\'ll use this to manage your subscription.',
+        placeholder: 'you@example.com',
+      });
+
+      if (!email || !email.trim()) return;
+
+      try {
+        // Create subscription via backend
+        const btn = document.getElementById('btn-' + tier);
+        btn.textContent = 'Setting up...';
+        btn.disabled = true;
+
+        const sub = await hub.createSubscription(email.trim(), tier, isAnnual);
+
+        if (sub.error) {
+          btn.textContent = 'Try again';
+          btn.disabled = false;
+          return;
+        }
+
+        // Open Razorpay Checkout
+        const rzpKey = await hub.getRazorpayKey();
+
+        const options = {
+          key: rzpKey,
+          subscription_id: sub.subscription_id,
+          name: 'SupaMsg',
+          description: tier.charAt(0).toUpperCase() + tier.slice(1) + ' Plan' + (isAnnual ? ' (Annual)' : ''),
+          handler: async function(response) {
+            // Verify payment
+            btn.textContent = 'Verifying...';
+            const result = await hub.verifyPayment({
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_subscription_id: response.razorpay_subscription_id,
+              razorpay_signature: response.razorpay_signature,
+              email: email.trim(),
+              tier: tier,
+            });
+
+            if (result.success) {
+              btn.textContent = '\u2713 Activated!';
+              btn.style.background = '#25D366';
+              btn.style.color = '#fff';
+              setTimeout(() => hub.closePanel('upgrade'), 1500);
+            } else {
+              btn.textContent = 'Verification failed — try again';
+              btn.disabled = false;
+            }
+          },
+          prefill: { email: email.trim() },
+          theme: { color: '#25D366' },
+          modal: {
+            ondismiss: function() {
+              btn.textContent = 'Get ' + tier.charAt(0).toUpperCase() + tier.slice(1);
+              btn.disabled = false;
+            },
+          },
+        };
+
+        const rzp = new Razorpay(options);
+        rzp.open();
+
+      } catch (e) {
+        document.getElementById('btn-' + tier).textContent = 'Error — try again';
+        document.getElementById('btn-' + tier).disabled = false;
       }
     }
 
-    async function selectPlan(tier) {
-      try {
-        const url = await hub.getCheckoutUrl(tier, isAnnual);
-        if (url) {
-          // Open checkout in-app via IPC (main process opens a BrowserWindow)
-          hub.openCheckout(url);
-
-          // Show waiting state
-          document.getElementById('btn-pro').disabled = true;
-          document.getElementById('btn-business').disabled = true;
-          document.getElementById('btn-' + tier).textContent = 'Completing payment...';
-
-          // Poll for license activation (check every 5 seconds for 5 minutes)
-          let attempts = 0;
-          const pollInterval = setInterval(async () => {
-            attempts++;
-            try {
-              const license = await hub.getLicense();
-              if (license && license.tier !== 'free') {
-                clearInterval(pollInterval);
-                document.getElementById('btn-' + tier).textContent = '✓ Activated!';
-                document.getElementById('btn-' + tier).style.background = '#25D366';
-                document.getElementById('btn-' + tier).style.color = '#fff';
-                setTimeout(() => window.close(), 1500);
-              }
-            } catch (e) {}
-            if (attempts > 60) { // 5 minutes
-              clearInterval(pollInterval);
-              document.getElementById('btn-pro').disabled = false;
-              document.getElementById('btn-business').disabled = false;
-              document.getElementById('btn-' + tier).textContent = tier === 'pro' ? 'Get Pro' : 'Get Business';
-            }
-          }, 5000);
-        }
-      } catch (e) {}
+    function toggleActivation() {
+      document.getElementById('activationForm').classList.toggle('visible');
     }
 
-    function toggleLicense() {
-      document.getElementById('licenseForm').classList.toggle('visible');
-    }
-
-    async function activateLicense() {
-      const key = document.getElementById('licenseKey').value.trim();
-      const email = document.getElementById('licenseEmail').value.trim();
-      const status = document.getElementById('licenseStatus');
-      if (!key) { status.innerHTML = '<span style="color:#EF4444">Enter a license key</span>'; return; }
-      status.innerHTML = '<span style="color:#667781">Activating...</span>';
+    async function activateByEmail() {
+      const email = document.getElementById('activationEmail').value.trim();
+      const status = document.getElementById('activationStatus');
+      if (!email) { status.innerHTML = '<span style="color:#EF4444">Enter your email</span>'; return; }
+      status.innerHTML = '<span style="color:#667781">Checking...</span>';
       try {
-        const result = await hub.activateLicense(key, email);
+        const result = await hub.activateLicense(email);
         if (result.success) {
           status.innerHTML = '<span style="color:#25D366">&#10003; Activated! You\'re now on ' + result.tier + '.</span>';
           setTimeout(() => hub.closePanel('upgrade'), 1500);
         } else {
-          status.innerHTML = '<span style="color:#EF4444">' + (result.error || 'Invalid key') + '</span>';
+          status.innerHTML = '<span style="color:#EF4444">' + (result.error || 'No active subscription found') + '</span>';
         }
       } catch (e) {
         status.innerHTML = '<span style="color:#EF4444">Activation failed</span>';
