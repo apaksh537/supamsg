@@ -81,10 +81,6 @@ contextBridge.exposeInMainWorld('hub', {
   crmLogConversation: (contactKey, messages, summary) => ipcRenderer.invoke('crm-log-conversation', { contactKey, messages, summary }),
   crmLinkContact: (contactKey, crmContact) => ipcRenderer.send('crm-link-contact', { contactKey, crmContact }),
 
-  // Panels
-  openPanel: (name) => ipcRenderer.send('open-panel', name),
-  closePanel: (name) => ipcRenderer.send('close-panel', name),
-
   // Pairing
   generatePairingQR: () => ipcRenderer.invoke('generate-pairing-qr'),
 

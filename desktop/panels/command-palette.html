@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Command Palette</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  background: rgba(0,0,0,0.5); color: #111B21;
+  display: flex; align-items: flex-start; justify-content: center;
+  height: 100vh; padding-top: 80px;
+}
+.palette {
+  width: 560px; max-height: 420px; background: #fff;
+  border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  overflow: hidden; display: flex; flex-direction: column;
+}
+.palette-input-wrap {
+  padding: 16px; border-bottom: 1px solid #E8E8E8;
+}
+.palette-input {
+  width: 100%; height: 40px; padding: 0 12px; font-size: 16px;
+  border: none; outline: none; background: #F0F2F5; border-radius: 8px;
+  color: #111B21;
+}
+.palette-input::placeholder { color: #667781; }
+.palette-results {
+  flex: 1; overflow-y: auto; padding: 8px;
+}
+.palette-item {
+  display: flex; align-items: center; gap: 12px; padding: 10px 12px;
+  border-radius: 8px; cursor: pointer; transition: background 0.1s;
+}
+.palette-item:hover, .palette-item.active { background: #F0F2F5; }
+.palette-item-icon {
+  width: 32px; height: 32px; border-radius: 8px; background: #E8F8EE;
+  display: flex; align-items: center; justify-content: center;
+  color: #25D366; font-size: 16px; flex-shrink: 0;
+}
+.palette-item-text { flex: 1; }
+.palette-item-name { font-size: 14px; font-weight: 600; }
+.palette-item-desc { font-size: 12px; color: #667781; }
+.palette-item-shortcut {
+  font-size: 11px; color: #667781; font-family: 'SF Mono', monospace;
+  background: #F0F2F5; padding: 2px 6px; border-radius: 4px;
+}
+.palette-empty {
+  padding: 24px; text-align: center; color: #667781; font-size: 14px;
+}
+</style>
+</head>
+<body>
+<div class="palette">
+  <div class="palette-input-wrap">
+    <input class="palette-input" id="searchInput" placeholder="Type a command..." autofocus>
+  </div>
+  <div class="palette-results" id="results"></div>
+</div>
+<script>
+const commands = [
+  { name: 'Switch Account', desc: 'Jump to another WhatsApp account', icon: '&#8644;', action: 'switch-account' },
+  { name: 'New Scheduled Message', desc: 'Schedule a message for later', icon: '&#128197;', action: 'open-schedule' },
+  { name: 'Templates', desc: 'Open message templates', icon: '&#128196;', action: 'open-templates', shortcut: 'Cmd+T' },
+  { name: 'AI Smart Reply', desc: 'Get AI-suggested replies', icon: '&#129302;', action: 'open-ai' },
+  { name: 'Broadcast', desc: 'Send a broadcast message', icon: '&#128227;', action: 'open-broadcast' },
+  { name: 'Settings', desc: 'Open app settings', icon: '&#9881;', action: 'open-settings', shortcut: 'Cmd+,' },
+  { name: 'Split Screen', desc: 'View two accounts side by side', icon: '&#9641;', action: 'toggle-split' },
+  { name: 'Export Chat', desc: 'Export current conversation', icon: '&#128190;', action: 'export-chat' },
+  { name: 'Dashboard', desc: 'View analytics dashboard', icon: '&#128200;', action: 'open-dashboard' },
+  { name: 'Upgrade', desc: 'Manage your subscription', icon: '&#11088;', action: 'open-upgrade' },
+];
+
+const searchInput = document.getElementById('searchInput');
+const results = document.getElementById('results');
+let activeIndex = 0;
+
+function render(filter = '') {
+  const filtered = filter
+    ? commands.filter(c => c.name.toLowerCase().includes(filter.toLowerCase()) || c.desc.toLowerCase().includes(filter.toLowerCase()))
+    : commands;
+
+  if (filtered.length === 0) {
+    results.innerHTML = '<div class="palette-empty">No commands found</div>';
+    return;
+  }
+
+  activeIndex = Math.min(activeIndex, filtered.length - 1);
+  results.innerHTML = filtered.map((c, i) => `
+    <div class="palette-item ${i === activeIndex ? 'active' : ''}" data-action="${c.action}">
+      <div class="palette-item-icon">${c.icon}</div>
+      <div class="palette-item-text">
+        <div class="palette-item-name">${c.name}</div>
+        <div class="palette-item-desc">${c.desc}</div>
+      </div>
+      ${c.shortcut ? '<div class="palette-item-shortcut">' + c.shortcut + '</div>' : ''}
+    </div>
+  `).join('');
+
+  results.querySelectorAll('.palette-item').forEach(item => {
+    item.addEventListener('click', () => executeAction(item.dataset.action));
+  });
+}
+
+function executeAction(action) {
+  if (action.startsWith('open-')) {
+    const panel = action.replace('open-', '');
+    hub.openPanel(panel);
+  } else if (action === 'toggle-split') {
+    hub.toggleSplitScreen();
+  } else if (action === 'export-chat') {
+    hub.exportChat({});
+  } else if (action === 'switch-account') {
+    hub.closePanel('command-palette');
+  }
+  hub.closePanel('command-palette');
+}
+
+searchInput.addEventListener('input', () => {
+  activeIndex = 0;
+  render(searchInput.value);
+});
+
+searchInput.addEventListener('keydown', (e) => {
+  const items = results.querySelectorAll('.palette-item');
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    activeIndex = Math.min(activeIndex + 1, items.length - 1);
+    render(searchInput.value);
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    activeIndex = Math.max(activeIndex - 1, 0);
+    render(searchInput.value);
+  } else if (e.key === 'Enter' && items[activeIndex]) {
+    executeAction(items[activeIndex].dataset.action);
+  } else if (e.key === 'Escape') {
+    hub.closePanel('command-palette');
+  }
+});
+
+render();
+</script>
+</body>
+</html>
