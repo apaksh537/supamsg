@@ -1,7 +1,4 @@
-<svg width="44" height="44" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg">
-  <!-- Chat bubble with lightning bolt - monochrome for macOS tray template image -->
-  <rect x="4" y="4" width="36" height="26" rx="7" fill="black"/>
-  <polygon points="10,30 6,40 17,30" fill="black"/>
-  <!-- Lightning bolt -->
-  <polygon points="24,9 16,22 21,22 18,33 28,18 23,18" fill="white"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44" width="44" height="44">
+  <rect x="3" y="3" width="38" height="38" rx="8" ry="8" fill="none" stroke="black" stroke-width="3"/>
+  <text x="22" y="32" text-anchor="middle" font-family="Arial Black, Arial, Helvetica, sans-serif" font-size="28" font-weight="900" fill="black">S</text>
 </svg>
