@@ -438,6 +438,9 @@ function showOnboarding() {
 
 // ── Main Window ──────────────────────────────────────────────
 
+// TODO: Add a Content Security Policy (CSP) in a future security update.
+// This can be done via session.defaultSession.webRequest.onHeadersReceived or
+// a <meta> tag to restrict script-src, style-src, connect-src, etc.
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1400,
@@ -484,7 +487,12 @@ function createWindow() {
       const heapUsedMB = Math.round(memUsage.heapUsed / 1024 / 1024);
       const rssMB = Math.round(memUsage.rss / 1024 / 1024);
       if (rssMB > 2000) { // Over 2GB
-        mainWindow.webContents.send('memory-warning', { rssMB, heapUsedMB, accounts: Object.keys(views).length });
+        mainWindow.webContents.send('memory-warning', {
+          rssMB,
+          heapUsedMB,
+          accounts: Object.keys(views).length,
+          suggestion: 'Memory usage is high (' + rssMB + ' MB). Please restart SupaMsg to free up memory. You can also try closing unused accounts.',
+        });
       }
     }, 60000); // Check every minute
   });

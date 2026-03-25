@@ -121,6 +121,27 @@ body {
 .license-btn:hover { background: #2C3E50; }
 .license-status { font-size: 12px; margin-top: 6px; text-align: center; }
 
+/* Spinner for "Setting up..." loading state */
+@keyframes btn-spinner {
+  to { transform: rotate(360deg); }
+}
+.plan-btn.loading {
+  position: relative;
+  color: transparent;
+  pointer-events: none;
+}
+.plan-btn.loading::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 18px; height: 18px;
+  margin: -9px 0 0 -9px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: btn-spinner 0.6s linear infinite;
+}
+
 /* Guarantee badge */
 .guarantee {
   text-align: center; margin-top: 16px; padding: 12px;
@@ -311,12 +332,14 @@ body {
         // Create subscription via backend
         const btn = document.getElementById('btn-' + tier);
         btn.textContent = 'Setting up...';
+        btn.classList.add('loading');
         btn.disabled = true;
 
         const sub = await hub.createSubscription(email.trim(), tier, isAnnual);
 
         if (sub.error) {
           btn.textContent = 'Try again';
+          btn.classList.remove('loading');
           btn.disabled = false;
           return;
         }
@@ -332,6 +355,7 @@ body {
           handler: async function(response) {
             // Verify payment
             btn.textContent = 'Verifying...';
+            btn.classList.remove('loading');
             const result = await hub.verifyPayment({
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_subscription_id: response.razorpay_subscription_id,
@@ -355,6 +379,7 @@ body {
           modal: {
             ondismiss: function() {
               btn.textContent = 'Get ' + tier.charAt(0).toUpperCase() + tier.slice(1);
+              btn.classList.remove('loading');
               btn.disabled = false;
             },
           },
@@ -364,8 +389,10 @@ body {
         rzp.open();
 
       } catch (e) {
-        document.getElementById('btn-' + tier).textContent = 'Error — try again';
-        document.getElementById('btn-' + tier).disabled = false;
+        const errBtn = document.getElementById('btn-' + tier);
+        errBtn.textContent = 'Error — try again';
+        errBtn.classList.remove('loading');
+        errBtn.disabled = false;
       }
     }
 

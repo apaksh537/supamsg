@@ -135,6 +135,9 @@ function saveAgents() {
   }
 }
 
+// TODO: API key is stored in plain text in settings.json. A future update should
+// use Electron's safeStorage API to encrypt the key at rest. See:
+// https://www.electronjs.org/docs/latest/api/safe-storage
 function getApiKey() {
   try {
     if (fs.existsSync(settingsPath)) {

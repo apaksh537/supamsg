@@ -309,15 +309,36 @@
       return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
     }
 
+    // Validate hex color to prevent CSS injection via account.color
+    function sanitizeColor(color) {
+      return /^#[0-9A-Fa-f]{6}$/.test(color) ? color : '#667781';
+    }
+
     // ── Context menu (right-click on accounts) ──
+    // Uses createElement + textContent to avoid XSS via dynamic account data
     function showTabContextMenu(x, y, account) {
       const menu = document.getElementById('tabContextMenu');
-      menu.innerHTML = `
-        <div class="context-menu-item" onclick="tabMenuAction('rename','${account.id}','${escapeHtml(account.name)}')">Rename</div>
-        <div class="context-menu-item" onclick="tabMenuAction('reload','${account.id}')">Reload</div>
-        <div class="context-menu-divider"></div>
-        <div class="context-menu-item danger" onclick="tabMenuAction('remove','${account.id}','${escapeHtml(account.name)}')">Remove</div>
-      `;
+      menu.innerHTML = '';
+
+      function addMenuItem(label, action, isDanger) {
+        const item = document.createElement('div');
+        item.className = 'context-menu-item' + (isDanger ? ' danger' : '');
+        item.textContent = label;
+        item.addEventListener('click', () => tabMenuAction(action, account.id, account.name));
+        menu.appendChild(item);
+      }
+
+      function addDivider() {
+        const div = document.createElement('div');
+        div.className = 'context-menu-divider';
+        menu.appendChild(div);
+      }
+
+      addMenuItem('Rename', 'rename', false);
+      addMenuItem('Reload', 'reload', false);
+      addDivider();
+      addMenuItem('Remove', 'remove', true);
+
       menu.style.left = Math.min(x, window.innerWidth - 200) + 'px';
       menu.style.top = Math.min(y, window.innerHeight - 150) + 'px';
       menu.classList.add('visible');
@@ -370,7 +391,7 @@
         const initials = escapeHtml(account.name).substring(0, 1).toUpperCase();
 
         item.innerHTML = `
-          <div class="nav-account-avatar" style="background:${account.color}">
+          <div class="nav-account-avatar" style="background:${sanitizeColor(account.color)}">
             ${initials}
             <div class="status-dot"></div>
           </div>
@@ -519,7 +540,9 @@
       document.getElementById('upgradeBanner').classList.remove('visible');
     });
 
-    // Feature gate check — shows upgrade banner if feature is locked
+    // Feature gate check — shows upgrade banner if feature is locked.
+    // NOTE: This is a frontend-only gate for UX purposes. The backend/main process
+    // should ALSO enforce licensing checks to prevent bypass via IPC calls.
     async function requireFeature(featureName, friendlyName) {
       const allowed = await hub.checkFeature(featureName);
       if (!allowed) {

@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.os.Environment
 import android.provider.MediaStore
 import android.view.LayoutInflater
@@ -151,7 +152,7 @@ class WhatsAppFragment : Fragment() {
                 try {
                     startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
                 } catch (e: Exception) {
-                    // ignore
+                    Log.w("SupaMsg", "Failed to open URL", e)
                 }
                 return true
             }

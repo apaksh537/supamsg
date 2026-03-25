@@ -297,29 +297,33 @@ struct SettingsView: View {
             }
             .listRowBackground(Color.smSurface)
 
-            Link(destination: URL(string: "https://supamsg.com/support")!) {
-                HStack {
-                    Text("Support")
-                        .foregroundColor(.smText)
-                    Spacer()
-                    Image(systemName: "arrow.up.right")
-                        .font(.caption)
-                        .foregroundColor(.smTextSecondary)
+            if let supportURL = URL(string: "https://supamsg.com/support") {
+                Link(destination: supportURL) {
+                    HStack {
+                        Text("Support")
+                            .foregroundColor(.smText)
+                        Spacer()
+                        Image(systemName: "arrow.up.right")
+                            .font(.caption)
+                            .foregroundColor(.smTextSecondary)
+                    }
                 }
+                .listRowBackground(Color.smSurface)
             }
-            .listRowBackground(Color.smSurface)
 
-            Link(destination: URL(string: "https://supamsg.com/privacy")!) {
-                HStack {
-                    Text("Privacy Policy")
-                        .foregroundColor(.smText)
-                    Spacer()
-                    Image(systemName: "arrow.up.right")
-                        .font(.caption)
-                        .foregroundColor(.smTextSecondary)
+            if let privacyURL = URL(string: "https://supamsg.com/privacy") {
+                Link(destination: privacyURL) {
+                    HStack {
+                        Text("Privacy Policy")
+                            .foregroundColor(.smText)
+                        Spacer()
+                        Image(systemName: "arrow.up.right")
+                            .font(.caption)
+                            .foregroundColor(.smTextSecondary)
+                    }
                 }
+                .listRowBackground(Color.smSurface)
             }
-            .listRowBackground(Color.smSurface)
         } header: {
             Text("About")
                 .foregroundColor(.smTextSecondary)
@@ -342,11 +346,13 @@ struct SettingsView: View {
         return formatter.string(from: date)
     }
 
+    // TODO: This needs server-side validation. The current implementation only performs
+    // basic client-side format checks and should not be considered secure.
     private func activateLicense() {
         let trimmed = licenseInput.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return }
+        guard trimmed.count >= 8 else { return }
         licenseKey = trimmed
         licenseActivated = true
-        // In production, validate against a server
     }
 }

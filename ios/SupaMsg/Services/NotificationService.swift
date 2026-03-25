@@ -21,10 +21,14 @@ final class NotificationService: NSObject {
         let center = UNUserNotificationCenter.current()
         center.requestAuthorization(options: [.alert, .badge, .sound]) { granted, error in
             if let error = error {
+                #if DEBUG
                 print("[SupaMsg] Notification auth error: \(error.localizedDescription)")
+                #endif
                 return
             }
+            #if DEBUG
             print("[SupaMsg] Notification permission granted: \(granted)")
+            #endif
         }
     }
 
@@ -96,7 +100,9 @@ final class NotificationService: NSObject {
 
         UNUserNotificationCenter.current().add(request) { error in
             if let error = error {
+                #if DEBUG
                 print("[SupaMsg] Failed to show notification: \(error.localizedDescription)")
+                #endif
             }
         }
     }

@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.widget.EditText
 import android.widget.PopupMenu
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -45,6 +46,7 @@ class MainActivity : AppCompatActivity() {
 
         setupViewPager()
         setupFab()
+        setupBackNavigation()
         requestPermissions()
     }
 
@@ -209,16 +211,21 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    @Deprecated("Use onBackPressedDispatcher instead")
-    override fun onBackPressed() {
-        val currentPos = viewPager.currentItem
-        val tag = "f$currentPos"
-        val fragment = supportFragmentManager.findFragmentByTag(tag)
-        if (fragment is WhatsAppFragment && fragment.canGoBack()) {
-            fragment.goBack()
-        } else {
-            super.onBackPressed()
-        }
+    private fun setupBackNavigation() {
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                val currentPos = viewPager.currentItem
+                val tag = "f$currentPos"
+                val fragment = supportFragmentManager.findFragmentByTag(tag)
+                if (fragment is WhatsAppFragment && fragment.canGoBack()) {
+                    fragment.goBack()
+                } else {
+                    isEnabled = false
+                    onBackPressedDispatcher.onBackPressed()
+                    isEnabled = true
+                }
+            }
+        })
     }
 
     inner class AccountPagerAdapter(activity: AppCompatActivity) :

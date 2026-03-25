@@ -7,6 +7,7 @@ final class PairingService: ObservableObject {
     @Published var isPaired = false
     @Published var pairingCode: String?
     @Published var connectedHost: String?
+    @Published var connectionLost = false
 
     weak var messageStore: MessageStore?
 
@@ -81,7 +82,9 @@ final class PairingService: ObservableObject {
 
         let urlString = "ws://\(host):8765"
         guard let url = URL(string: urlString) else {
+            #if DEBUG
             print("[SupaMsg] Invalid WebSocket URL: \(urlString)")
+            #endif
             return
         }
 
@@ -105,9 +108,12 @@ final class PairingService: ObservableObject {
             self.isConnected = true
             self.connectedHost = host
             self.reconnectAttempts = 0
+            self.connectionLost = false
         }
 
+        #if DEBUG
         print("[SupaMsg] Connected to \(urlString)")
+        #endif
     }
 
     func disconnect() {
@@ -126,13 +132,22 @@ final class PairingService: ObservableObject {
     // MARK: - Auto Reconnect
 
     private func scheduleReconnect() {
-        guard isPaired, reconnectAttempts < maxReconnectAttempts else { return }
+        guard isPaired, reconnectAttempts < maxReconnectAttempts else {
+            if reconnectAttempts >= maxReconnectAttempts {
+                DispatchQueue.main.async {
+                    self.connectionLost = true
+                }
+            }
+            return
+        }
 
         reconnectAttempts += 1
         let delay = baseReconnectDelay * pow(1.5, Double(reconnectAttempts - 1))
         let clampedDelay = min(delay, 30.0)
 
+        #if DEBUG
         print("[SupaMsg] Scheduling reconnect in \(clampedDelay)s (attempt \(reconnectAttempts))")
+        #endif
 
         reconnectTimer?.invalidate()
         reconnectTimer = Timer.scheduledTimer(withTimeInterval: clampedDelay, repeats: false) { [weak self] _ in
@@ -160,7 +175,9 @@ final class PairingService: ObservableObject {
                 self?.receiveMessage()
 
             case .failure(let error):
+                #if DEBUG
                 print("[SupaMsg] WebSocket receive error: \(error.localizedDescription)")
+                #endif
                 DispatchQueue.main.async {
                     self?.isConnected = false
                 }
@@ -179,7 +196,9 @@ final class PairingService: ObservableObject {
                 self?.processPayload(payload)
             }
         } catch {
+            #if DEBUG
             print("[SupaMsg] Failed to decode message: \(error.localizedDescription)")
+            #endif
         }
     }
 
@@ -242,7 +261,9 @@ final class PairingService: ObservableObject {
 
         case "pair_ack":
             // Pairing acknowledged by desktop
+            #if DEBUG
             print("[SupaMsg] Pairing acknowledged by desktop")
+            #endif
             isPaired = true
             if let host = payload.host {
                 savePairingState(host: host, code: payload.code ?? "")
@@ -254,7 +275,9 @@ final class PairingService: ObservableObject {
             break // Keep-alive response
 
         default:
+            #if DEBUG
             print("[SupaMsg] Unknown message type: \(payload.type)")
+            #endif
         }
     }
 
@@ -264,7 +287,9 @@ final class PairingService: ObservableObject {
 
         webSocketTask?.send(.string(text)) { error in
             if let error = error {
+                #if DEBUG
                 print("[SupaMsg] Send error: \(error.localizedDescription)")
+                #endif
             }
         }
     }

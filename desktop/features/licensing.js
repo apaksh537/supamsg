@@ -202,7 +202,10 @@ function initLicensing({ app, ipcMain, getMainWindow }) {
     return { success: true };
   });
 
-  // Get Razorpay key (public key only — safe for client)
+  // Get Razorpay key (public key only — safe for client).
+  // This is intentionally the Razorpay PUBLIC key (not the secret key).
+  // Public keys are designed to be embedded in client-side code per Razorpay docs.
+  // The secret key is only used server-side for signature verification.
   ipcMain.handle('get-razorpay-key', () => {
     return 'rzp_live_SUiVuogZWjVUKd';
   });
