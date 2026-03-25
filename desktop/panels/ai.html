@@ -150,10 +150,14 @@ body {
       try {
         const messages = await hub.aiGetChatMessages();
         const result = await hub.aiSuggestReplies(messages);
-        if (result && result.suggestions) {
-          const chips = result.suggestions.map(s =>
-            `<span class="suggestion-chip">${s}</span>`
-          ).join('');
+        if (result && (result.replies || result.suggestions)) {
+          const replies = result.replies || result.suggestions;
+          const chips = replies.map(s => {
+            const chip = document.createElement('span');
+            chip.className = 'suggestion-chip';
+            chip.textContent = s;
+            return chip.outerHTML;
+          }).join('');
           showResults('Suggested Replies', chips);
         } else {
           showResults('Suggested Replies', '<span class="loading">No suggestions available. Open a chat first.</span>');
@@ -168,7 +172,8 @@ body {
       try {
         const messages = await hub.aiGetChatMessages();
         const result = await hub.aiSummarize(messages);
-        showResults('Summary', result.summary || 'No summary available.');
+        const safeText = (result.summary || 'No summary available.').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        showResults('Summary', safeText);
       } catch (e) {
         showResults('Summary', '<span class="loading">Error: ' + (e.message || 'Could not generate summary.') + '</span>');
       }
@@ -190,9 +195,10 @@ body {
       showLoading('Translating...');
       try {
         const messages = await hub.aiGetChatMessages();
-        const lastMsg = messages && messages.length ? messages[messages.length - 1].body : '';
+        const lastMsg = messages && messages.length ? (messages[messages.length - 1].text || messages[messages.length - 1].body || '') : '';
         const result = await hub.aiTranslate(lastMsg, lang);
-        showResults('Translation (' + lang + ')', result.translation || 'No translation available.');
+        const safeTranslation = (result.translation || 'No translation available.').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        showResults('Translation (' + lang + ')', safeTranslation);
       } catch (e) {
         showResults('Translation', '<span class="loading">Error: ' + (e.message || 'Could not translate.') + '</span>');
       }
