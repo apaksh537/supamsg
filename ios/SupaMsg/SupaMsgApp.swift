@@ -64,7 +64,9 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
     ) {
         let token = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
+        #if DEBUG
         print("[SupaMsg] APNs device token: \(token)")
+        #endif
         NotificationService.shared.deviceToken = token
     }
 
@@ -72,7 +74,9 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         _ application: UIApplication,
         didFailToRegisterForRemoteNotificationsWithError error: Error
     ) {
+        #if DEBUG
         print("[SupaMsg] Failed to register for remote notifications: \(error.localizedDescription)")
+        #endif
     }
 
     // Foreground notification
