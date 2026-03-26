@@ -8,7 +8,7 @@
 
 ### Tagline (60 chars max)
 
-**All your WhatsApp accounts in one window — with AI superpowers**
+**WhatsApp outreach from multiple numbers — without getting banned**
 
 ### Topics
 
@@ -16,42 +16,34 @@
 
 ### Description
 
-If you have more than one WhatsApp number, you know the pain. Multiple phones, missed messages, wrong-account replies, and zero way to automate anything.
+If you do WhatsApp outreach, you know this pain: you send too many messages from one number, and it gets banned. You buy a new SIM, set it up, start again — and it gets banned too. You're stuck in a loop.
 
-SupaMsg puts all your WhatsApp accounts in one desktop window — and adds 48 features on top that WhatsApp will probably never build.
+**Smart Outreach changes everything.**
 
-**The basics:**
-- Run unlimited WhatsApp accounts in isolated tabs
-- Split screen — view two conversations side by side
-- Unified notifications with per-account badges
-- Keyboard shortcuts to switch instantly (Cmd+1, Cmd+2...)
+SupaMsg's Smart Outreach intelligently rotates your messages across multiple WhatsApp numbers — automatically distributing volume so no single number hits WhatsApp's spam thresholds. It tracks sending patterns, enforces cooldown periods, and adapts in real time. Your outreach keeps flowing. Your numbers stay alive.
 
-**AI features (powered by Claude):**
-- Smart reply suggestions that match your tone
-- Chat summarization — catch up on 200 messages in 10 seconds
-- Real-time translation across 25 languages
-- Voice message transcription
-- AI Agent mode — auto-replies to common questions
+**How it works:**
+- Add your WhatsApp numbers to SupaMsg (unlimited accounts in isolated tabs)
+- Set up your outreach campaign with your contact list and message templates
+- Smart Outreach auto-distributes sends across your numbers with intelligent pacing
+- Built-in warmup mode for new numbers, cooldown triggers, and volume balancing
+- Real-time health dashboard shows each number's risk level
 
-**Business tools:**
-- Scheduled messages across time zones
-- Broadcast campaigns (bulk messaging)
-- No-code chatbot builder
-- CRM integration (HubSpot, Zoho)
-- Conversation Kanban pipeline
-- Payment collection via UPI/Stripe
-- Webhook API + Zapier integration
+**And that's just one of 48 features:**
 
-**Privacy first:**
-- Zero access to your messages — everything runs locally
-- WhatsApp's end-to-end encryption stays fully intact
-- No cloud, no servers, no data leaves your Mac
+**AI (powered by Claude):** Smart reply suggestions, chat summarization, real-time translation (25 languages), voice transcription, AI Agent auto-replies
+
+**Business tools:** Scheduled messages, broadcast campaigns, no-code chatbot builder, CRM integration (HubSpot, Zoho), conversation Kanban, payment collection via UPI/Stripe, Webhook API + Zapier
+
+**The basics:** Split screen, unified notifications, keyboard shortcuts (Cmd+1, Cmd+2...), per-account badges
+
+**Privacy first:** Zero access to your messages — everything runs locally. WhatsApp's end-to-end encryption stays fully intact. No cloud, no servers, no data leaves your Mac.
 
 **Who it's for:**
-Freelancers, agency owners, real estate agents, sales teams, recruiters, small business owners — anyone who juggles multiple WhatsApp numbers daily.
+Sales teams, agency owners, recruiters, real estate agents, D2C brands, small businesses — anyone doing WhatsApp outreach at scale and tired of losing numbers.
 
 **Pricing:**
-Free forever (3 accounts). Pro starts at ₹499/mo ($6). Business at ₹999/mo ($12).
+Starts at ₹199/mo ($3). Smart Outreach is in the Business plan at ₹999/mo ($12).
 
 Try it free at supamsg.com
 
@@ -63,14 +55,17 @@ I looked for a solution and found nothing that wasn't a browser hack or a janky 
 
 SupaMsg started as a simple multi-account WhatsApp manager, but it evolved into something much bigger. Once you have all your conversations in one window, you start thinking — what if I could schedule that follow-up? What if AI could draft that reply? What if I could see all my leads in a pipeline? So I kept building.
 
+The breakthrough was Smart Outreach — intelligent multi-number rotation that prevents your numbers from getting banned. I kept hearing the same story from sales teams and agency owners: they'd burn through WhatsApp numbers doing outreach, lose their contacts, and start over. Smart Outreach auto-distributes messages across your numbers with pacing, warmup, and cooldown — so your outreach keeps running without a single ban. That's the feature that made everything click.
+
 48 features later, here we are.
 
 A few things I'm proud of:
+- **Smart Outreach**: Multi-number rotation that actually prevents bans. This is the one people lose their minds over.
 - **Privacy**: We literally cannot read your messages. Everything runs locally on your Mac. No servers, no cloud sync for messages.
 - **AI replies**: Powered by Claude — the suggestions actually sound like you, not a robot.
 - **It just works**: Scan QR codes, and you're in. No account linking, no API keys, no setup wizard.
 
-The free tier gives you 3 accounts with all basic features. Pro and Business unlock AI, automations, and business tools.
+The free tier gives you 3 accounts with all basic features. Starter at ₹199/mo ($3) for more accounts. Business at ₹999/mo ($12) unlocks Smart Outreach, automations, CRM, and broadcasting.
 
 I'd love your feedback — what's missing? What would make this a must-have for your workflow? I'm here all day to answer questions.
 
@@ -80,15 +75,15 @@ I'd love your feedback — what's missing? What would make this a must-have for 
 
 ### r/SideProject
 
-**Title:** I built a desktop app with 48 features for managing multiple WhatsApp accounts — here's what I learned
+**Title:** I built Smart Outreach for WhatsApp — rotate messages across multiple numbers so you never get banned again
 
 **Body:**
 
-Six months ago, I had 3 phones on my desk and was losing my mind. Personal WhatsApp, work WhatsApp, side business WhatsApp. I'd miss messages, reply from the wrong account, and couldn't automate anything.
+If you've ever done WhatsApp outreach at scale, you know the cycle: send too many messages from one number, get banned, buy a new SIM, start over. Repeat.
 
-So I built SupaMsg — a Mac desktop app that puts all your WhatsApp accounts in one window.
+So I built SupaMsg — a Mac desktop app with a feature called Smart Outreach that intelligently rotates your messages across multiple WhatsApp numbers. It paces sends, warms up new numbers, triggers cooldowns, and balances volume automatically. Your outreach keeps flowing. Your numbers stay alive.
 
-But here's where it got interesting. Once I had multi-account working, I realized the real opportunity wasn't just tabs — it was everything WhatsApp doesn't let you do:
+But Smart Outreach is just one of 48 features:
 
 - **AI smart replies** — context-aware suggestions that match your tone (powered by Claude)
 - **Scheduled messages** — send later, across time zones
@@ -97,11 +92,11 @@ But here's where it got interesting. Once I had multi-account working, I realize
 - **CRM integration** — HubSpot + Zoho, conversation pipeline
 - **Payment collection** — send UPI/Stripe payment links in chat
 
-48 features total. All running locally on your Mac. Zero cloud, zero access to your messages.
+Everything runs locally on your Mac. Zero cloud, zero access to your messages.
 
-**Business model:** Free for 3 accounts. Pro at ₹499/mo ($6) for unlimited accounts + AI. Business at ₹999/mo ($12) for automations, CRM, broadcasting.
+**Business model:** Free for 3 accounts. Starter at ₹199/mo ($3). Business at ₹999/mo ($12) for Smart Outreach, automations, CRM, broadcasting.
 
-I chose Razorpay for payments because my core market (India, SE Asia) lives on UPI, and nobody wants to enter a credit card for a $6/mo tool.
+I chose Razorpay for payments because my core market (India, SE Asia) lives on UPI, and nobody wants to enter a credit card for a $3/mo tool.
 
 Live at supamsg.com — genuinely want feedback on what's missing.
 
@@ -109,13 +104,15 @@ Live at supamsg.com — genuinely want feedback on what's missing.
 
 ### r/macapps
 
-**Title:** SupaMsg — manage multiple WhatsApp accounts from one Mac app, now with AI and 48 features
+**Title:** SupaMsg — Smart Outreach rotates WhatsApp messages across numbers so you don't get banned. Plus 48 features.
 
 **Body:**
 
-Built a macOS app for anyone running more than one WhatsApp account. Each account runs in an isolated BrowserView with its own session — no cross-contamination.
+Built a macOS app for anyone doing WhatsApp outreach or running more than one account. The headline feature: Smart Outreach auto-distributes your messages across multiple WhatsApp numbers with intelligent pacing, warmup, and cooldown — so no single number gets flagged.
 
-What started as a multi-account manager now has 48 features:
+Each account runs in an isolated BrowserView with its own session — no cross-contamination.
+
+Plus 47 other features:
 
 - Split screen (2 chats side by side)
 - AI replies, summarization, translation (25 languages)
@@ -126,7 +123,7 @@ What started as a multi-account manager now has 48 features:
 
 Privacy-first: everything runs locally, we never touch your messages.
 
-Free for 3 accounts. Pro from ₹499/mo ($6).
+Free for 3 accounts. Starter from ₹199/mo ($3). Smart Outreach in Business at ₹999/mo ($12).
 
 supamsg.com
 
@@ -134,22 +131,24 @@ supamsg.com
 
 ### r/Entrepreneur
 
-**Title:** WhatsApp is the #1 business tool in India/SE Asia/LATAM. I built a power-user app for it.
+**Title:** We built Smart Outreach for WhatsApp — rotate messages across numbers so you stop getting banned. Here's the full story.
 
 **Body:**
 
-If you're in a market where WhatsApp = business communication, you know the pain of multiple numbers. Personal, business, regional — and WhatsApp Desktop only supports one account.
+If you're in a market where WhatsApp = business communication, you know the outreach problem. You send too many messages from one number, WhatsApp bans it. Buy a new SIM, start again, get banned again. Sales teams in India and SE Asia burn through numbers every week.
 
-I built SupaMsg — a Mac desktop app that runs unlimited WhatsApp accounts in one window, plus 48 features that turn WhatsApp into a proper business tool:
+I built SupaMsg — a Mac desktop app with a feature called **Smart Outreach** that solves this. It intelligently rotates your outreach messages across multiple WhatsApp numbers, paces sends, warms up new numbers, and triggers cooldowns automatically. No single number gets flagged. Your pipeline keeps moving.
 
-**For sales:** CRM integration (HubSpot/Zoho), conversation Kanban, AI-powered follow-ups
+Smart Outreach is the hero, but SupaMsg has 48 features total:
+
+**For sales:** Smart Outreach multi-number rotation, CRM integration (HubSpot/Zoho), conversation Kanban, AI-powered follow-ups
 **For support:** Team inbox, chatbot builder, canned replies, sentiment alerts
 **For marketing:** Broadcast campaigns, contact labels, analytics dashboard
 **For everyone:** AI smart replies, scheduled messages, split screen, stealth mode
 
 It runs locally — we never read your messages. WhatsApp's encryption stays intact.
 
-**Pricing designed for emerging markets:** Free (3 accounts), Pro ₹499/mo ($6), Business ₹999/mo ($12). Razorpay for payments — UPI, cards, netbanking.
+**Pricing designed for emerging markets:** Free (3 accounts), Starter ₹199/mo ($3), Business ₹999/mo ($12) with Smart Outreach. Razorpay for payments — UPI, cards, netbanking.
 
 The TAM here is massive. 500M+ WhatsApp users in India alone, and most business owners have 2-4 numbers. Yet there's no proper power tool for multi-account WhatsApp on desktop.
 
@@ -160,25 +159,23 @@ Live at supamsg.com. Would love to hear from people in WhatsApp-heavy markets.
 ## 3. X/Twitter Thread
 
 **Tweet 1:**
-You have 3 phones on your desk right now.
+Every week, someone in our Slack loses a WhatsApp number to bans.
 
-Personal. Work. Side hustle.
+They were sending too many messages from one number.
 
-And every time WhatsApp buzzes, you pick up the wrong one.
+We fixed that.
 
-I built a fix. Here's what it does (thread):
+Here's how SupaMsg's Smart Outreach keeps your numbers alive (thread):
 
 **Tweet 2:**
-SupaMsg puts ALL your WhatsApp accounts in one Mac window.
+Smart Outreach rotates your messages across multiple WhatsApp numbers automatically.
 
-Switch between them instantly. Split screen to view two side by side.
+It paces sends, warms up new numbers, triggers cooldowns, and balances volume — so no single number gets flagged.
 
-Each account is fully isolated. Nothing leaks between them.
-
-That alone saves hours. But we didn't stop there...
+Your outreach keeps flowing. Your numbers stay alive.
 
 **Tweet 3:**
-We added 48 features that WhatsApp will never build:
+But Smart Outreach is just one of 48 features:
 
 - AI smart replies (powered by Claude)
 - Chat summarization
@@ -206,8 +203,8 @@ If WhatsApp is your office, SupaMsg is your OS.
 Pricing is dead simple:
 
 Free — 3 accounts, forever
-Pro — ₹499/mo ($6) — unlimited accounts + AI
-Business — ₹999/mo ($12) — automations, CRM, broadcasting
+Starter — ₹199/mo ($3) — more accounts + basic features
+Business — ₹999/mo ($12) — Smart Outreach, automations, CRM, broadcasting
 
 No contracts. Cancel anytime. 30-day money back.
 
@@ -226,17 +223,19 @@ Every upvote and comment helps us reach more people who need this.
 
 ## 4. IndieHackers Post
 
-**Title:** I launched SupaMsg — 48 features for multi-account WhatsApp. Here's the full breakdown.
+**Title:** I launched SupaMsg — Smart Outreach rotates WhatsApp messages across numbers so you never get banned. Plus 48 features.
 
 **Body:**
 
 Hey IH. Sharing what I've been building and being fully transparent.
 
-**The problem:** I have 3 WhatsApp numbers. WhatsApp Desktop supports one. I tried browser profiles, separate Chrome windows, incognito tabs. All painful. And there's zero automation — no scheduling, no AI, no CRM, nothing.
+**The problem:** If you do WhatsApp outreach at scale, your numbers get banned. Send too many messages from one number, WhatsApp flags it. Buy a new SIM, start over, get banned again. Sales teams and agencies burn through numbers every week. On top of that, WhatsApp Desktop only supports one account, there's zero automation, no CRM, nothing.
 
-**The insight:** 500M+ WhatsApp users in India alone. Most business owners have 2-4 numbers. Yet there's no desktop power tool for multi-account WhatsApp. The market is massive and completely underserved.
+**The insight:** 500M+ WhatsApp users in India alone. Most business owners have 2-4 numbers. They need outreach that works without burning numbers. The market is massive and completely underserved.
 
-**The product:** SupaMsg is a macOS desktop app. You scan QR codes, and all your WhatsApp accounts live in one window. But the real value is the 48 features on top:
+**The product:** SupaMsg is a macOS desktop app. The headline feature is **Smart Outreach** — it intelligently rotates your messages across multiple WhatsApp numbers with automatic pacing, warmup for new numbers, cooldown triggers, and volume balancing. No single number gets flagged. Your outreach keeps flowing.
+
+But that's one of 48 features:
 
 - AI smart replies + summarization + translation (powered by Claude)
 - Scheduled messages, auto-reply rules, chatbot builder
@@ -249,17 +248,17 @@ Everything runs locally. Zero access to messages. WhatsApp's encryption stays in
 
 **Revenue model:** Freemium with subscriptions.
 - Free: 3 accounts, basic features
-- Pro: ₹499/mo ($6) — unlimited accounts, AI, scheduling
-- Business: ₹999/mo ($12) — automations, CRM, broadcasting, API
+- Starter: ₹199/mo ($3) — more accounts, core features
+- Business: ₹999/mo ($12) — Smart Outreach, automations, CRM, broadcasting, API
 
 Using Razorpay for payments because my core market is India/SE Asia and UPI is king.
 
 **Tech stack:** Electron + isolated BrowserViews per account. Backend on DigitalOcean (Node.js + Express) for payment verification. Cloudflare for DNS/CDN. GitHub for distribution.
 
 **What I'd love from you:**
-1. Is ₹499 ($6) the right price point, or should I go lower for the Indian market?
+1. Is ₹199 ($3) the right entry price, or should Smart Outreach be available lower than ₹999?
 2. Should I build a Windows version before or after validating on Mac?
-3. How would you approach SEO for "multiple whatsapp accounts on pc" — it gets 50K+ searches/month?
+3. How would you approach SEO for "whatsapp outreach without getting banned" — it's a growing search?
 
 supamsg.com — try it free, tear it apart, tell me what's wrong.
 
@@ -267,21 +266,23 @@ supamsg.com — try it free, tear it apart, tell me what's wrong.
 
 ## 5. Hacker News (Show HN)
 
-**Title:** Show HN: SupaMsg — Manage multiple WhatsApp accounts with AI, automations, and 48 features
+**Title:** Show HN: SupaMsg — Smart Outreach rotates WhatsApp messages across numbers to prevent bans, plus 48 features
 
 **Body:**
 
-SupaMsg is a macOS desktop app that runs multiple WhatsApp Web sessions in isolated tabs, plus 48 features on top.
+SupaMsg is a macOS desktop app for multi-account WhatsApp. The headline feature is Smart Outreach — intelligent message rotation across multiple WhatsApp numbers to prevent bans during outreach campaigns.
+
+Smart Outreach works by distributing sends across your connected numbers with pacing algorithms, warmup sequences for new numbers, cooldown triggers when risk is detected, and real-time volume balancing. Each number has a health score tracked in a dashboard. The goal: sustained outreach without tripping WhatsApp's spam detection.
 
 Technical details: Each WhatsApp account runs in its own Electron BrowserView with a separate session partition (persist:account-N). This gives full cookie/localStorage/IndexedDB isolation between accounts without the memory overhead of separate windows. WhatsApp Web's aggressive session invalidation was the hardest part — getting user-agent and fingerprint handling right per partition took significant iteration.
 
 AI features use the Anthropic Claude API for reply suggestions, summarization, translation, and sentiment analysis. Everything runs as a request from the desktop app — no messages are stored or sent to our servers. The AI sees only the conversation context you explicitly ask it to analyze.
 
-Other features: scheduled messages, auto-reply rules, chatbot builder, broadcast campaigns, CRM integration (HubSpot/Zoho API), conversation Kanban, split screen, voice transcription, and more.
+Other features (48 total): scheduled messages, auto-reply rules, chatbot builder, broadcast campaigns, CRM integration (HubSpot/Zoho API), conversation Kanban, split screen, voice transcription, and more.
 
 Privacy model: all data stays on your device. The only server component is payment verification (Razorpay subscriptions via a Node.js API). Messages never leave the local Electron process.
 
-Free for 3 accounts. Pro $6/mo, Business $12/mo.
+Free for 3 accounts. Starter $3/mo, Business $12/mo (includes Smart Outreach).
 
 supamsg.com
 

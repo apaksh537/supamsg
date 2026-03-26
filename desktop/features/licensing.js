@@ -21,18 +21,37 @@ let license = {
 // Feature gates per tier
 const TIER_FEATURES = {
   free: {
-    maxAccounts: 10,
+    maxAccounts: 3,
+    templates: true,
+    scheduling: false,
+    aiReplies: false,
+    automations: false,
+    broadcast: false,
+    chatExport: false,
+    contactLabels: true,
+    analytics: false,
+    stealthMode: false,
+    splitScreen: false,
+    crmIntegration: false,
+    smartOutreach: false,
+    aiDailyLimit: 0,
+  },
+  starter: {
+    maxAccounts: Infinity,
     templates: true,
     scheduling: true,
     aiReplies: true,
-    automations: true,
-    broadcast: true,
-    chatExport: true,
+    automations: false,
+    broadcast: false,
+    chatExport: false,
     contactLabels: true,
-    analytics: true,
+    analytics: false,
     stealthMode: true,
-    crmIntegration: true,
     splitScreen: true,
+    crmIntegration: false,
+    smartOutreach: false,
+    aiDailyLimit: 10,
+    schedulingDailyLimit: 10,
   },
   pro: {
     maxAccounts: Infinity,
@@ -47,6 +66,7 @@ const TIER_FEATURES = {
     stealthMode: true,
     splitScreen: true,
     crmIntegration: false,
+    smartOutreach: false,
     aiDailyLimit: 50,
   },
   business: {
@@ -62,12 +82,14 @@ const TIER_FEATURES = {
     stealthMode: true,
     splitScreen: true,
     crmIntegration: true,
+    smartOutreach: true,
     aiDailyLimit: Infinity,
   },
 };
 
 // Pricing config (INR base, USD for international display)
 const PRICING = {
+  starter: { inr: 199, usd: 3, inrAnnual: 1499, usdAnnual: 29 },
   pro: { inr: 499, usd: 6, inrAnnual: 3999, usdAnnual: 48 },
   business: { inr: 999, usd: 12, inrAnnual: 7999, usdAnnual: 96 },
 };

@@ -164,8 +164,23 @@ body {
       <div class="billing-opt active" id="opt-monthly" onclick="setBilling(false)">Monthly</div>
       <div class="billing-opt" id="opt-annual" onclick="setBilling(true)">
         Annual
-        <span class="save-tag">SAVE 33%</span>
+        <span class="save-tag">SAVE 37%</span>
       </div>
+    </div>
+
+    <!-- Starter banner -->
+    <div id="starter-banner" style="
+      margin-bottom: 16px; padding: 14px 16px; border-radius: 12px;
+      background: linear-gradient(135deg, #F0FFF4 0%, #E8F8EE 100%);
+      border: 1.5px solid #D1FAE5; display: flex; align-items: center;
+      justify-content: space-between; gap: 12px;
+    ">
+      <div>
+        <div style="font-size: 14px; font-weight: 700; color: #111B21; margin-bottom: 2px;">Starter</div>
+        <div style="font-size: 13px; color: #667781;" id="starter-price-line"></div>
+      </div>
+      <button class="plan-btn plan-btn-outline" id="btn-starter" onclick="selectPlan('starter')"
+        style="width: auto; padding: 0 20px; flex-shrink: 0; height: 36px; font-size: 13px;">Get Starter</button>
     </div>
 
     <!-- Plan cards -->
@@ -185,19 +200,11 @@ body {
         </div>
 
         <ul class="plan-features">
-          <li><span class="check-circle">&#10003;</span> Unlimited accounts</li>
-          <li><span class="check-circle">&#10003;</span> Scheduled messages</li>
-          <li><span class="check-circle">&#10003;</span> Unlimited templates</li>
+          <li><span class="check-circle">&#10003;</span> Everything in Starter, plus:</li>
           <li><span class="check-circle">&#10003;</span> AI smart replies (50/day)</li>
-          <li><span class="check-circle">&#10003;</span> AI summarize, translate, draft</li>
+          <li><span class="check-circle">&#10003;</span> Unlimited scheduling</li>
+          <li><span class="check-circle">&#10003;</span> Chat export &amp; analytics</li>
           <li><span class="check-circle">&#10003;</span> Voice transcription</li>
-          <li><span class="check-circle">&#10003;</span> Chat export (text/CSV)</li>
-          <li><span class="check-circle">&#10003;</span> Split screen</li>
-          <li><span class="check-circle">&#10003;</span> Analytics dashboard</li>
-          <li><span class="check-circle">&#10003;</span> Stealth mode</li>
-          <li><span class="check-circle">&#10003;</span> Cross-account search</li>
-          <li><span class="check-circle">&#10003;</span> Smart notifications</li>
-          <li><span class="check-circle">&#10003;</span> Chat backup & restore</li>
           <li><span class="check-circle">&#10003;</span> iPhone companion app</li>
         </ul>
         <button class="plan-btn plan-btn-outline" id="btn-pro" onclick="selectPlan('pro')">Get Pro</button>
@@ -220,20 +227,13 @@ body {
 
         <ul class="plan-features">
           <li><span class="check-circle">&#10003;</span> Everything in Pro, plus:</li>
+          <li><span class="check-circle">&#10003;</span> Smart Outreach (anti-ban)</li>
           <li><span class="check-circle">&#10003;</span> Unlimited AI (no daily limit)</li>
-          <li><span class="check-circle">&#10003;</span> AI Agent mode (auto-replies)</li>
-          <li><span class="check-circle">&#10003;</span> Automations & workflows</li>
-          <li><span class="check-circle">&#10003;</span> Chatbot builder (no-code)</li>
+          <li><span class="check-circle">&#10003;</span> Automations &amp; chatbot builder</li>
           <li><span class="check-circle">&#10003;</span> Broadcast campaigns</li>
           <li><span class="check-circle">&#10003;</span> CRM (HubSpot + Zoho)</li>
-          <li><span class="check-circle">&#10003;</span> Conversation Kanban</li>
-          <li><span class="check-circle">&#10003;</span> Team inbox & notes</li>
-          <li><span class="check-circle">&#10003;</span> Payment collection (UPI/Stripe)</li>
-          <li><span class="check-circle">&#10003;</span> Product catalog</li>
-          <li><span class="check-circle">&#10003;</span> Appointment booking</li>
           <li><span class="check-circle">&#10003;</span> Webhook API + Zapier</li>
           <li><span class="check-circle">&#10003;</span> White-label branding</li>
-          <li><span class="check-circle">&#10003;</span> Priority support</li>
         </ul>
         <button class="plan-btn plan-btn-primary" id="btn-business" onclick="selectPlan('business')">Get Business</button>
       </div>
@@ -267,6 +267,7 @@ body {
     } catch (e) {}
 
     const pricing = {
+      starter: { inr: 199, usd: 3, inrAnnual: 1499, usdAnnual: 29 },
       pro: { inr: 499, usd: 6, inrAnnual: 3999, usdAnnual: 48 },
       business: { inr: 999, usd: 12, inrAnnual: 7999, usdAnnual: 96 },
     };
@@ -295,6 +296,19 @@ body {
 
     function updatePrices() {
       const c = cur();
+
+      // Update starter banner
+      const smp = monthlyPrice('starter');
+      const sap = annualPrice('starter');
+      if (isAnnual) {
+        const sMonthlyEquiv = Math.round(sap / 12);
+        document.getElementById('starter-price-line').textContent = 'Start at ' + fmt(sMonthlyEquiv, c) + '/mo (' + fmt(sap, c) + '/yr)';
+        document.getElementById('btn-starter').textContent = 'Get Starter \u2014 ' + fmt(sap, c) + '/yr';
+      } else {
+        document.getElementById('starter-price-line').textContent = 'Start at ' + fmt(smp, c) + '/mo' + (isIndia ? ' ($' + pricing.starter.usd + ')' : ' (\u20B9' + pricing.starter.inr + ')');
+        document.getElementById('btn-starter').textContent = 'Get Starter';
+      }
+
       ['pro', 'business'].forEach(tier => {
         const mp = monthlyPrice(tier);
         const ap = annualPrice(tier);
