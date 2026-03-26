@@ -25,7 +25,6 @@ body {
 .panel-close:hover { background: #F0F2F5; color: #111B21; }
 .panel-body { flex: 1; overflow-y: auto; padding: 20px; }
 
-/* Billing toggle */
 .billing-toggle {
   display: flex; align-items: center; justify-content: center;
   background: #F0F2F5; border-radius: 8px; padding: 3px; margin-bottom: 20px;
@@ -42,7 +41,16 @@ body {
   padding: 2px 6px; border-radius: 8px; letter-spacing: 0.3px;
 }
 
-/* Plans */
+/* Starter banner */
+.starter-banner {
+  background: #F0FFF4; border: 1px solid #C1EDD1; border-radius: 10px;
+  padding: 16px; margin-bottom: 16px; text-align: center;
+}
+.starter-banner .tier-name { font-size: 13px; font-weight: 700; color: #25D366; text-transform: uppercase; letter-spacing: 0.5px; }
+.starter-banner .price-line { font-size: 15px; font-weight: 600; color: #111B21; margin: 6px 0 10px; }
+.starter-banner .features-sm { font-size: 12px; color: #667781; margin-bottom: 10px; }
+
+/* Plan cards */
 .plans-row { display: flex; gap: 12px; margin-bottom: 16px; }
 .plan-card {
   flex: 1; border: 2px solid #E8E8E8; border-radius: 12px; padding: 20px;
@@ -59,34 +67,21 @@ body {
 .plan-price { font-size: 32px; font-weight: 800; color: #111B21; line-height: 1; }
 .plan-price .period { font-size: 14px; font-weight: 400; color: #667781; }
 
-/* Annual breakdown */
 .plan-annual-info {
   margin-top: 8px; padding: 8px 12px; background: #F0FFF4; border-radius: 8px;
   border: 1px solid #D1FAE5;
 }
 .plan-annual-total { font-size: 14px; font-weight: 600; color: #111B21; }
-.plan-annual-save {
-  font-size: 12px; font-weight: 700; color: #25D366; margin-top: 2px;
-  display: flex; align-items: center; gap: 4px;
-}
-.plan-monthly-compare {
-  margin-top: 4px; font-size: 12px; color: #667781;
-  text-decoration: line-through;
-}
+.plan-annual-save { font-size: 12px; font-weight: 700; color: #25D366; margin-top: 2px; display: flex; align-items: center; gap: 4px; }
+.plan-monthly-compare { margin-top: 4px; font-size: 12px; color: #667781; text-decoration: line-through; }
 
-/* Feature list */
 .plan-features { list-style: none; margin: 16px 0; }
 .plan-features li {
   font-size: 13px; color: #111B21; padding: 5px 0;
   display: flex; align-items: center; gap: 8px;
 }
-.plan-features li .check-circle {
-  width: 18px; height: 18px; border-radius: 50%; background: #E8F8EE;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0; color: #25D366; font-size: 11px; font-weight: 700;
-}
+.plan-features li .check { color: #25D366; font-weight: 700; font-size: 14px; }
 
-/* CTA buttons */
 .plan-btn {
   width: 100%; height: 40px; border: none; border-radius: 8px;
   font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.15s;
@@ -95,15 +90,29 @@ body {
 .plan-btn-primary:hover { background: #1FAA59; }
 .plan-btn-outline { background: none; border: 1.5px solid #25D366; color: #25D366; }
 .plan-btn-outline:hover { background: #F0FFF4; }
+.plan-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
-/* Email activation section */
-.license-section {
-  margin-top: 16px; padding-top: 16px; border-top: 1px solid #E8E8E8;
+/* Waiting state */
+.waiting-state {
+  display: none; text-align: center; padding: 32px 16px;
 }
-.license-toggle {
-  font-size: 13px; color: #667781; cursor: pointer; text-align: center;
-  transition: color 0.15s;
+.waiting-state.visible { display: block; }
+.waiting-spinner {
+  width: 40px; height: 40px; border: 3px solid #E8E8E8;
+  border-top-color: #25D366; border-radius: 50%;
+  animation: spin 0.8s linear infinite; margin: 0 auto 16px;
 }
+@keyframes spin { to { transform: rotate(360deg); } }
+.waiting-state h3 { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+.waiting-state p { font-size: 13px; color: #667781; margin-bottom: 16px; }
+.waiting-cancel {
+  background: none; border: 1px solid #E8E8E8; border-radius: 6px;
+  padding: 8px 20px; font-size: 13px; color: #667781; cursor: pointer;
+}
+
+/* Activation */
+.license-section { margin-top: 16px; padding-top: 16px; border-top: 1px solid #E8E8E8; }
+.license-toggle { font-size: 13px; color: #667781; cursor: pointer; text-align: center; transition: color 0.15s; }
 .license-toggle:hover { color: #25D366; }
 .license-form { display: none; margin-top: 12px; }
 .license-form.visible { display: block; }
@@ -121,130 +130,82 @@ body {
 .license-btn:hover { background: #2C3E50; }
 .license-status { font-size: 12px; margin-top: 6px; text-align: center; }
 
-/* Spinner for "Setting up..." loading state */
-@keyframes btn-spinner {
-  to { transform: rotate(360deg); }
-}
-.plan-btn.loading {
-  position: relative;
-  color: transparent;
-  pointer-events: none;
-}
-.plan-btn.loading::after {
-  content: '';
-  position: absolute;
-  top: 50%; left: 50%;
-  width: 18px; height: 18px;
-  margin: -9px 0 0 -9px;
-  border: 2px solid rgba(255,255,255,0.3);
-  border-top-color: #fff;
-  border-radius: 50%;
-  animation: btn-spinner 0.6s linear infinite;
-}
-
-/* Guarantee badge */
-.guarantee {
-  text-align: center; margin-top: 16px; padding: 12px;
-  background: #FAFAFA; border-radius: 8px;
-}
+.guarantee { text-align: center; margin-top: 16px; padding: 12px; background: #FAFAFA; border-radius: 8px; }
 .guarantee-text { font-size: 12px; color: #667781; }
 .guarantee-text strong { color: #111B21; }
 </style>
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </head>
 <body>
   <div class="panel-header">
     <span class="panel-title">Upgrade SupaMsg</span>
     <button class="panel-close" onclick="hub.closePanel('upgrade')">&times;</button>
   </div>
-  <div class="panel-body">
 
-    <!-- Billing toggle -->
+  <!-- Normal pricing view -->
+  <div class="panel-body" id="pricingView">
     <div class="billing-toggle">
       <div class="billing-opt active" id="opt-monthly" onclick="setBilling(false)">Monthly</div>
       <div class="billing-opt" id="opt-annual" onclick="setBilling(true)">
-        Annual
-        <span class="save-tag">SAVE 37%</span>
+        Annual <span class="save-tag">SAVE 37%</span>
       </div>
     </div>
 
-    <!-- Starter banner -->
-    <div id="starter-banner" style="
-      margin-bottom: 16px; padding: 14px 16px; border-radius: 12px;
-      background: linear-gradient(135deg, #F0FFF4 0%, #E8F8EE 100%);
-      border: 1.5px solid #D1FAE5; display: flex; align-items: center;
-      justify-content: space-between; gap: 12px;
-    ">
-      <div>
-        <div style="font-size: 14px; font-weight: 700; color: #111B21; margin-bottom: 2px;">Starter</div>
-        <div style="font-size: 13px; color: #667781;" id="starter-price-line"></div>
-      </div>
-      <button class="plan-btn plan-btn-outline" id="btn-starter" onclick="selectPlan('starter')"
-        style="width: auto; padding: 0 20px; flex-shrink: 0; height: 36px; font-size: 13px;">Get Starter</button>
+    <!-- Starter -->
+    <div class="starter-banner">
+      <div class="tier-name">Starter</div>
+      <div class="price-line" id="starter-price-line"></div>
+      <div class="features-sm">Unlimited accounts &bull; AI replies (10/day) &bull; Split screen &bull; Stealth mode</div>
+      <button class="plan-btn plan-btn-outline" id="btn-starter" onclick="selectPlan('starter')" style="max-width:200px;margin:0 auto;">Get Starter</button>
     </div>
 
-    <!-- Plan cards -->
+    <!-- Pro + Business -->
     <div class="plans-row">
-      <!-- Pro -->
-      <div class="plan-card" id="card-pro">
+      <div class="plan-card popular" id="card-pro">
+        <div class="popular-badge">Most Popular</div>
         <div class="plan-name">Pro</div>
         <div class="plan-price" id="price-pro"></div>
-
         <div class="plan-annual-info" id="annual-info-pro" style="display:none">
           <div class="plan-annual-total" id="annual-total-pro"></div>
-          <div class="plan-annual-save">
-            <span>&#10003;</span>
-            <span id="annual-save-pro"></span>
-          </div>
+          <div class="plan-annual-save"><span>&#10003;</span><span id="annual-save-pro"></span></div>
           <div class="plan-monthly-compare" id="annual-compare-pro"></div>
         </div>
-
         <ul class="plan-features">
-          <li><span class="check-circle">&#10003;</span> Everything in Starter, plus:</li>
-          <li><span class="check-circle">&#10003;</span> AI smart replies (50/day)</li>
-          <li><span class="check-circle">&#10003;</span> Unlimited scheduling</li>
-          <li><span class="check-circle">&#10003;</span> Chat export &amp; analytics</li>
-          <li><span class="check-circle">&#10003;</span> Voice transcription</li>
-          <li><span class="check-circle">&#10003;</span> iPhone companion app</li>
+          <li><span class="check">&#10003;</span> Everything in Starter, plus:</li>
+          <li><span class="check">&#10003;</span> AI smart replies (50/day)</li>
+          <li><span class="check">&#10003;</span> Unlimited scheduling</li>
+          <li><span class="check">&#10003;</span> Chat export &amp; analytics</li>
+          <li><span class="check">&#10003;</span> Voice transcription</li>
+          <li><span class="check">&#10003;</span> iPhone companion app</li>
         </ul>
-        <button class="plan-btn plan-btn-outline" id="btn-pro" onclick="selectPlan('pro')">Get Pro</button>
+        <button class="plan-btn plan-btn-primary" id="btn-pro" onclick="selectPlan('pro')">Get Pro</button>
       </div>
 
-      <!-- Business -->
-      <div class="plan-card popular" id="card-business">
-        <div class="popular-badge">Most Popular</div>
+      <div class="plan-card" id="card-business">
         <div class="plan-name">Business</div>
         <div class="plan-price" id="price-business"></div>
-
         <div class="plan-annual-info" id="annual-info-business" style="display:none">
           <div class="plan-annual-total" id="annual-total-business"></div>
-          <div class="plan-annual-save">
-            <span>&#10003;</span>
-            <span id="annual-save-business"></span>
-          </div>
+          <div class="plan-annual-save"><span>&#10003;</span><span id="annual-save-business"></span></div>
           <div class="plan-monthly-compare" id="annual-compare-business"></div>
         </div>
-
         <ul class="plan-features">
-          <li><span class="check-circle">&#10003;</span> Everything in Pro, plus:</li>
-          <li><span class="check-circle">&#10003;</span> Smart Outreach (anti-ban)</li>
-          <li><span class="check-circle">&#10003;</span> Unlimited AI (no daily limit)</li>
-          <li><span class="check-circle">&#10003;</span> Automations &amp; chatbot builder</li>
-          <li><span class="check-circle">&#10003;</span> Broadcast campaigns</li>
-          <li><span class="check-circle">&#10003;</span> CRM (HubSpot + Zoho)</li>
-          <li><span class="check-circle">&#10003;</span> Webhook API + Zapier</li>
-          <li><span class="check-circle">&#10003;</span> White-label branding</li>
+          <li><span class="check">&#10003;</span> Everything in Pro, plus:</li>
+          <li><span class="check">&#10003;</span> Smart Outreach (anti-ban)</li>
+          <li><span class="check">&#10003;</span> Unlimited AI (no daily limit)</li>
+          <li><span class="check">&#10003;</span> Automations &amp; chatbot builder</li>
+          <li><span class="check">&#10003;</span> Broadcast campaigns</li>
+          <li><span class="check">&#10003;</span> CRM (HubSpot + Zoho)</li>
+          <li><span class="check">&#10003;</span> Webhook API + Zapier</li>
+          <li><span class="check">&#10003;</span> White-label branding</li>
         </ul>
-        <button class="plan-btn plan-btn-primary" id="btn-business" onclick="selectPlan('business')">Get Business</button>
+        <button class="plan-btn plan-btn-outline" id="btn-business" onclick="selectPlan('business')">Get Business</button>
       </div>
     </div>
 
-    <!-- Guarantee -->
     <div class="guarantee">
       <div class="guarantee-text"><strong>30-day money-back guarantee.</strong> Try risk-free — full refund if not satisfied.</div>
     </div>
 
-    <!-- Email activation -->
     <div class="license-section">
       <div class="license-toggle" onclick="toggleActivation()">Already subscribed? Activate with email &#8594;</div>
       <div class="license-form" id="activationForm">
@@ -255,11 +216,20 @@ body {
     </div>
   </div>
 
+  <!-- Waiting for payment view -->
+  <div class="waiting-state" id="waitingView">
+    <div class="waiting-spinner"></div>
+    <h3>Complete payment in your browser</h3>
+    <p id="waitingMsg">We opened Razorpay in your browser. Complete the payment there and come back — we'll detect it automatically.</p>
+    <button class="waiting-cancel" onclick="cancelWaiting()">Cancel</button>
+  </div>
+
   <script>
     let isAnnual = false;
-    let isIndia = true; // default to INR, detect below
+    let isIndia = true;
+    let pollTimer = null;
+    let currentEmail = null;
 
-    // Detect locale for currency display
     try {
       const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
       const locale = navigator.language || '';
@@ -276,16 +246,9 @@ body {
       if (currency === 'INR') return '\u20B9' + amount.toLocaleString('en-IN');
       return '$' + amount;
     }
-
     function cur() { return isIndia ? 'INR' : 'USD'; }
-
-    function monthlyPrice(tier) {
-      return isIndia ? pricing[tier].inr : pricing[tier].usd;
-    }
-
-    function annualPrice(tier) {
-      return isIndia ? pricing[tier].inrAnnual : pricing[tier].usdAnnual;
-    }
+    function monthlyPrice(tier) { return isIndia ? pricing[tier].inr : pricing[tier].usd; }
+    function annualPrice(tier) { return isIndia ? pricing[tier].inrAnnual : pricing[tier].usdAnnual; }
 
     function setBilling(annual) {
       isAnnual = annual;
@@ -297,18 +260,19 @@ body {
     function updatePrices() {
       const c = cur();
 
-      // Update starter banner
+      // Starter
       const smp = monthlyPrice('starter');
       const sap = annualPrice('starter');
       if (isAnnual) {
         const sMonthlyEquiv = Math.round(sap / 12);
-        document.getElementById('starter-price-line').textContent = 'Start at ' + fmt(sMonthlyEquiv, c) + '/mo (' + fmt(sap, c) + '/yr)';
+        document.getElementById('starter-price-line').textContent = fmt(sMonthlyEquiv, c) + '/mo (' + fmt(sap, c) + '/yr)';
         document.getElementById('btn-starter').textContent = 'Get Starter \u2014 ' + fmt(sap, c) + '/yr';
       } else {
-        document.getElementById('starter-price-line').textContent = 'Start at ' + fmt(smp, c) + '/mo' + (isIndia ? ' ($' + pricing.starter.usd + ')' : ' (\u20B9' + pricing.starter.inr + ')');
+        document.getElementById('starter-price-line').textContent = fmt(smp, c) + '/month';
         document.getElementById('btn-starter').textContent = 'Get Starter';
       }
 
+      // Pro + Business
       ['pro', 'business'].forEach(tier => {
         const mp = monthlyPrice(tier);
         const ap = annualPrice(tier);
@@ -329,85 +293,71 @@ body {
       });
     }
 
-    // Initialize prices
     updatePrices();
 
     async function selectPlan(tier) {
-      // Prompt for email
-      const email = await hub.showInputDialog({
-        title: 'Enter your email',
-        message: 'We\'ll use this to manage your subscription.',
-        placeholder: 'you@example.com',
-      });
+      // Ask for email inline
+      const email = prompt('Enter your email to manage your subscription:');
+      if (!email || !email.trim() || !email.includes('@')) return;
 
-      if (!email || !email.trim()) return;
+      currentEmail = email.trim();
+
+      const btn = document.getElementById('btn-' + tier);
+      btn.textContent = 'Setting up...';
+      btn.disabled = true;
 
       try {
         // Create subscription via backend
-        const btn = document.getElementById('btn-' + tier);
-        btn.textContent = 'Setting up...';
-        btn.classList.add('loading');
-        btn.disabled = true;
-
-        const sub = await hub.createSubscription(email.trim(), tier, isAnnual);
+        const sub = await hub.createSubscription(currentEmail, tier, isAnnual);
 
         if (sub.error) {
-          btn.textContent = 'Try again';
-          btn.classList.remove('loading');
+          btn.textContent = 'Error — try again';
           btn.disabled = false;
           return;
         }
 
-        // Open Razorpay Checkout
-        const rzpKey = await hub.getRazorpayKey();
+        // Open payment link in user's default browser (Safari/Chrome)
+        // This gives the best native Razorpay experience with UPI, cards, netbanking
+        hub.openCheckout(sub.short_url);
 
-        const options = {
-          key: rzpKey,
-          subscription_id: sub.subscription_id,
-          name: 'SupaMsg',
-          description: tier.charAt(0).toUpperCase() + tier.slice(1) + ' Plan' + (isAnnual ? ' (Annual)' : ''),
-          handler: async function(response) {
-            // Verify payment
-            btn.textContent = 'Verifying...';
-            btn.classList.remove('loading');
-            const result = await hub.verifyPayment({
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_subscription_id: response.razorpay_subscription_id,
-              razorpay_signature: response.razorpay_signature,
-              email: email.trim(),
-              tier: tier,
-            });
+        // Show waiting state
+        document.getElementById('pricingView').style.display = 'none';
+        document.getElementById('waitingView').classList.add('visible');
 
+        // Poll for payment completion every 5 seconds
+        pollTimer = setInterval(async () => {
+          try {
+            const result = await hub.activateLicense(currentEmail);
             if (result.success) {
-              btn.textContent = '\u2713 Activated!';
-              btn.style.background = '#25D366';
-              btn.style.color = '#fff';
-              setTimeout(() => hub.closePanel('upgrade'), 1500);
-            } else {
-              btn.textContent = 'Verification failed — try again';
-              btn.disabled = false;
+              clearInterval(pollTimer);
+              pollTimer = null;
+              document.getElementById('waitingView').innerHTML =
+                '<div style="text-align:center;padding:48px 16px;">' +
+                '<div style="font-size:48px;margin-bottom:16px;">&#10003;</div>' +
+                '<h3 style="font-size:18px;margin-bottom:8px;color:#25D366;">Payment Successful!</h3>' +
+                '<p style="font-size:14px;color:#667781;">You\'re now on the <strong>' + result.tier + '</strong> plan.</p>' +
+                '</div>';
+              setTimeout(() => hub.closePanel('upgrade'), 2500);
             }
-          },
-          prefill: { email: email.trim() },
-          theme: { color: '#25D366' },
-          modal: {
-            ondismiss: function() {
-              btn.textContent = 'Get ' + tier.charAt(0).toUpperCase() + tier.slice(1);
-              btn.classList.remove('loading');
-              btn.disabled = false;
-            },
-          },
-        };
-
-        const rzp = new Razorpay(options);
-        rzp.open();
+          } catch (e) { /* keep polling */ }
+        }, 5000);
 
       } catch (e) {
-        const errBtn = document.getElementById('btn-' + tier);
-        errBtn.textContent = 'Error — try again';
-        errBtn.classList.remove('loading');
-        errBtn.disabled = false;
+        btn.textContent = 'Error — try again';
+        btn.disabled = false;
       }
+    }
+
+    function cancelWaiting() {
+      if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+      document.getElementById('pricingView').style.display = '';
+      document.getElementById('waitingView').classList.remove('visible');
+      // Reset all buttons
+      ['starter', 'pro', 'business'].forEach(t => {
+        const b = document.getElementById('btn-' + t);
+        if (b) { b.disabled = false; }
+      });
+      updatePrices();
     }
 
     function toggleActivation() {

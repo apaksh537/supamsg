@@ -746,8 +746,10 @@ ipcMain.handle('generate-pairing-qr', async () => {
   return { qrDataUrl, code, ip: localIp };
 });
 
-// Razorpay checkout is handled inline via the Razorpay JS SDK in the upgrade panel
-// No separate checkout window needed
+// Open payment URL in user's default browser for best Razorpay/UPI experience
+ipcMain.on('open-checkout', (_event, url) => {
+  shell.openExternal(url);
+});
 
 ipcMain.on('wa-notification', (_event, { accountId, title, body }) => {
   showNotification(accountId, title, body);
