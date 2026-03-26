@@ -4,8 +4,10 @@
 const path = require('path');
 const fs = require('fs');
 
-const MIN_DELAY = 3; // minimum seconds between messages (safety floor)
+const MIN_DELAY = 45; // minimum seconds between messages (safety floor — protects against WhatsApp bans)
+const MAX_DELAY = 120; // maximum seconds for random delay
 const MAX_CONTACTS = 50; // free tier limit per campaign
+const MAX_PER_DAY = 50; // maximum messages per day per account (WhatsApp safe threshold)
 
 let campaignsPath;
 let campaigns = [];
@@ -120,10 +122,27 @@ function initBroadcast({ app, ipcMain, getMainWindow, getViews }) {
 }
 
 async function runCampaign(campaign, getViews, getMainWindow) {
+  // Use random delay between MIN_DELAY and MAX_DELAY for human-like behavior
+  function getRandomDelay() {
+    const base = MIN_DELAY + Math.random() * (MAX_DELAY - MIN_DELAY);
+    // 10% chance of a longer "break" (2-5 minutes) to mimic human pauses
+    if (Math.random() < 0.1) return base + 120 + Math.random() * 180;
+    return base;
+  }
   const delay = Math.max(MIN_DELAY, campaign.delayBetween || MIN_DELAY);
+
+  let sentThisSession = 0;
 
   for (const contact of campaign.contacts) {
     if (contact.status !== 'pending') continue;
+
+    // Enforce daily limit to protect against WhatsApp bans
+    if (sentThisSession >= MAX_PER_DAY) {
+      campaign.status = 'paused';
+      saveCampaigns();
+      sendProgress(getMainWindow, campaign);
+      return; // pause until tomorrow
+    }
 
     // Check if paused or deleted
     if (!activeSends[campaign.id] || activeSends[campaign.id].paused) {
@@ -195,6 +214,7 @@ async function runCampaign(campaign, getViews, getMainWindow) {
       if (result?.success) {
         contact.status = 'sent';
         campaign.stats.sent++;
+        sentThisSession++;
       } else {
         contact.status = 'failed';
         campaign.stats.failed++;
@@ -207,9 +227,10 @@ async function runCampaign(campaign, getViews, getMainWindow) {
     saveCampaigns();
     sendProgress(getMainWindow(), campaign);
 
-    // Wait before next contact (unless this is the last one)
+    // Wait before next contact with random human-like delay
     if (campaign.contacts.some((c) => c.status === 'pending')) {
-      await sleep(delay * 1000);
+      const randomDelay = getRandomDelay();
+      await sleep(randomDelay * 1000);
     }
 
     // Re-check pause after delay
