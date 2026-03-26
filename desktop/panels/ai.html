@@ -82,6 +82,21 @@ body {
     <button class="panel-close" onclick="hub.closePanel('ai')">&times;</button>
   </div>
   <div class="panel-body">
+    <!-- API Key Banner - shown when key is not configured -->
+    <div id="apiKeyBanner" style="display:none;background:#FFF3CD;border:1px solid #FFE69C;border-radius:8px;padding:14px 16px;margin-bottom:16px;">
+      <div style="display:flex;align-items:flex-start;gap:10px;">
+        <span style="font-size:20px;line-height:1;">🔑</span>
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:600;color:#664D03;margin-bottom:4px;">API Key Required</div>
+          <div style="font-size:13px;color:#997404;line-height:1.5;margin-bottom:8px;">AI features need an Anthropic API key to work. Get one free at console.anthropic.com, then add it in Settings.</div>
+          <button onclick="hub.closePanel('ai');hub.openPanel('settings');" style="background:#111B21;color:#fff;border:none;border-radius:6px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;">Add API Key in Settings →</button>
+        </div>
+      </div>
+    </div>
+    <!-- API Key OK Banner - shown when key is configured -->
+    <div id="apiKeyOk" style="display:none;background:#E8F8EE;border:1px solid #C1EDD1;border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:12px;color:#1a7a3a;display:flex;align-items:center;gap:8px;">
+      <span>✓</span> <span>AI powered by Claude — ready to go</span>
+    </div>
     <div class="list-item" id="action-suggest">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
@@ -129,6 +144,31 @@ body {
     const resultsTitleEl = document.getElementById('results-title');
     const resultsContentEl = document.getElementById('results-content');
 
+    // Check API key status on load
+    const API_KEY_ERROR = 'API key not configured. Set it in Settings.';
+    const API_KEY_CTA = '<div style="margin-top:12px;padding:14px;background:#FFF3CD;border:1px solid #FFE69C;border-radius:8px;">' +
+      '<div style="font-weight:600;color:#664D03;margin-bottom:4px;">🔑 API Key Required</div>' +
+      '<div style="font-size:13px;color:#997404;margin-bottom:8px;">Add your Anthropic API key in Settings to use AI features.</div>' +
+      '<button onclick="hub.closePanel(\'ai\');hub.openPanel(\'settings\');" style="background:#111B21;color:#fff;border:none;border-radius:6px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;">Add API Key →</button></div>';
+
+    // Check if API key is set
+    (async function checkApiKey() {
+      try {
+        // Try a lightweight check - get license which loads settings
+        const result = await hub.aiSuggestReplies([]);
+        if (result && result.error && result.error.includes('API key')) {
+          document.getElementById('apiKeyBanner').style.display = 'block';
+          document.getElementById('apiKeyOk').style.display = 'none';
+        } else {
+          document.getElementById('apiKeyBanner').style.display = 'none';
+          document.getElementById('apiKeyOk').style.display = 'flex';
+        }
+      } catch (e) {
+        document.getElementById('apiKeyBanner').style.display = 'block';
+        document.getElementById('apiKeyOk').style.display = 'none';
+      }
+    })();
+
     function showLoading(title) {
       resultsTitleEl.textContent = title;
       resultsContentEl.innerHTML = '<span class="loading">Thinking...</span>';
@@ -159,11 +199,17 @@ body {
             return chip.outerHTML;
           }).join('');
           showResults('Suggested Replies', chips);
+        } else if (result && result.error && result.error.includes('API key')) {
+          showResults('Suggested Replies', API_KEY_CTA);
         } else {
           showResults('Suggested Replies', '<span class="loading">No suggestions available. Open a chat first.</span>');
         }
       } catch (e) {
-        showResults('Suggested Replies', '<span class="loading">Error: ' + (e.message || 'Could not generate suggestions.') + '</span>');
+        if (e.message && e.message.includes('API key')) {
+          showResults('Suggested Replies', API_KEY_CTA);
+        } else {
+          showResults('Suggested Replies', '<span class="loading">Error: ' + (e.message || 'Could not generate suggestions.') + '</span>');
+        }
       }
     });
 
@@ -172,10 +218,18 @@ body {
       try {
         const messages = await hub.aiGetChatMessages();
         const result = await hub.aiSummarize(messages);
-        const safeText = (result.summary || 'No summary available.').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-        showResults('Summary', safeText);
+        if (result && result.error && result.error.includes('API key')) {
+          showResults('Summary', API_KEY_CTA);
+        } else {
+          const safeText = (result.summary || 'No summary available.').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+          showResults('Summary', safeText);
+        }
       } catch (e) {
-        showResults('Summary', '<span class="loading">Error: ' + (e.message || 'Could not generate summary.') + '</span>');
+        if (e.message && e.message.includes('API key')) {
+          showResults('Summary', API_KEY_CTA);
+        } else {
+          showResults('Summary', '<span class="loading">Error: ' + (e.message || 'Could not generate summary.') + '</span>');
+        }
       }
     });
 
@@ -197,10 +251,18 @@ body {
         const messages = await hub.aiGetChatMessages();
         const lastMsg = messages && messages.length ? (messages[messages.length - 1].text || messages[messages.length - 1].body || '') : '';
         const result = await hub.aiTranslate(lastMsg, lang);
-        const safeTranslation = (result.translation || 'No translation available.').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-        showResults('Translation (' + lang + ')', safeTranslation);
+        if (result && result.error && result.error.includes('API key')) {
+          showResults('Translation', API_KEY_CTA);
+        } else {
+          const safeTranslation = (result.translation || 'No translation available.').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+          showResults('Translation (' + lang + ')', safeTranslation);
+        }
       } catch (e) {
-        showResults('Translation', '<span class="loading">Error: ' + (e.message || 'Could not translate.') + '</span>');
+        if (e.message && e.message.includes('API key')) {
+          showResults('Translation', API_KEY_CTA);
+        } else {
+          showResults('Translation', '<span class="loading">Error: ' + (e.message || 'Could not translate.') + '</span>');
+        }
       }
     }
   </script>
