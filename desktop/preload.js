@@ -47,6 +47,7 @@ contextBridge.exposeInMainWorld('hub', {
   // Analytics
   getAnalytics: () => ipcRenderer.invoke('get-analytics'),
   getAnalyticsSummary: (accountId) => ipcRenderer.invoke('get-analytics-summary', accountId),
+  trackEvent: (eventName, properties) => ipcRenderer.send('track-event', { eventName, properties }),
 
   // AI Replies
   aiSuggestReplies: (messages) => ipcRenderer.invoke('ai-suggest-replies', { messages }),
@@ -96,6 +97,9 @@ contextBridge.exposeInMainWorld('hub', {
 
   // Pairing
   generatePairingQR: () => ipcRenderer.invoke('generate-pairing-qr'),
+
+  // Feedback
+  sendFeedback: (data) => ipcRenderer.invoke('send-feedback', data),
 
   // Checkout
   openCheckout: (url) => ipcRenderer.send('open-checkout', url),

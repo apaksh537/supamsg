@@ -16,6 +16,7 @@ const PANEL_CONFIGS = {
   'connect-phone': { width: 440, height: 600, title: 'Settings', file: 'settings' },
   'command-palette': { width: 500, height: 400, title: 'Search' },
   'smart-outreach': { width: 640, height: 700, title: 'Smart Outreach' },
+  'feedback': { width: 440, height: 500, title: 'Feedback' },
 };
 
 function initPanelManager({ getMainWindow }) {

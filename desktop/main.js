@@ -838,6 +838,33 @@ app.whenReady().then(async () => {
   safeInit('posthog-analytics', () => initPosthogAnalytics({ app, ipcMain }));
   safeInit('panel-manager', () => initPanelManager({ getMainWindow }));
 
+  // Feedback endpoint
+  ipcMain.handle('send-feedback', async (_event, data) => {
+    const https = require('https');
+    const payload = JSON.stringify({
+      type: data.type,
+      message: data.message,
+      email: data.email || null,
+      appVersion: app.getVersion(),
+      platform: process.platform,
+    });
+    return new Promise((resolve, reject) => {
+      const req = https.request({
+        hostname: 'api.supamsg.com',
+        path: '/feedback',
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(payload) },
+      }, (res) => {
+        let body = '';
+        res.on('data', (chunk) => body += chunk);
+        res.on('end', () => resolve({ ok: res.statusCode === 200, status: res.statusCode }));
+      });
+      req.on('error', (err) => reject(err));
+      req.write(payload);
+      req.end();
+    });
+  });
+
   // Global shortcut
   if (settings.globalShortcut) {
     globalShortcut.register(settings.globalShortcut, () => {
