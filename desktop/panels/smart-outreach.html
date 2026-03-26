@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Outreach</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  background: #FFFFFF;
+  color: #111B21;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+.panel-header {
+  height: 48px;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  border-bottom: 1px solid #E8E8E8;
+  -webkit-app-region: drag;
+  flex-shrink: 0;
+}
+.panel-title { font-size: 16px; font-weight: 600; color: #111B21; flex: 1; }
+.panel-close {
+  width: 28px; height: 28px; border-radius: 6px; border: none;
+  background: none; color: #667781; font-size: 18px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  -webkit-app-region: no-drag;
+  transition: all 0.15s;
+}
+.panel-close:hover { background: #F0F2F5; color: #111B21; }
+
+/* Tabs */
+.tab-bar {
+  display: flex;
+  border-bottom: 1px solid #E8E8E8;
+  flex-shrink: 0;
+  background: #FFFFFF;
+}
+.tab-btn {
+  flex: 1;
+  height: 40px;
+  border: none;
+  background: none;
+  font-size: 13px;
+  font-weight: 500;
+  color: #667781;
+  cursor: pointer;
+  position: relative;
+  transition: color 0.2s;
+  -webkit-app-region: no-drag;
+}
+.tab-btn:hover { color: #111B21; }
+.tab-btn.active { color: #25D366; font-weight: 600; }
+.tab-btn.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 20%; right: 20%;
+  height: 2px;
+  background: #25D366;
+  border-radius: 2px 2px 0 0;
+}
+.tab-panel {
+  display: none;
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  animation: fadeIn 0.2s ease;
+}
+.tab-panel.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Common */
+.section-label {
+  font-size: 11px; font-weight: 600; color: #667781;
+  text-transform: uppercase; letter-spacing: 1px;
+  margin: 16px 0 8px;
+}
+.section-label:first-child { margin-top: 0; }
+.divider { height: 1px; background: #E8E8E8; margin: 16px 0; }
+.form-label { font-size: 12px; font-weight: 500; color: #667781; margin-bottom: 4px; display: block; }
+.form-input {
+  width: 100%; height: 40px; padding: 0 12px;
+  background: #F0F2F5; border: none; border-radius: 8px;
+  font-size: 14px; color: #111B21; outline: none;
+  margin-bottom: 12px;
+  font-family: inherit;
+}
+.form-input:focus { box-shadow: 0 0 0 2px rgba(37,211,102,0.3); }
+textarea.form-input { height: 80px; padding: 10px 12px; resize: none; }
+.form-hint { font-size: 11px; color: #667781; margin: -8px 0 12px; }
+
+.btn {
+  height: 36px; padding: 0 16px; border-radius: 8px;
+  font-size: 13px; font-weight: 500; cursor: pointer;
+  border: none; transition: all 0.15s;
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: inherit;
+}
+.btn-primary { background: #25D366; color: #fff; }
+.btn-primary:hover { background: #1FAA59; }
+.btn-outline { background: none; border: 1px solid #E8E8E8; color: #111B21; }
+.btn-outline:hover { background: #F0F2F5; }
+.btn-danger { background: none; border: 1px solid #E74C3C; color: #E74C3C; }
+.btn-danger:hover { background: #FDF0EF; }
+.btn-sm { height: 30px; font-size: 12px; padding: 0 12px; }
+.btn-block { width: 100%; justify-content: center; }
+
+.badge {
+  display: inline-block; padding: 3px 8px; border-radius: 10px;
+  font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
+}
+.badge-draft { background: #F0F2F5; color: #667781; }
+.badge-running { background: #E8F8EE; color: #1FAA59; }
+.badge-paused { background: #FFF3E0; color: #E67E22; }
+.badge-completed { background: #E8F0FE; color: #4285F4; }
+
+/* Campaign cards */
+.campaign-card {
+  background: #F0F2F5; border-radius: 10px; padding: 14px;
+  margin-bottom: 8px; cursor: pointer; transition: all 0.15s;
+}
+.campaign-card:hover { background: #E8EAED; }
+.campaign-card-header {
+  display: flex; align-items: center; gap: 10px;
+}
+.campaign-card-info { flex: 1; }
+.campaign-card-name { font-size: 14px; font-weight: 500; color: #111B21; }
+.campaign-card-meta { font-size: 12px; color: #667781; margin-top: 2px; }
+.campaign-card-meta span { margin-right: 12px; }
+.progress-bar {
+  height: 4px; background: #E8E8E8; border-radius: 2px;
+  margin-top: 10px; overflow: hidden;
+}
+.progress-fill {
+  height: 100%; background: #25D366; border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+/* Campaign detail */
+.campaign-detail {
+  max-height: 0; overflow: hidden;
+  transition: max-height 0.3s ease, padding 0.3s ease;
+}
+.campaign-detail.open {
+  max-height: 2000px;
+  padding-top: 12px;
+}
+.detail-stats {
+  display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;
+  margin-bottom: 12px;
+}
+.detail-stat {
+  background: #fff; border-radius: 8px; padding: 10px;
+  text-align: center;
+}
+.detail-stat-value { font-size: 20px; font-weight: 700; color: #111B21; }
+.detail-stat-label { font-size: 11px; color: #667781; margin-top: 2px; }
+.account-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 0; border-bottom: 1px solid #E8E8E8;
+  font-size: 13px;
+}
+.account-row:last-child { border-bottom: none; }
+.account-row .name { flex: 1; font-weight: 500; }
+.account-row .sent-count { color: #667781; }
+.health-badge {
+  display: inline-block; padding: 2px 8px; border-radius: 8px;
+  font-size: 11px; font-weight: 600;
+}
+.health-green { background: #E8F8EE; color: #1FAA59; }
+.health-yellow { background: #FFF3E0; color: #E67E22; }
+.health-red { background: #FDF0EF; color: #E74C3C; }
+
+.contact-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 6px 0; border-bottom: 1px solid #F0F2F5;
+  font-size: 13px;
+}
+.contact-row:last-child { border-bottom: none; }
+.contact-row .contact-name { flex: 1; font-weight: 500; }
+.contact-row .contact-phone { color: #667781; flex: 1; }
+.contact-status { font-size: 12px; min-width: 24px; text-align: center; }
+.contact-status.sent { color: #25D366; }
+.contact-status.failed { color: #E74C3C; }
+.contact-status.replied { color: #4285F4; }
+.contact-status.queued { color: #E67E22; }
+.contact-status.pending { color: #667781; }
+
+/* New campaign form */
+#newCampaignForm { display: none; }
+#newCampaignForm.visible { display: block; }
+.checkbox-group { margin-bottom: 12px; }
+.checkbox-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 0; font-size: 13px;
+}
+.checkbox-item input[type="checkbox"] {
+  width: 16px; height: 16px; accent-color: #25D366;
+}
+.contacts-summary {
+  padding: 10px 14px; background: #F0F2F5; border-radius: 8px;
+  font-size: 13px; color: #667781; margin-bottom: 12px;
+}
+.contacts-summary strong { color: #111B21; }
+.btn-row { display: flex; gap: 8px; margin-top: 8px; }
+
+/* Collapsible settings */
+.collapsible-header {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 0; cursor: pointer; user-select: none;
+}
+.collapsible-header .arrow {
+  font-size: 10px; color: #667781; transition: transform 0.2s;
+}
+.collapsible-header.open .arrow { transform: rotate(90deg); }
+.collapsible-header .label { font-size: 13px; font-weight: 500; color: #111B21; }
+.collapsible-body {
+  max-height: 0; overflow: hidden; transition: max-height 0.3s ease;
+}
+.collapsible-body.open { max-height: 600px; }
+.setting-row {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 12px;
+}
+.setting-row label { font-size: 13px; color: #111B21; flex: 1; }
+.setting-row .value { font-size: 13px; font-weight: 500; color: #25D366; min-width: 36px; text-align: right; }
+.setting-row input[type="range"] {
+  flex: 2; accent-color: #25D366; height: 4px;
+}
+.toggle-switch {
+  position: relative; display: inline-block;
+  width: 40px; height: 22px;
+}
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+.toggle-slider {
+  position: absolute; cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: #E8E8E8; border-radius: 22px;
+  transition: 0.2s;
+}
+.toggle-slider::before {
+  content: ''; position: absolute;
+  height: 18px; width: 18px;
+  left: 2px; bottom: 2px;
+  background: #fff; border-radius: 50%;
+  transition: 0.2s;
+}
+.toggle-switch input:checked + .toggle-slider { background: #25D366; }
+.toggle-switch input:checked + .toggle-slider::before { transform: translateX(18px); }
+.time-inputs {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 12px;
+}
+.time-inputs input[type="time"] {
+  height: 34px; padding: 0 8px;
+  background: #F0F2F5; border: none; border-radius: 6px;
+  font-size: 13px; color: #111B21; outline: none;
+  font-family: inherit;
+}
+.time-inputs span { font-size: 12px; color: #667781; }
+
+/* Number health cards */
+.health-card {
+  background: #F0F2F5; border-radius: 12px; padding: 16px;
+  margin-bottom: 10px;
+}
+.health-card-header {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 12px;
+}
+.health-ring {
+  width: 64px; height: 64px; position: relative;
+  flex-shrink: 0;
+}
+.health-ring svg { width: 64px; height: 64px; transform: rotate(-90deg); }
+.health-ring .ring-bg { fill: none; stroke: #E8E8E8; stroke-width: 5; }
+.health-ring .ring-fill { fill: none; stroke-width: 5; stroke-linecap: round; transition: stroke-dashoffset 0.5s ease; }
+.health-ring .score-text {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; font-weight: 700;
+}
+.health-card-info { flex: 1; }
+.health-card-name { font-size: 14px; font-weight: 600; color: #111B21; display: flex; align-items: center; gap: 6px; }
+.health-card-name .dot { width: 8px; height: 8px; border-radius: 50%; }
+.health-card-status { font-size: 12px; color: #667781; margin-top: 2px; }
+.health-stats {
+  display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;
+  margin-bottom: 12px;
+}
+.health-stat {
+  background: #fff; border-radius: 8px; padding: 8px 10px;
+  text-align: center;
+}
+.health-stat-value { font-size: 16px; font-weight: 600; color: #111B21; }
+.health-stat-label { font-size: 10px; color: #667781; margin-top: 2px; }
+.mini-chart {
+  display: flex; align-items: flex-end; gap: 3px;
+  height: 32px; margin-bottom: 12px;
+}
+.mini-bar {
+  flex: 1; background: #25D366; border-radius: 2px 2px 0 0;
+  min-height: 3px; transition: height 0.3s;
+  opacity: 0.7;
+}
+.mini-bar:last-child { opacity: 1; }
+.mini-chart-labels {
+  display: flex; gap: 3px;
+}
+.mini-chart-labels span {
+  flex: 1; text-align: center; font-size: 9px; color: #667781;
+}
+
+/* Settings tab */
+.settings-section {
+  background: #F0F2F5; border-radius: 10px; padding: 14px;
+  margin-bottom: 12px;
+}
+.settings-section-title {
+  font-size: 13px; font-weight: 600; color: #111B21;
+  margin-bottom: 12px;
+}
+
+/* Manual contact add row */
+.add-contact-row {
+  display: flex; gap: 6px; margin-bottom: 8px;
+}
+.add-contact-row input {
+  flex: 1; height: 34px; padding: 0 8px;
+  background: #F0F2F5; border: none; border-radius: 6px;
+  font-size: 12px; color: #111B21; outline: none;
+  font-family: inherit;
+}
+.add-contact-row input:focus { box-shadow: 0 0 0 2px rgba(37,211,102,0.3); }
+
+/* Contact list in form */
+.contact-list-preview {
+  max-height: 160px; overflow-y: auto;
+  background: #fff; border-radius: 8px; padding: 4px 0;
+  margin-bottom: 12px;
+}
+.contact-list-preview .contact-row { padding: 4px 10px; }
+
+/* Empty state */
+.empty-state {
+  text-align: center; padding: 40px 20px;
+  color: #667781;
+}
+.empty-state .icon { font-size: 36px; margin-bottom: 8px; opacity: 0.5; }
+.empty-state .message { font-size: 14px; }
+.empty-state .sub { font-size: 12px; margin-top: 4px; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #E8E8E8; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #D0D0D0; }
+</style>
+</head>
+<body>
+  <div class="panel-header">
+    <span class="panel-title">Smart Outreach</span>
+    <button class="panel-close" onclick="hub.closePanel('smart-outreach')">&times;</button>
+  </div>
+
+  <div class="tab-bar">
+    <button class="tab-btn active" data-tab="campaigns">Campaigns</button>
+    <button class="tab-btn" data-tab="health">Number Health</button>
+    <button class="tab-btn" data-tab="settings">Settings</button>
+  </div>
+
+  <!-- TAB 1: CAMPAIGNS -->
+  <div class="tab-panel active" id="tab-campaigns">
+    <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">
+      <div class="section-label" style="margin:0; flex:1;">Campaigns</div>
+      <button class="btn btn-primary btn-sm" id="btnNewCampaign">+ New Campaign</button>
+    </div>
+
+    <div id="campaignList">
+      <div class="empty-state">
+        <div class="icon">&#128640;</div>
+        <div class="message">No campaigns yet</div>
+        <div class="sub">Create your first outreach campaign to get started.</div>
+      </div>
+    </div>
+
+    <!-- New / Edit Campaign Form -->
+    <div id="newCampaignForm">
+      <div class="divider"></div>
+      <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">
+        <div class="section-label" style="margin:0; flex:1;" id="formTitle">New Campaign</div>
+        <button class="btn btn-outline btn-sm" id="btnCancelForm">Cancel</button>
+      </div>
+
+      <label class="form-label">Campaign Name</label>
+      <input class="form-input" id="fCampaignName" type="text" placeholder="e.g. March Outreach" />
+
+      <label class="form-label">Message Template</label>
+      <textarea class="form-input" id="fMessageTemplate" placeholder="Hi {name}, I wanted to reach out from {company}..."></textarea>
+      <div class="form-hint">Variables: {name}, {company}, {custom1}, {custom2}</div>
+
+      <label class="form-label">WhatsApp Accounts</label>
+      <div class="checkbox-group" id="fAccountList">
+        <div style="color:#667781;font-size:12px;padding:4px 0;">Loading accounts...</div>
+      </div>
+
+      <label class="form-label">Contacts</label>
+      <div style="display:flex; gap:8px; margin-bottom:8px;">
+        <button class="btn btn-outline btn-sm" id="btnImportCSV">Import CSV</button>
+        <input type="file" id="csvFileInput" accept=".csv" style="display:none" />
+      </div>
+      <div class="add-contact-row">
+        <input type="text" id="fContactName" placeholder="Name" />
+        <input type="text" id="fContactPhone" placeholder="Phone" />
+        <input type="text" id="fContactCompany" placeholder="Company" />
+        <button class="btn btn-outline btn-sm" id="btnAddContact">Add</button>
+      </div>
+      <div class="contacts-summary" id="contactsSummary">
+        <strong>0</strong> contacts loaded
+      </div>
+      <div class="contact-list-preview" id="contactListPreview" style="display:none;"></div>
+
+      <!-- Collapsible settings -->
+      <div class="collapsible-header" id="campaignSettingsToggle">
+        <span class="arrow">&#9654;</span>
+        <span class="label">Campaign Settings</span>
+      </div>
+      <div class="collapsible-body" id="campaignSettingsBody">
+        <div class="setting-row">
+          <label>Daily limit per number</label>
+          <span class="value" id="valDailyLimit">50</span>
+          <input type="range" min="10" max="100" value="50" id="fDailyLimit" />
+        </div>
+        <div class="setting-row">
+          <label>Min delay (seconds)</label>
+          <span class="value" id="valMinDelay">30</span>
+          <input type="range" min="15" max="120" value="30" id="fMinDelay" />
+        </div>
+        <div class="setting-row">
+          <label>Max delay (seconds)</label>
+          <span class="value" id="valMaxDelay">90</span>
+          <input type="range" min="30" max="300" value="90" id="fMaxDelay" />
+        </div>
+        <div class="setting-row">
+          <label>Business hours only</label>
+          <label class="toggle-switch">
+            <input type="checkbox" id="fBusinessHours" checked />
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="time-inputs" id="businessHoursTime">
+          <input type="time" id="fBizStart" value="09:00" />
+          <span>to</span>
+          <input type="time" id="fBizEnd" value="18:00" />
+        </div>
+        <div class="setting-row">
+          <label>Warm-up mode</label>
+          <label class="toggle-switch">
+            <input type="checkbox" id="fWarmup" checked />
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="btn-row" style="margin-top:16px;">
+        <button class="btn btn-primary" id="btnStartCampaign" style="flex:1;">Start Campaign</button>
+        <button class="btn btn-outline" id="btnSaveDraft">Save Draft</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 2: NUMBER HEALTH -->
+  <div class="tab-panel" id="tab-health">
+    <div class="section-label">Account Health Dashboard</div>
+    <div id="healthList">
+      <div class="empty-state">
+        <div class="icon">&#128170;</div>
+        <div class="message">No accounts found</div>
+        <div class="sub">Connect WhatsApp accounts to see their health.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 3: SETTINGS -->
+  <div class="tab-panel" id="tab-settings">
+    <div class="section-label">Default Campaign Settings</div>
+    <div class="settings-section">
+      <div class="settings-section-title">Message Limits</div>
+      <div class="setting-row">
+        <label>Global daily limit</label>
+        <span class="value" id="valGlobalLimit">50</span>
+        <input type="range" min="10" max="100" value="50" id="sGlobalLimit" />
+      </div>
+      <div class="setting-row">
+        <label>Default min delay (s)</label>
+        <span class="value" id="valSMinDelay">30</span>
+        <input type="range" min="15" max="120" value="30" id="sMinDelay" />
+      </div>
+      <div class="setting-row">
+        <label>Default max delay (s)</label>
+        <span class="value" id="valSMaxDelay">90</span>
+        <input type="range" min="30" max="300" value="90" id="sMaxDelay" />
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-title">Business Hours</div>
+      <div class="setting-row">
+        <label>Enforce business hours</label>
+        <label class="toggle-switch">
+          <input type="checkbox" id="sBizToggle" checked />
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="time-inputs">
+        <input type="time" id="sBizStart" value="09:00" />
+        <span>to</span>
+        <input type="time" id="sBizEnd" value="18:00" />
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-title">Warm-up Configuration</div>
+      <div class="setting-row">
+        <label>Enable warm-up for new numbers</label>
+        <label class="toggle-switch">
+          <input type="checkbox" id="sWarmupToggle" checked />
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="setting-row">
+        <label>Warm-up duration (days)</label>
+        <span class="value" id="valWarmupDays">14</span>
+        <input type="range" min="7" max="30" value="14" id="sWarmupDays" />
+      </div>
+    </div>
+
+    <button class="btn btn-danger btn-block" id="btnResetHealth" style="margin-top:12px;">
+      Reset All Health Scores
+    </button>
+  </div>
+
+  <script>
+    /* ============================================================
+       STATE
+    ============================================================ */
+    let campaigns = [];
+    let contacts = [];
+    let accounts = [];
+    let healthData = [];
+    let editingCampaignId = null;
+    let expandedCampaignId = null;
+    let refreshInterval = null;
+
+    /* ============================================================
+       TAB SWITCHING
+    ============================================================ */
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+
+        if (btn.dataset.tab === 'health') loadHealth();
+      });
+    });
+
+    /* ============================================================
+       CSV PARSING
+    ============================================================ */
+    function parseCSV(text) {
+      const lines = text.trim().split('\n');
+      const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+      return lines.slice(1).map(line => {
+        const values = line.split(',').map(v => v.trim());
+        return {
+          name: values[headers.indexOf('name')] || '',
+          phone: values[headers.indexOf('phone')] || '',
+          company: values[headers.indexOf('company')] || '',
+          custom1: values[headers.indexOf('custom1')] || '',
+          custom2: values[headers.indexOf('custom2')] || '',
+          status: 'pending',
+        };
+      }).filter(c => c.phone);
+    }
+
+    /* ============================================================
+       HELPER: HEALTH COLOR
+    ============================================================ */
+    function healthColor(score) {
+      if (score > 70) return '#1FAA59';
+      if (score >= 40) return '#E67E22';
+      return '#E74C3C';
+    }
+    function healthClass(score) {
+      if (score > 70) return 'health-green';
+      if (score >= 40) return 'health-yellow';
+      return 'health-red';
+    }
+    function statusIcon(status) {
+      const map = { sent: ['&#10003;', 'sent'], failed: ['&#10007;', 'failed'], replied: ['&#8617;', 'replied'], queued: ['&#9200;', 'queued'], pending: ['&#8943;', 'pending'] };
+      const s = map[status] || map.pending;
+      return `<span class="contact-status ${s[1]}">${s[0]}</span>`;
+    }
+
+    /* ============================================================
+       CAMPAIGN LIST RENDERING
+    ============================================================ */
+    function renderCampaigns() {
+      const el = document.getElementById('campaignList');
+      if (!campaigns.length) {
+        el.innerHTML = `<div class="empty-state"><div class="icon">&#128640;</div><div class="message">No campaigns yet</div><div class="sub">Create your first outreach campaign to get started.</div></div>`;
+        return;
+      }
+      el.innerHTML = campaigns.map(c => {
+        const total = (c.contacts || []).length;
+        const sent = (c.contacts || []).filter(x => x.status === 'sent' || x.status === 'replied').length;
+        const pct = total ? Math.round(sent / total * 100) : 0;
+        const acctCount = (c.accounts || []).length;
+        const badgeClass = 'badge-' + (c.status || 'draft');
+        const isExpanded = expandedCampaignId === c.id;
+        return `
+          <div class="campaign-card" onclick="toggleCampaignDetail('${c.id}')">
+            <div class="campaign-card-header">
+              <div class="campaign-card-info">
+                <div class="campaign-card-name">${esc(c.name)}</div>
+                <div class="campaign-card-meta">
+                  <span>${sent}/${total} sent</span>
+                  <span>${acctCount} account${acctCount !== 1 ? 's' : ''}</span>
+                </div>
+              </div>
+              <span class="badge ${badgeClass}">${c.status || 'draft'}</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+            <div class="campaign-detail ${isExpanded ? 'open' : ''}" id="detail-${c.id}">
+              ${isExpanded ? renderCampaignDetail(c) : ''}
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    function renderCampaignDetail(c) {
+      const total = (c.contacts || []).length;
+      const sent = (c.contacts || []).filter(x => x.status === 'sent' || x.status === 'replied').length;
+      const replied = (c.contacts || []).filter(x => x.status === 'replied').length;
+      const failed = (c.contacts || []).filter(x => x.status === 'failed').length;
+      const responseRate = sent ? Math.round(replied / sent * 100) : 0;
+
+      let accountBreakdown = '';
+      if (c.accountStats && c.accountStats.length) {
+        accountBreakdown = c.accountStats.map(a => `
+          <div class="account-row">
+            <span class="name">${esc(a.name)}</span>
+            <span class="sent-count">${a.sent} sent</span>
+            <span class="health-badge ${healthClass(a.healthScore)}">${a.healthScore}</span>
+          </div>`).join('');
+      }
+
+      const contactRows = (c.contacts || []).slice(0, 50).map(ct => `
+        <div class="contact-row">
+          <span class="contact-name">${esc(ct.name)}</span>
+          <span class="contact-phone">${esc(ct.phone)}</span>
+          ${statusIcon(ct.status)}
+        </div>`).join('');
+
+      const isRunning = c.status === 'running';
+      const isPaused = c.status === 'paused';
+      const toggleBtn = isRunning
+        ? `<button class="btn btn-outline btn-sm" onclick="event.stopPropagation(); pauseCampaign('${c.id}')">Pause</button>`
+        : isPaused
+        ? `<button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); resumeCampaign('${c.id}')">Resume</button>`
+        : '';
+
+      return `
+        <div class="detail-stats">
+          <div class="detail-stat"><div class="detail-stat-value">${sent}/${total}</div><div class="detail-stat-label">Sent</div></div>
+          <div class="detail-stat"><div class="detail-stat-value">${responseRate}%</div><div class="detail-stat-label">Response Rate</div></div>
+          <div class="detail-stat"><div class="detail-stat-value">${failed}</div><div class="detail-stat-label">Failed</div></div>
+        </div>
+        ${accountBreakdown ? '<div class="section-label" style="margin-top:0;">Accounts</div>' + accountBreakdown : ''}
+        <div class="section-label">Contacts</div>
+        <div style="max-height:200px; overflow-y:auto;">${contactRows || '<div style="color:#667781;font-size:12px;">No contacts.</div>'}</div>
+        <div style="display:flex; gap:8px; margin-top:12px; justify-content:flex-end;">
+          ${toggleBtn}
+          <button class="btn btn-danger btn-sm" onclick="event.stopPropagation(); deleteCampaign('${c.id}')">Delete</button>
+        </div>`;
+    }
+
+    function toggleCampaignDetail(id) {
+      expandedCampaignId = expandedCampaignId === id ? null : id;
+      renderCampaigns();
+    }
+
+    /* ============================================================
+       HEALTH RENDERING
+    ============================================================ */
+    function renderHealth() {
+      const el = document.getElementById('healthList');
+      if (!healthData.length) {
+        el.innerHTML = `<div class="empty-state"><div class="icon">&#128170;</div><div class="message">No accounts found</div><div class="sub">Connect WhatsApp accounts to see their health.</div></div>`;
+        return;
+      }
+      el.innerHTML = healthData.map(h => {
+        const color = healthColor(h.score);
+        const circumference = 2 * Math.PI * 27;
+        const offset = circumference - (h.score / 100) * circumference;
+        const dayLabels = ['M','T','W','T','F','S','S'];
+        const volumes = h.last7Days || [0,0,0,0,0,0,0];
+        const maxVol = Math.max(...volumes, 1);
+        const bars = volumes.map((v, i) =>
+          `<div class="mini-bar" style="height:${Math.max(3, (v / maxVol) * 32)}px"></div>`
+        ).join('');
+        const labels = dayLabels.map(d => `<span>${d}</span>`).join('');
+
+        let statusText = 'Active';
+        if (h.status === 'warming') statusText = `Warming Up (Day ${h.warmupDay || '?'}/14)`;
+        else if (h.status === 'paused') statusText = `Paused${h.pauseReason ? ' - ' + esc(h.pauseReason) : ''}`;
+
+        const toggleBtn = h.status === 'paused'
+          ? `<button class="btn btn-primary btn-sm" onclick="resumeAccount('${h.accountId}')">Resume</button>`
+          : `<button class="btn btn-outline btn-sm" onclick="pauseAccount('${h.accountId}')">Pause</button>`;
+
+        return `
+          <div class="health-card">
+            <div class="health-card-header">
+              <div class="health-ring">
+                <svg viewBox="0 0 64 64">
+                  <circle class="ring-bg" cx="32" cy="32" r="27" />
+                  <circle class="ring-fill" cx="32" cy="32" r="27"
+                    stroke="${color}"
+                    stroke-dasharray="${circumference}"
+                    stroke-dashoffset="${offset}" />
+                </svg>
+                <div class="score-text" style="color:${color}">${h.score}</div>
+              </div>
+              <div class="health-card-info">
+                <div class="health-card-name">
+                  <span class="dot" style="background:${h.color || color}"></span>
+                  ${esc(h.name)}
+                </div>
+                <div class="health-card-status">${statusText}</div>
+              </div>
+              ${toggleBtn}
+            </div>
+            <div class="health-stats">
+              <div class="health-stat"><div class="health-stat-value">${h.sentToday || 0}/${h.dailyLimit || 50}</div><div class="health-stat-label">Sent Today</div></div>
+              <div class="health-stat"><div class="health-stat-value">${h.responseRate || 0}%</div><div class="health-stat-label">Response Rate</div></div>
+              <div class="health-stat"><div class="health-stat-value">${h.warnings || 0}</div><div class="health-stat-label">Warnings</div></div>
+            </div>
+            <div class="mini-chart">${bars}</div>
+            <div class="mini-chart-labels">${labels}</div>
+          </div>`;
+      }).join('');
+    }
+
+    /* ============================================================
+       FORM LOGIC
+    ============================================================ */
+    const $form = document.getElementById('newCampaignForm');
+    const $list = document.getElementById('campaignList');
+
+    document.getElementById('btnNewCampaign').addEventListener('click', () => {
+      editingCampaignId = null;
+      contacts = [];
+      resetForm();
+      $form.classList.add('visible');
+      document.getElementById('formTitle').textContent = 'New Campaign';
+      loadAccounts();
+    });
+
+    document.getElementById('btnCancelForm').addEventListener('click', () => {
+      $form.classList.remove('visible');
+    });
+
+    // Collapsible settings
+    document.getElementById('campaignSettingsToggle').addEventListener('click', function() {
+      this.classList.toggle('open');
+      document.getElementById('campaignSettingsBody').classList.toggle('open');
+    });
+
+    // Slider live values
+    function bindSlider(sliderId, valueId) {
+      const s = document.getElementById(sliderId);
+      const v = document.getElementById(valueId);
+      s.addEventListener('input', () => { v.textContent = s.value; });
+    }
+    bindSlider('fDailyLimit', 'valDailyLimit');
+    bindSlider('fMinDelay', 'valMinDelay');
+    bindSlider('fMaxDelay', 'valMaxDelay');
+    bindSlider('sGlobalLimit', 'valGlobalLimit');
+    bindSlider('sMinDelay', 'valSMinDelay');
+    bindSlider('sMaxDelay', 'valSMaxDelay');
+    bindSlider('sWarmupDays', 'valWarmupDays');
+
+    // CSV import
+    document.getElementById('btnImportCSV').addEventListener('click', () => {
+      document.getElementById('csvFileInput').click();
+    });
+    document.getElementById('csvFileInput').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const parsed = parseCSV(ev.target.result);
+        contacts = contacts.concat(parsed);
+        updateContactsSummary();
+      };
+      reader.readAsText(file);
+      e.target.value = '';
+    });
+
+    // Manual add contact
+    document.getElementById('btnAddContact').addEventListener('click', () => {
+      const name = document.getElementById('fContactName').value.trim();
+      const phone = document.getElementById('fContactPhone').value.trim();
+      const company = document.getElementById('fContactCompany').value.trim();
+      if (!phone) return;
+      contacts.push({ name, phone, company, custom1: '', custom2: '', status: 'pending' });
+      document.getElementById('fContactName').value = '';
+      document.getElementById('fContactPhone').value = '';
+      document.getElementById('fContactCompany').value = '';
+      updateContactsSummary();
+    });
+
+    function updateContactsSummary() {
+      document.getElementById('contactsSummary').innerHTML = `<strong>${contacts.length}</strong> contacts loaded`;
+      const preview = document.getElementById('contactListPreview');
+      if (contacts.length) {
+        preview.style.display = 'block';
+        preview.innerHTML = contacts.slice(0, 30).map(c => `
+          <div class="contact-row">
+            <span class="contact-name">${esc(c.name)}</span>
+            <span class="contact-phone">${esc(c.phone)}</span>
+          </div>`).join('') + (contacts.length > 30 ? `<div style="text-align:center;font-size:11px;color:#667781;padding:4px;">...and ${contacts.length - 30} more</div>` : '');
+      } else {
+        preview.style.display = 'none';
+      }
+    }
+
+    function resetForm() {
+      document.getElementById('fCampaignName').value = '';
+      document.getElementById('fMessageTemplate').value = '';
+      document.getElementById('fDailyLimit').value = 50;
+      document.getElementById('valDailyLimit').textContent = '50';
+      document.getElementById('fMinDelay').value = 30;
+      document.getElementById('valMinDelay').textContent = '30';
+      document.getElementById('fMaxDelay').value = 90;
+      document.getElementById('valMaxDelay').textContent = '90';
+      document.getElementById('fBusinessHours').checked = true;
+      document.getElementById('fBizStart').value = '09:00';
+      document.getElementById('fBizEnd').value = '18:00';
+      document.getElementById('fWarmup').checked = true;
+      contacts = [];
+      updateContactsSummary();
+    }
+
+    function gatherFormData() {
+      const selectedAccounts = [];
+      document.querySelectorAll('#fAccountList input[type="checkbox"]:checked').forEach(cb => {
+        selectedAccounts.push(cb.value);
+      });
+      return {
+        id: editingCampaignId || undefined,
+        name: document.getElementById('fCampaignName').value.trim(),
+        template: document.getElementById('fMessageTemplate').value,
+        accounts: selectedAccounts,
+        contacts: contacts,
+        settings: {
+          dailyLimit: parseInt(document.getElementById('fDailyLimit').value),
+          minDelay: parseInt(document.getElementById('fMinDelay').value),
+          maxDelay: parseInt(document.getElementById('fMaxDelay').value),
+          businessHours: document.getElementById('fBusinessHours').checked,
+          bizStart: document.getElementById('fBizStart').value,
+          bizEnd: document.getElementById('fBizEnd').value,
+          warmup: document.getElementById('fWarmup').checked,
+        },
+      };
+    }
+
+    // Save Draft
+    document.getElementById('btnSaveDraft').addEventListener('click', async () => {
+      const data = gatherFormData();
+      if (!data.name) return alert('Please enter a campaign name.');
+      data.status = 'draft';
+      try {
+        await hub.saveOutreachCampaign(data);
+        $form.classList.remove('visible');
+        loadCampaigns();
+      } catch (err) {
+        console.error('Save draft failed:', err);
+      }
+    });
+
+    // Start Campaign
+    document.getElementById('btnStartCampaign').addEventListener('click', async () => {
+      const data = gatherFormData();
+      if (!data.name) return alert('Please enter a campaign name.');
+      if (!data.contacts.length) return alert('Please add at least one contact.');
+      if (!data.accounts.length) return alert('Please select at least one WhatsApp account.');
+      data.status = 'running';
+      try {
+        const saved = await hub.saveOutreachCampaign(data);
+        await hub.startOutreachCampaign(saved.id || data.id);
+        $form.classList.remove('visible');
+        loadCampaigns();
+        startAutoRefresh();
+      } catch (err) {
+        console.error('Start campaign failed:', err);
+      }
+    });
+
+    /* ============================================================
+       CAMPAIGN ACTIONS
+    ============================================================ */
+    async function pauseCampaign(id) {
+      try { await hub.pauseOutreachCampaign(id); loadCampaigns(); } catch (e) { console.error(e); }
+    }
+    async function resumeCampaign(id) {
+      try { await hub.resumeOutreachCampaign(id); loadCampaigns(); startAutoRefresh(); } catch (e) { console.error(e); }
+    }
+    async function deleteCampaign(id) {
+      if (!confirm('Delete this campaign?')) return;
+      try { await hub.deleteOutreachCampaign(id); expandedCampaignId = null; loadCampaigns(); } catch (e) { console.error(e); }
+    }
+
+    /* ============================================================
+       ACCOUNT ACTIONS (Health tab)
+    ============================================================ */
+    async function pauseAccount(accountId) {
+      try {
+        await hub.pauseOutreachAccount(accountId);
+        loadHealth();
+      } catch (e) { console.error(e); }
+    }
+    async function resumeAccount(accountId) {
+      try {
+        await hub.resumeOutreachAccount(accountId);
+        loadHealth();
+      } catch (e) { console.error(e); }
+    }
+
+    /* ============================================================
+       DATA LOADING
+    ============================================================ */
+    async function loadCampaigns() {
+      try {
+        campaigns = await hub.getOutreachCampaigns() || [];
+        renderCampaigns();
+      } catch (e) {
+        console.error('Failed to load campaigns:', e);
+      }
+    }
+
+    async function loadAccounts() {
+      try {
+        accounts = await hub.getAccounts() || [];
+        const el = document.getElementById('fAccountList');
+        if (!accounts.length) {
+          el.innerHTML = '<div style="color:#667781;font-size:12px;">No accounts connected.</div>';
+          return;
+        }
+        el.innerHTML = accounts.map(a => `
+          <div class="checkbox-item">
+            <input type="checkbox" value="${a.id}" id="acct-${a.id}" />
+            <label for="acct-${a.id}">${esc(a.name || a.phone || a.id)}</label>
+          </div>`).join('');
+      } catch (e) {
+        console.error('Failed to load accounts:', e);
+      }
+    }
+
+    async function loadHealth() {
+      try {
+        healthData = await hub.getNumberHealth() || [];
+        renderHealth();
+      } catch (e) {
+        console.error('Failed to load health:', e);
+      }
+    }
+
+    /* ============================================================
+       SETTINGS TAB
+    ============================================================ */
+    document.getElementById('btnResetHealth').addEventListener('click', async () => {
+      if (!confirm('Reset all health scores to 100? This cannot be undone.')) return;
+      try {
+        await hub.resetAllHealthScores();
+        loadHealth();
+      } catch (e) {
+        console.error('Reset failed:', e);
+      }
+    });
+
+    /* ============================================================
+       AUTO-REFRESH
+    ============================================================ */
+    function startAutoRefresh() {
+      stopAutoRefresh();
+      refreshInterval = setInterval(() => {
+        const hasRunning = campaigns.some(c => c.status === 'running');
+        if (hasRunning) {
+          loadCampaigns();
+          loadHealth();
+        } else {
+          stopAutoRefresh();
+        }
+      }, 5000);
+    }
+
+    function stopAutoRefresh() {
+      if (refreshInterval) {
+        clearInterval(refreshInterval);
+        refreshInterval = null;
+      }
+    }
+
+    /* ============================================================
+       REAL-TIME EVENTS
+    ============================================================ */
+    if (typeof hub !== 'undefined') {
+      if (hub.on) {
+        hub.on('outreach-progress', (data) => {
+          if (data && data.campaignId) {
+            const c = campaigns.find(x => x.id === data.campaignId);
+            if (c && data.contacts) c.contacts = data.contacts;
+            if (c && data.accountStats) c.accountStats = data.accountStats;
+            if (c && data.status) c.status = data.status;
+            renderCampaigns();
+          }
+        });
+
+        hub.on('number-health-updated', (data) => {
+          if (data) {
+            healthData = Array.isArray(data) ? data : [data];
+            renderHealth();
+          }
+        });
+      }
+    }
+
+    /* ============================================================
+       UTILITY
+    ============================================================ */
+    function esc(str) {
+      if (!str) return '';
+      const d = document.createElement('div');
+      d.textContent = str;
+      return d.innerHTML;
+    }
+
+    /* ============================================================
+       INIT
+    ============================================================ */
+    loadCampaigns();
+  </script>
+</body>
+</html>

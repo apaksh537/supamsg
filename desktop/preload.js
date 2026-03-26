@@ -70,6 +70,19 @@ contextBridge.exposeInMainWorld('hub', {
   pauseCampaign: (id) => ipcRenderer.send('pause-campaign', id),
   resumeCampaign: (id) => ipcRenderer.send('resume-campaign', id),
 
+  // Smart Outreach
+  getOutreachCampaigns: () => ipcRenderer.invoke('get-outreach-campaigns'),
+  saveOutreachCampaign: (c) => ipcRenderer.invoke('save-outreach-campaign', c),
+  deleteOutreachCampaign: (id) => ipcRenderer.send('delete-outreach-campaign', id),
+  startOutreachCampaign: (id) => ipcRenderer.send('start-outreach-campaign', id),
+  pauseOutreachCampaign: (id) => ipcRenderer.send('pause-outreach-campaign', id),
+  resumeOutreachCampaign: (id) => ipcRenderer.send('resume-outreach-campaign', id),
+  getNumberHealth: () => ipcRenderer.invoke('get-number-health'),
+  resetNumberHealth: (accountId) => ipcRenderer.send('reset-number-health', accountId),
+  markContactReplied: (campaignId, phone) => ipcRenderer.send('mark-contact-replied', { campaignId, phone }),
+  getOutreachStats: () => ipcRenderer.invoke('get-outreach-stats'),
+  getAccountWarnings: () => ipcRenderer.invoke('get-account-warnings'),
+
   // Stealth Mode
   getStealthSettings: () => ipcRenderer.invoke('get-stealth-settings'),
   updateStealth: (accountId, settings) => ipcRenderer.send('update-stealth', { accountId, settings }),
@@ -115,6 +128,9 @@ contextBridge.exposeInMainWorld('hub', {
   onTemplatesUpdated: (cb) => ipcRenderer.on('templates-updated', (_e, d) => cb(d)),
   onLabelsUpdated: (cb) => ipcRenderer.on('labels-updated', (_e, d) => cb(d)),
   onCampaignProgress: (cb) => ipcRenderer.on('campaign-progress', (_e, d) => cb(d)),
+  onOutreachProgress: (cb) => ipcRenderer.on('outreach-progress', (_e, d) => cb(d)),
+  onNumberHealthUpdated: (cb) => ipcRenderer.on('number-health-updated', (_e, d) => cb(d)),
+  onWhatsAppWarning: (cb) => ipcRenderer.on('whatsapp-warning', (_e, d) => cb(d)),
   onAutomationsUpdated: (cb) => ipcRenderer.on('automations-updated', (_e, d) => cb(d)),
   onLicenseUpdated: (cb) => ipcRenderer.on('license-updated', (_e, d) => cb(d)),
   onUpdateReady: (cb) => ipcRenderer.on('update-ready', (_e, d) => cb(d)),

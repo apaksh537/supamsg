@@ -9,4 +9,9 @@ window.addEventListener('message', (event) => {
       body: event.data.body,
     });
   }
+
+  // Forward WhatsApp warning signals to the main process
+  if (event.data?.type === 'supamsg-whatsapp-warning' && event.data.payload) {
+    ipcRenderer.sendToHost('supamsg-whatsapp-warning', event.data.payload);
+  }
 });

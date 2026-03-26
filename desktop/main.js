@@ -30,6 +30,8 @@ const { initCrmIntegration } = require('./features/crm-integration');
 const { initLicensing } = require('./features/licensing');
 const { initMobileRelay, broadcastNotification, broadcastUnreadUpdate, broadcastAccountUpdate } = require('./features/mobile-relay');
 const { initAutoUpdater } = require('./features/auto-updater');
+const { initSmartOutreach } = require('./features/smart-outreach');
+const { initWhatsAppMonitor } = require('./features/whatsapp-monitor');
 
 // New feature modules (30 features)
 const { initConversationKanban } = require('./features/conversation-kanban');
@@ -799,6 +801,8 @@ app.whenReady().then(async () => {
   safeInit('licensing', () => initLicensing({ app, ipcMain, getMainWindow }));
   safeInit('mobile-relay', () => initMobileRelay({ ipcMain, getMainWindow, getViews, getAccounts }));
   safeInit('auto-updater', () => initAutoUpdater({ getMainWindow }));
+  safeInit('smart-outreach', () => initSmartOutreach({ app, ipcMain, getMainWindow, getViews, getAccounts, getActiveAccountId }));
+  safeInit('whatsapp-monitor', () => initWhatsAppMonitor({ app, ipcMain, getMainWindow, getViews, getAccounts }));
 
   // Initialize all 30 new features
   safeInit('kanban', () => initConversationKanban(featureCtx));
